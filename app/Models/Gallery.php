@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
 
 class Gallery extends Model
@@ -11,6 +12,15 @@ class Gallery extends Model
     use HasFactory;
 
     protected $fillable = ['code'];
+
+    public function supplier(String $supplier): void {
+        $supplier = Supplier::find($supplier);
+        $this->suppliers()->attach($supplier);
+    }
+
+    public function suppliers(): BelongsToMany {
+        return $this->belongsToMany(Supplier::class);
+    }
 
     protected static function boot()
     {

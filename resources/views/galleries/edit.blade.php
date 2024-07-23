@@ -8,7 +8,7 @@
             <div class="w-full">
                 <h1 class="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
                     Editar
-                </h1>
+                </h1>                
                 <form method="POST" action="/galleries/{{$gallery->id}}" >
                     @csrf
                     @method('PATCH')
@@ -23,10 +23,33 @@
                     </span>
                     @enderror
                     </label>
-                    <button id="submit" onclick="disableButton()"
-                    class="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-sky-600 hover:bg-sky-700 focus:outline-none focus:shadow-outline-sky">
-                    Guardar
-                    </button>
+                    <label class="block mt-4 text-sm">
+                        <span class="text-gray-700 dark:text-gray-400">
+                          Selecciona proveedor(es)
+                        </span><br>
+                        <span class="text-gray-700 dark:text-gray-400 text-xs">
+                          Presiona SHIFT/CMD/CTRL para seleccionar varios
+                        </span>
+                        <select
+                          class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-multiselect focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray"
+                          multiple name="suppliers[]"
+                        >
+                        @foreach ($suppliers as $supplier)
+                        <option @if ($gallery->suppliers->contains($supplier->id)) selected @endif value="{{$supplier->id}}">{{$supplier->name}}</option>
+                        @endforeach
+                        </select>
+                    </label>
+                    <div class="flex justify-end space-x-4">
+                        <a href="/galleries"
+                        class=" px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150  border border-gray-600 rounded-lg active:bg-sky-600 hover:bg-sky-700 focus:outline-none focus:shadow-outline-sky">
+                        Regresar
+                        </a>
+                        <button id="submit" onclick="disableButton()"
+                        class=" px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-sky-600 hover:bg-sky-700 focus:outline-none focus:shadow-outline-sky">
+                        Guardar
+                        </button>
+
+                    </div>
                 </form>  
             </div>
         </div>
@@ -35,12 +58,7 @@
 
     
 </x-layout>
-                <!-- For disabled buttons ADD these classes: 
-                  opacity-50 cursor-not-allowed
 
-                  And REMOVE these classes:
-                  active:bg-purple-600 hover:bg-purple-700 focus:shadow-outline-purple
-                -->
 <script>
     function disableButton() {
         const button = document.getElementById("submit");

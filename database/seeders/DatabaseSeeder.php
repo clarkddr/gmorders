@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Supplier::factory(10)->create();
-        Gallery::factory(10)->create();
+        $suppliers = Supplier::factory(4)->create();
+        Gallery::factory(8)->hasAttached($suppliers)->create();
 
         
     }

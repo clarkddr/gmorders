@@ -6,14 +6,10 @@
 		<h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">
 			Galerías
 		</h2>
-
-		<form method="POST" action="/galleries" >
-			@csrf
-			<button class="py-2 px-2 bg-blue-600 inline-flex items-center text-sm font-medium text-center hover:text-gray-800  rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" type="submit">
-				<svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/></svg>
-				<p class="text-white pl-1.5">Agregar</p>			  
-			</button>
-		</form>  		
+		<a href="{{route('galleries.create')}}" class="py-2 px-2 bg-blue-600 inline-flex items-center text-sm font-medium text-center hover:text-gray-800  rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" type="button">
+			<svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/></svg>
+			<p class="text-white pl-1.5">Agregar</p>			  
+		</a>
 	</div>
 	
 	<div class="w-full overflow-hidden rounded-lg shadow-xs">
@@ -22,6 +18,7 @@
 				<thead>
 					<tr	class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 						<th class="px-4 py-3">Código</th>
+						<th class="px-4 py-3">Proveedor(es)</th>
 						<th class="px-4 py-3">Creado</th>
 						<th class="px-4 py-3"></th>
 					</tr>
@@ -30,6 +27,13 @@
 					@foreach ($galleries as $gallery)
 					<tr class="text-gray-700 dark:text-gray-400">
 						<td class="px-4 py-3"> {{ $gallery->code }} </td>		
+						<td class="px-4 py-3">
+							<div class="flex items-center text-sm wrap-text">
+								@foreach ($gallery->suppliers as $supplier)
+									{{$supplier->name . ', '}}									
+								@endforeach
+							</div>
+						</td>
 						<td class="px-4 py-3"> {{ $gallery->created_at->locale('es')->diffForHumans() }} </td>
 						<td class="px-4 py-3 flex justify-end "> 
 							<div class="flex items-center space-x-4 text-sm">
@@ -142,3 +146,10 @@
 
 
 </x-layout>
+
+<style>
+	.wrap-text {
+  white-space: normal; /* Permite que el texto se envuelva */
+  word-break: break-word; /* Rompe las palabras largas si es necesario */
+}
+</style>

@@ -2,8 +2,7 @@
 
 	<h2 class="mb-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
 		Proveedores
-	</h2>
-    {{$supplier}}
+	</h2>    
     <div class="flex flex-col justify-center md:flex-row ">
         <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2 dark:bg-gray-800 rounded-lg">
             <div class="w-full">

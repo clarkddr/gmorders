@@ -14,7 +14,7 @@
                     @csrf
                     <label class="block text-sm">
                     <span class="text-gray-700 dark:text-gray-400">Nombre</span>
-                    <input
+                    <input autofocus
                     class="@error('name') border-red-600 @else dark:border-gray-600 @enderror block w-full mt-1 text-sm  dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                     placeholder="Proveedor"name="name" value="{{old('name')}}"/>
                     @error('name')

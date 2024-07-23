@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class GalleryController extends Controller
@@ -13,9 +14,8 @@ class GalleryController extends Controller
     public function index()
     {
         $data = [
-            'galleries' => Gallery::latest()->get()
-        ];
-        
+            'galleries' => Gallery::with('suppliers')->latest()->get()
+        ];        
         return view('galleries.index',$data);
     }
 
@@ -24,15 +24,24 @@ class GalleryController extends Controller
      */
     public function create()
     {
-        return view('galleries.create');
+        $data = [
+            'suppliers' => Supplier::orderBy('name')->get()
+        ];        
+        return view('galleries.create',$data);
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {       
-        Gallery::create();
+    {
+        $gallery = Gallery::create();
+        if($suppliers = $request->suppliers) {
+            foreach ($suppliers as $supplier){
+                $gallery->supplier($supplier);
+            }
+        }
+
         return redirect('galleries')->with('banner',['type' => 'success','message' => 'La galería se ha agregado exitosamente.']);
     }
 
@@ -48,15 +57,20 @@ class GalleryController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(Gallery $gallery)
-    {
-        return view('galleries.edit',['gallery'=>$gallery]);
+    {        
+        $data = [
+            'gallery' => $gallery = $gallery->load('suppliers'),
+            'suppliers' => Supplier::orderBy('name')->get()
+        ];
+        
+        return view('galleries.edit',$data);
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Gallery $gallery)
-    {
+    {        
         $request->validate([
             'code' => ['required','regex:/^(?!^\d+$)[\p{L}\p{N}_\- ]+$/u','max:30'],
         ],[
@@ -66,6 +80,32 @@ class GalleryController extends Controller
         ]);
         $gallery->code = $request->code;
         $gallery->saveOrFail();
+        // Obtener los IDs de los suppliers actuales
+        $currentSuppliers = $gallery->suppliers->pluck('id')->toArray();
+
+        // Obtener los IDs de los suppliers enviados en la request
+        $newSuppliers = $request->suppliers ?: [];
+
+        // Calcular los suppliers que deben ser agregados
+        $suppliersToAdd = array_diff($newSuppliers, $currentSuppliers);
+
+        // Calcular los suppliers que deben ser eliminados
+        $suppliersToRemove = array_diff($currentSuppliers, $newSuppliers);
+
+        // Agregar los nuevos suppliers
+        if (!empty($suppliersToAdd)) {
+            foreach ($suppliersToAdd as $supplierId) {
+                $gallery->suppliers()->attach($supplierId);
+            }
+        }
+
+        // Eliminar los suppliers que ya no están seleccionados
+        if (!empty($suppliersToRemove)) {
+            foreach ($suppliersToRemove as $supplierId) {
+                $gallery->suppliers()->detach($supplierId);
+            }
+        }
+
         return redirect()->route('galleries.index')->with('banner',['type' => 'success','message' => 'La galería se ha actualizado.'])->withInput();        
     }
 
