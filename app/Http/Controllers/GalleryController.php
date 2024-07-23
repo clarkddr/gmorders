@@ -13,10 +13,10 @@ class GalleryController extends Controller
     public function index()
     {
         $data = [
-            ['name' => 'asd'],
-            ['created_at' => '2024-01-01'],
+            'galleries' => Gallery::latest()->get()
         ];
-        return view('gallery.index',$data);
+        
+        return view('galleries.index',$data);
     }
 
     /**
@@ -24,15 +24,16 @@ class GalleryController extends Controller
      */
     public function create()
     {
-        //
+        return view('galleries.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
+    {       
+        Gallery::create();
+        return redirect('galleries')->with('banner',['type' => 'success','message' => 'La galería se ha agregado exitosamente.']);
     }
 
     /**
@@ -48,7 +49,7 @@ class GalleryController extends Controller
      */
     public function edit(Gallery $gallery)
     {
-        //
+        return view('galleries.edit',['gallery'=>$gallery]);
     }
 
     /**
@@ -56,7 +57,16 @@ class GalleryController extends Controller
      */
     public function update(Request $request, Gallery $gallery)
     {
-        //
+        $request->validate([
+            'code' => ['required','regex:/^(?!^\d+$)[\p{L}\p{N}_\- ]+$/u','max:30'],
+        ],[
+            'code.regex' => 'El campo :attribute debe contener solo letras, números, guiones, guiones bajos y espacios.'
+        ],[            
+            'code' => 'código'            
+        ]);
+        $gallery->code = $request->code;
+        $gallery->saveOrFail();
+        return redirect()->route('galleries.index')->with('banner',['type' => 'success','message' => 'La galería se ha actualizado.'])->withInput();        
     }
 
     /**
@@ -64,6 +74,7 @@ class GalleryController extends Controller
      */
     public function destroy(Gallery $gallery)
     {
-        //
+        $gallery->delete();
+        return redirect('galleries')->with('banner',['type' => 'success','message' => 'La galería se ha borrado exitosamente.']);
     }
 }

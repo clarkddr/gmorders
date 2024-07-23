@@ -11,12 +11,11 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     </a>
     <ul class="mt-6">
     <li class="relative px-6 py-3">
-        <span
-        class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg"
-        aria-hidden="true"
-        ></span>
+        @if (false)
+        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @endif
         <a
-        class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
+        class="@if(Route::is('suppliers.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
         href="index.html"
         >
         <svg
@@ -39,8 +38,12 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     </ul>
     <ul>
     <li class="relative px-6 py-3">
+        @if (Route::is('suppliers.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @endif
         <a
-        class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+        class="@if(Route::is('suppliers.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+        
         href="{{route('suppliers.index')}}"
         >
         <svg
@@ -61,9 +64,12 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </a>
     </li>
     <li class="relative px-6 py-3">
+        @if (Route::is('galleries.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @endif
         <a
-        class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-        href="{{route('colections.index')}}"
+        class="@if(Route::is('galleries.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+        href="{{route('galleries.index')}}"
         >
         <svg
             class="w-5 h-5"
@@ -79,7 +85,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
             ></path>
         </svg>
-        <span class="ml-4">Colecciones</span>
+        <span class="ml-4">Galerias</span>
         </a>
     </li>
     <li class="relative px-6 py-3">

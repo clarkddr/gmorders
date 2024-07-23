@@ -25,7 +25,7 @@
         // Usa setTimeout para ejecutar una función después de unos segundos
         setTimeout(() => {
             // Añade la clase de Tailwind para ocultar el banner
-            banner.classList.add('hidden');            
+            banner.classList.add('hidden');
         }, hideAfter);
     });
     
