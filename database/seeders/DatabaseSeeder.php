@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Gallery;
+use App\Models\Image;
 use App\Models\Supplier;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -23,7 +24,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $suppliers = Supplier::factory(4)->create();
-        Gallery::factory(8)->hasAttached($suppliers)->create();
+        Gallery::factory(8)->create();
+        Image::factory(100)->create();
+
 
         
     }

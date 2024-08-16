@@ -7,7 +7,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     class="ml-6 text-lg font-bold text-gray-800 dark:text-gray-200"
     href="#"
     >
-    Windmill
+    GM Ordenes
     </a>
     <ul class="mt-6">
     <li class="relative px-6 py-3">
@@ -88,7 +88,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         <span class="ml-4">Galerias</span>
         </a>
     </li>
-    <li class="relative px-6 py-3">
+    {{-- <li class="relative px-6 py-3">
         <a
         class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
         href="charts.html"
@@ -110,8 +110,8 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">Charts</span>
         </a>
-    </li>
-    <li class="relative px-6 py-3">
+    </li> --}}
+    {{-- <li class="relative px-6 py-3">
         <a
         class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
         href="buttons.html"
@@ -132,8 +132,8 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">Buttons</span>
         </a>
-    </li>
-    <li class="relative px-6 py-3">
+    </li> --}}
+    {{-- <li class="relative px-6 py-3">
         <a
         class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
         href="modals.html"
@@ -154,8 +154,8 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">Modals</span>
         </a>
-    </li>
-    <li class="relative px-6 py-3">
+    </li> --}}
+    {{-- <li class="relative px-6 py-3">
         <a
         class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
         href="tables.html"
@@ -174,8 +174,8 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">Tables</span>
         </a>
-    </li>
-    <li class="relative px-6 py-3">
+    </li> --}}
+    {{-- <li class="relative px-6 py-3">
         <button
         class="inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
         @click="togglePagesMenu"
@@ -262,6 +262,6 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         Create account
         <span class="ml-2" aria-hidden="true">+</span>
     </button>
-    </div>
+    </div> --}}
 </div>
 </aside>

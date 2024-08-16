@@ -50,8 +50,11 @@ function data() {
     // Modal
     isModalOpen: false,
     trapCleanup: null,
-    openModal() {
-      this.isModalOpen = true
+    imageData:"",
+    
+    openModal(imageData) {
+      this.imageData = imageData;
+      this.isModalOpen = true;
       this.trapCleanup = focusTrap(document.querySelector('#modal'))
     },
     closeModal() {

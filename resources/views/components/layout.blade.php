@@ -24,6 +24,7 @@
 		></script>
 		<script src="{{asset('js/charts-lines.js')}}" defer></script>
 		<script src="{{asset('js/charts-pie.js')}}" defer></script>
+		<script src="{{asset('js/focus-trap.js')}}" defer></script>
 </head>
 <body>
 	<div class="flex h-screen bg-gray-50 dark:bg-gray-900" 	:class="{ 'overflow-hidden': isSideMenuOpen }" >	

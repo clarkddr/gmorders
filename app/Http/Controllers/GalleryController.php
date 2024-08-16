@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\Image;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -14,8 +16,9 @@ class GalleryController extends Controller
     public function index()
     {
         $data = [
-            'galleries' => Gallery::with('suppliers')->latest()->get()
+            'galleries' => Gallery::with('images.supplier')->latest()->get()
         ];        
+        
         return view('galleries.index',$data);
     }
 
@@ -26,7 +29,7 @@ class GalleryController extends Controller
     {
         $data = [
             'suppliers' => Supplier::orderBy('name')->get()
-        ];        
+        ];
         return view('galleries.create',$data);
     }
 
@@ -36,12 +39,6 @@ class GalleryController extends Controller
     public function store(Request $request)
     {
         $gallery = Gallery::create();
-        if($suppliers = $request->suppliers) {
-            foreach ($suppliers as $supplier){
-                $gallery->supplier($supplier);
-            }
-        }
-
         return redirect('galleries')->with('banner',['type' => 'success','message' => 'La galería se ha agregado exitosamente.']);
     }
 
@@ -50,7 +47,7 @@ class GalleryController extends Controller
      */
     public function show(Gallery $gallery)
     {
-        //
+        return $gallery;
     }
 
     /**
@@ -58,11 +55,10 @@ class GalleryController extends Controller
      */
     public function edit(Gallery $gallery)
     {        
-        $data = [
-            'gallery' => $gallery = $gallery->load('suppliers'),
-            'suppliers' => Supplier::orderBy('name')->get()
-        ];
-        
+        $data = [            
+            'gallery' => $gallery->load('images.supplier'),
+            'suppliers' => Supplier::all()
+        ];        
         return view('galleries.edit',$data);
     }
 
@@ -70,43 +66,36 @@ class GalleryController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Gallery $gallery)
-    {        
+    {
         $request->validate([
             'code' => ['required','regex:/^(?!^\d+$)[\p{L}\p{N}_\- ]+$/u','max:30'],
+            'images.*' => ['required','image','mimes:jpeg,png,jpg,gif,svg','max:2048'],
         ],[
             'code.regex' => 'El campo :attribute debe contener solo letras, números, guiones, guiones bajos y espacios.'
         ],[            
-            'code' => 'código'            
-        ]);
+            'code' => 'código',
+            'images.*' => 'imagen'
+        ]);        
+        
+        
+        if ($request->hasfile('images')) {
+            foreach ($request->file('images') as $file) {
+                //$path = Storage::disk('public')->put('pictures',$file);
+                $path = $file->store('images','public');
+                Image::create([
+                    'gallery_id' => $gallery->id,
+                    'supplier_id' => $request->supplier_id,
+                    'subcategory' => $request->subcategory,
+                    'url' => $path
+                ]);
+            }
+        }
+        
         $gallery->code = $request->code;
         $gallery->saveOrFail();
-        // Obtener los IDs de los suppliers actuales
-        $currentSuppliers = $gallery->suppliers->pluck('id')->toArray();
 
-        // Obtener los IDs de los suppliers enviados en la request
-        $newSuppliers = $request->suppliers ?: [];
 
-        // Calcular los suppliers que deben ser agregados
-        $suppliersToAdd = array_diff($newSuppliers, $currentSuppliers);
-
-        // Calcular los suppliers que deben ser eliminados
-        $suppliersToRemove = array_diff($currentSuppliers, $newSuppliers);
-
-        // Agregar los nuevos suppliers
-        if (!empty($suppliersToAdd)) {
-            foreach ($suppliersToAdd as $supplierId) {
-                $gallery->suppliers()->attach($supplierId);
-            }
-        }
-
-        // Eliminar los suppliers que ya no están seleccionados
-        if (!empty($suppliersToRemove)) {
-            foreach ($suppliersToRemove as $supplierId) {
-                $gallery->suppliers()->detach($supplierId);
-            }
-        }
-
-        return redirect()->route('galleries.index')->with('banner',['type' => 'success','message' => 'La galería se ha actualizado.'])->withInput();        
+        return redirect()->back()->with('banner',['type' => 'success','message' => 'La galería se ha actualizado.'])->withInput();        
     }
 
     /**
@@ -116,5 +105,24 @@ class GalleryController extends Controller
     {
         $gallery->delete();
         return redirect('galleries')->with('banner',['type' => 'success','message' => 'La galería se ha borrado exitosamente.']);
+    }
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+
+        return $request->all();
+
+        if ($request->hasfile('images')) {
+            foreach ($request->file('images') as $file) {
+                $name = time().rand(1,100).'.'.$file->extension();
+                $file->move(public_path('images'), $name);
+            }
+        }
+
+        return redirect('galleries')->with('banner',['type' => 'success','message' => 'Las imágenes se han agregado exitosamente.']);
     }
 }
