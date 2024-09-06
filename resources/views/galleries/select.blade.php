@@ -21,7 +21,6 @@
 						<th class="px-4 py-3">Proveedor(es)</th>
 						<th class="px-4 py-3">Creado</th>
 						<th class="px-4 py-3"></th>
-						<th class="px-4 py-3"></th>
 					</tr>
 				</thead>
 				<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -40,17 +39,8 @@
 
 						</td>
 						<td class="px-4 py-3"> {{ $gallery->created_at->locale('es')->diffForHumans() }} </td>
-						<td class="px-4 py-3">
-							<button	class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
-							Activar
-	   						</button>
-						</td>
-						<td class="px-4 py-3 flex justify-end "> 
-							<div class="flex items-center space-x-4 text-sm">
-								<x-editButton href="/galleries/{{$gallery->id}}/edit" />
-								<x-deleteButton action="galleries" id="{{$gallery->id}}"/>
-								
-							</div>
+						<td class="px-4 py-3 flex "> 
+                            <x-statusButton />
 						</td>
 					</tr>
 					@endforeach

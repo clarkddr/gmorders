@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Gallery::class);
             $table->foreignIdFor(Supplier::class)->nullable();
             $table->string('subcategory')->nullable();
-            $table->string('url')->nullabe();
+            $table->string('url')->nullable();
             $table->timestamps();
         });
     }

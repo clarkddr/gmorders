@@ -9,9 +9,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/plan', [ImageController::class,'plan'])->name('plan');
+
 
 Route::resource('suppliers',SupplierController::class);
 Route::resource('galleries',GalleryController::class);
+Route::get('/select', [GalleryController::class,'select'])->name('select');
 Route::resource('images',ImageController::class);
 
 

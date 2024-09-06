@@ -12,7 +12,4 @@ class Supplier extends Model
 
     protected $fillable = ['name'];
 
-    public function galleries(): BelongsToMany {
-        return $this->belongsToMany(Gallery::class);
-    }
 }

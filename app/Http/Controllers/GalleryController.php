@@ -17,9 +17,16 @@ class GalleryController extends Controller
     {
         $data = [
             'galleries' => Gallery::with('images.supplier')->latest()->get()
-        ];        
+        ];
         
         return view('galleries.index',$data);
+    }
+
+    public function select(){
+        $data = [
+            'galleries' => Gallery::with('images.supplier')->latest()->get()
+        ];
+        return view('galleries.select',$data);
     }
 
     /**

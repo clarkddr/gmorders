@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable();            
+            $table->string('code')->nullable();
+            $table->enum('status',['created','active','closed'])->default('created');
             $table->timestamps();
         });
     }
