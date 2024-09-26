@@ -112,6 +112,21 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'mssql' => [
+            'driver' => 'sqlsrv',
+            'url' => '',
+            'host' => 'bnxproduction.database.windows.net',
+            'port' => '1433',
+            'database' => 'MejorPrecio',
+            'username' => 'grupomalo_user',
+            'password' => 'Grupo@Malo#09',
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => false,
+            'encrypt' => 'yes',
+            'trust_server_certificate' => false,
+        ],
+
     ],
 
     /*

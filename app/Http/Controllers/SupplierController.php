@@ -12,7 +12,7 @@ class SupplierController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-
+        
         $data = [
             'suppliers' => Supplier::all()
         ];
