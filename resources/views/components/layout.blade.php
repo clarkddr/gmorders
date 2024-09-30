@@ -8,6 +8,7 @@
 		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
 		rel="stylesheet"
 		/>
+		<script src="https://cdn.tailwindcss.com"></script>
 		<link rel="stylesheet" href="{{ asset('css/tailwind.css')}}" />
 		<link rel="stylesheet" href="{{ asset('css/tailwind.output.css')}}" />
 		<script
@@ -26,6 +27,13 @@
 		<script src="{{asset('js/charts-lines.js')}}" defer></script>
 		<script src="{{asset('js/charts-pie.js')}}" defer></script>
 		<script src="{{asset('js/focus-trap.js')}}" defer></script>
+		
+		<script
+			  src="https://code.jquery.com/jquery-3.7.1.min.js"
+			  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+			  crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />  
+		<script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
 </head>
 <body>
 	<div class="flex h-screen bg-gray-50 dark:bg-gray-900" 	:class="{ 'overflow-hidden': isSideMenuOpen }" >	

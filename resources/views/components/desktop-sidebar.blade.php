@@ -7,7 +7,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     class="ml-6 text-lg font-bold text-gray-800 dark:text-gray-200"
     href="#"
     >
-    GM Ordenes
+    GM
     </a>
     <ul class="mt-6">
     <li class="relative px-6 py-3">
@@ -93,7 +93,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
         <a
-        class="@if(Route::is('galleries.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+        class="@if(Route::is('plan')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
         href="{{route('plan')}}"
         >
         <svg
@@ -111,6 +111,16 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
             ></path>
         </svg>
         <span class="ml-4">C/V Familia</span>
+        </a>
+    </li>
+    <li class="relative px-6 py-3">
+        @if (Route::is('projection.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @endif
+        <a class="@if(Route::is('projection.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
+         href="{{route('projection.index')}}">
+            <svg class="w-6 h-6 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.6 16.733c.234.269.548.456.895.534a1.4 1.4 0 0 0 1.75-.762c.172-.615-.446-1.287-1.242-1.481-.796-.194-1.41-.861-1.241-1.481a1.4 1.4 0 0 1 1.75-.762c.343.077.654.26.888.524m-1.358 4.017v.617m0-5.939v.725M4 15v4m3-6v6M6 8.5 10.5 5 14 7.5 18 4m0 0h-3.5M18 4v3m2 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"/></svg>
+            <span class="ml-4">Venta vs Proyección</span>
         </a>
     </li>
     {{-- <li class="relative px-6 py-3">
