@@ -96,7 +96,7 @@ class ProjectionController extends Controller
         $families = Family::all();    
         $projectionSales = ProjectionAmount::with('families')->where('projection_id',1)->get();
 
-        dd($projectionSales->families);
+        
 
         $groupedProjection = $projectionSales->groupBy('FamilyId');                
         $projection = $groupedProjection->map(function($group) {

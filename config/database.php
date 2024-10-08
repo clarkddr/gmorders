@@ -112,7 +112,6 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
-<<<<<<< HEAD
         'mssql' => [
             'driver' => 'sqlsrv',
             'url' => '',
@@ -128,8 +127,7 @@ return [
             'trust_server_certificate' => false,
         ],
 
-=======
->>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
+
     ],
 
     /*

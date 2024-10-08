@@ -3,11 +3,9 @@
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
-<<<<<<< HEAD
+
 use App\Http\Controllers\ProjectionController;
 use Illuminate\Support\Facades\DB;
-=======
->>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,7 +29,3 @@ Route::get('/upload', function () {
 });
 
 Route::post('/upload', [GalleryController::class, 'upload'])->name('upload');
-<<<<<<< HEAD
-
-=======
->>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
