@@ -4,16 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Family;
-use Illuminate\Http\Request;
+use App\Models\Projection;
+use App\Models\ProjectionAmount;
+use Illuminate\Http\Request;    
 use Illuminate\Support\Facades\DB;
-use PDO;
 
 class ProjectionController extends Controller
 {
 
     public function index()
-    {
-
+    {       
 
         $data  = collect([
             ['name'=> 'TA', 'value' => 50],
@@ -93,40 +93,25 @@ class ProjectionController extends Controller
         ";        
         $results = DB::connection('mssql')->selectResultSets($query);
         $results = collect($results[1]);        
-        $families = Family::all();        
-        
-        $projectionSales = collect([
-            ['branchid' => 6, 'familyid' => 7, 'current' => 300000, 'old' => 75523, 'amount' => 375523],
-            ['branchid' => 22, 'familyid' => 7, 'current' => 94040, 'old' => 37792, 'amount' => 131832],
-            ['branchid' => 3, 'familyid' => 7, 'current' => 230939, 'old' => 45837, 'amount' => 276776],
-            ['branchid' => 12, 'familyid' => 7, 'current' => 132655, 'old' => 43389, 'amount' => 176043],
-            ['branchid' => 13, 'familyid' => 7, 'current' => 97817, 'old' => 44397, 'amount' => 142214],
-            ['branchid' => 23, 'familyid' => 7, 'current' => 75000, 'old' => 5000, 'amount' => 80000],
-            ['branchid' => 24, 'familyid' => 7, 'current' => 524284, 'old' => 106267, 'amount' => 630551],
-            ['branchid' => 2, 'familyid' => 7, 'current' => 242300, 'old' => 19182, 'amount' => 261481],
-            ['branchid' => 11, 'familyid' => 7, 'current' => 90000, 'old' => 32851, 'amount' => 122851],
-            ['branchid' => 15, 'familyid' => 7, 'current' => 50000, 'old' => 39543, 'amount' => 89543],
-            ['branchid' => 7, 'familyid' => 7, 'current' => 180176, 'old' => 36904, 'amount' => 217080],
-            ['branchid' => 8, 'familyid' => 7, 'current' => 189590, 'old' => 32959, 'amount' => 222549],
-            ['branchid' => 9, 'familyid' => 7, 'current' => 452280, 'old' => 72253, 'amount' => 524533],
-            ['branchid' => 1, 'familyid' => 7, 'current' => 35000, 'old' => 26868, 'amount' => 61868],
-            // ['branchid' => 1, 'familyid' => 1, 'current' => 35000, 'old' => 26868, 'amount' => 61868],
-            // ['branchid' => 1, 'familyid' => 6, 'current' => 35000, 'old' => 26868, 'amount' => 61868],
-        ]);
+        $families = Family::all();    
+        $projectionSales = ProjectionAmount::with('families')->where('projection_id',1)->get();
 
-        $groupedProjection = $projectionSales->groupBy('familyid');
+        dd($projectionSales->families);
 
+        $groupedProjection = $projectionSales->groupBy('FamilyId');                
         $projection = $groupedProjection->map(function($group) {
+            $current = $group->sum('new_sale');
+            $old = $group->sum('old_sale');
+            $amount = $current + $old;
             return collect([
-                'familyid' => $group->first()['familyid'],
-                'current' => $group->sum('current'),
-                'old' => $group->sum('old'),
-                'amount' => $group->sum('amount'),
+                'familyid' => $group->first()->FamilyId,
+                'current' => $current,
+                'old' => $old,
+                'amount' => $amount,
                 ]);
-            }, [ 'familyid' => 0, 'current' => 0, 'old' => 0,'amount' => 0]
+            }
         );
-        
-       
+    //    dd($projection);
         $thisYearSalesTotal = $results->reduce(function ($carry,$item) {
             return [
                 'name' => 'Todas',
@@ -138,14 +123,17 @@ class ProjectionController extends Controller
 
         
         $projectionSalesTotal = $projectionSales->reduce(function ($carry,$item) {
+            $new = $item->new_sale;
+            $old = $item->old;
+            $amount = $new + $old;
             return [
                 'name' => 'Todas',
-                'current' => $carry['current'] + $item['current'],
-                'old' => $carry['old'] + $item['old'],
-                'total' => $carry['total'] + $item['amount'],
+                'current' => $carry['current'] + $new,
+                'old' => $carry['old'] + $old,
+                'total' => $carry['total'] + $amount,
             ];
-        },['current' => 0, 'old' => 0, 'total' => 0]);
-        
+        },['name'=>'Todas','current' => 0, 'old' => 0, 'total' => 0]);
+        // dd($projectionSalesTotal);
         
         
         $thisYearSales = $results->map(function ($row) use ($families, $projection){
@@ -168,6 +156,7 @@ class ProjectionController extends Controller
                 ]
             ];
         });
+        
                 
         // Formatear numeros para la vista
         // Formatear el totalizado para la vista
@@ -182,7 +171,7 @@ class ProjectionController extends Controller
             'current' => number_format($projectionSalesTotal['current'], 0, '.', ','), // Formato de moneda
             'old' => number_format($projectionSalesTotal['old'], 0, '.', ','),
             'total' => number_format($projectionSalesTotal['total'], 0, '.', ','),
-            'totalVsProjection' => number_format(($thisYearSalesTotal['total']/$projectionSalesTotal['total']*100),1)
+            'totalVsProjection' => 0//number_format(($thisYearSalesTotal['total']/$projectionSalesTotal['total']*100),1)
         ];
         $thisYearSalesFormatted = $thisYearSales->map(function ($item){
             return [
@@ -367,4 +356,6 @@ class ProjectionController extends Controller
     {
         //
     }
+
+    
 }

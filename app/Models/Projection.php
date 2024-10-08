@@ -7,16 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Branch extends Model
+class Projection extends Model
 {
     use HasFactory;
-    protected $connection = 'mssql';
-    protected $table = 'Branch';
-    protected $primaryKey = 'BranchId';
 
+    protected $fillable = ['name','start','end'];
 
-    public function projectionAmounts(): HasMany
+    public function amounts(): HasMany
     {
-        return $this->hasMany(Projection::class,'BranchId');
+        return $this->HasMany(ProjectionAmount::class);
     }
+
 }
