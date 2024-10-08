@@ -88,6 +88,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         <span class="ml-4">Galerias</span>
         </a>
     </li>
+<<<<<<< HEAD
     <li class="relative px-6 py-3">
         @if (Route::is('plan'))
         <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
@@ -123,6 +124,8 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
             <span class="ml-4">Venta vs Proyección</span>
         </a>
     </li>
+=======
+>>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
     {{-- <li class="relative px-6 py-3">
         <a
         class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
