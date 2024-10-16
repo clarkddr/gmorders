@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Branch;
+use App\Models\Category;
 use App\Models\Family;
 use App\Models\Projection;
 use Illuminate\Database\Eloquent\Factories\Factory;

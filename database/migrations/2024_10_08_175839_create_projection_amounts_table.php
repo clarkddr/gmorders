@@ -19,7 +19,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Projection::class);
             $table->foreignIdFor(Branch::class,'BranchId');
-            $table->foreignIdFor(Category::class,'CategoryId');
             $table->foreignIdFor(Family::class,'FamilyId');
             $table->float('new_sale');
             $table->float('old_sale');
