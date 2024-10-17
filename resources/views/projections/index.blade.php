@@ -2,11 +2,25 @@
 	@if(session('banner'))
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
-	<div class="flex justify-between items-center">
+	<div class="flex justify-between items-center mb-2">
 		<h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 ">
 			Proyección de {{ $categoryName }} Invierno 2024
 		</h2>		
 	</div>	
+	<div class="w-full overflow-x-auto flex space-x-2">
+		<a href="http://gmorders.test/projection?category=12" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+			Calzado
+		</a>
+		<a href="http://gmorders.test/projection?category=1" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+			Damas
+		</a>
+		<a href="http://gmorders.test/projection?category=2" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+			Accesorio
+		</a>
+		<a href="http://gmorders.test/projection?category=4" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+			Boneteria
+		</a>
+	</div>
 	<div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
 		<div class="w-full overflow-x-auto">
 			<table id="salesTable" class="w-full whitespace-no-wrap">
@@ -114,12 +128,6 @@
 
 
 <script>
-	// import DataTable from 'datatables.net-dt';
-	// import 'datatables.net-responsive-dt';
-	// console.log('este si funciona');
-	// let table = new DataTable('#salesTable', {
-	// 	responsive: true
-	// });
 	$(document).ready( function () {
 		$('#salesTable').DataTable({
 			paging:false,

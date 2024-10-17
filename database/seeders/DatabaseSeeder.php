@@ -11,6 +11,7 @@ use App\Models\User;
 use Database\Factories\BranchProjectionFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,8 +23,19 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'David Ruiz',
+            'email' => 'clarkddr@gmail.com',
+            'password' => 'ruiz123456',
+        ]);
+        User::factory()->create([
+            'name' => 'Eduardo Malo',
+            'email' => 'jemomxl@hotmail.com',
+            'password' => '123456',
+        ]);
+        User::factory()->create([
+            'name' => 'Bayo Malo',
+            'email' => 'jeduardomalo@gmail.com',
+            'password' => '123456',
         ]);
 
         $suppliers = Supplier::factory(4)->create();
