@@ -93,7 +93,7 @@ class ProjectionController extends Controller
         EXEC dbo.DRGetSalesReportByFamily @From = '{$initDate}', @To = '{$finalDate}', @Family = 0, @Category = {$categoryId}
         ";        
         $queryResults = DB::connection('mssql')->selectResultSets($query);        
-        $saleResults = collect($queryResults[2]);        
+        $saleResults = collect($queryResults[2]);
         $purchaseResults = collect($queryResults[3]);
 
         $families = Family::whereHas('subcategories', function ($query) use ($categoryId){

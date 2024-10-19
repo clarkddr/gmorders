@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\FamilySalesOverYearsController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
-
 use App\Http\Controllers\ProjectionController;
 use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\DB;
@@ -20,8 +20,9 @@ Route::middleware('auth')->group(function(){
     Route::get('/',function(){
         return view('welcome');
     });
+    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'index'])->name('salesyearoy');
+    Route::get('/getsalesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');
 });
-
 
 Route::get('/plan', [ImageController::class,'plan'])->name('plan');
 Route::get('/select', [GalleryController::class,'select'])->name('select');
@@ -40,6 +41,5 @@ Route::get('/upload', function () {
 });
 
 Route::post('/upload', [GalleryController::class, 'upload'])->name('upload');
-
 
 Route::delete('/logout', [SessionController::class,'destroy'])->middleware('auth');
