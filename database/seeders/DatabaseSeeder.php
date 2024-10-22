@@ -25,17 +25,22 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'David Ruiz',
             'email' => 'clarkddr@gmail.com',
-            'password' => 'ruiz123456',
+            'password' => 'ruiz123',
         ]);
         User::factory()->create([
             'name' => 'Eduardo Malo',
             'email' => 'jemomxl@hotmail.com',
-            'password' => '123456',
+            'password' => 'eduardo123',
         ]);
         User::factory()->create([
             'name' => 'Bayo Malo',
             'email' => 'jeduardomalo@gmail.com',
-            'password' => '123456',
+            'password' => 'bayo123',
+        ]);
+        User::factory()->create([
+            'name' => 'Mayra Almaraz',
+            'email' => 'mayriux2@hotmail.com',
+            'password' => 'almaraz123',
         ]);
 
         $suppliers = Supplier::factory(4)->create();

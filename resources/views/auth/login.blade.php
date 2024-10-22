@@ -70,8 +70,7 @@
               </button>
               </form>
               <hr class="my-8" />
-              @error('email')
-              {{$errors->all()}}
+              @error('email')              
               @enderror
               
             </div>
