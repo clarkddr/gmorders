@@ -43,3 +43,15 @@ Route::get('/upload', function () {
 Route::post('/upload', [GalleryController::class, 'upload'])->name('upload');
 
 Route::delete('/logout', [SessionController::class,'destroy'])->middleware('auth');
+
+
+Route::get('/php', function () {
+    $sql = DB::connection('mssql')->select('select * from branch');
+    return phpinfo();
+});
+
+Route::get('/sql', function () {
+    $sql = DB::connection('mssql')->select('select * from branch');
+    dd($sql);    
+});
+
