@@ -2,14 +2,26 @@
 	@if(session('banner'))
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
-	<div class="flex justify-between items-center">
-		<h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 ">
-			Proyección de {{$familyName}} Invierno 2024
-		</h2>		
-	</div>	
+	<x-titlePage title="Proyección Invierno 2024 {{ $categoryName ?? ''}}">
+		<div class="w-full overflow-x-auto flex space-x-2">
+			<a href="projection?category=12" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+				Calzado
+			</a>
+			<a href="projection?category=1" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+				Damas
+			</a>
+			<a href="projection?category=2" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+				Accesorio
+			</a>
+			<a href="projection?category=4" class="px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+				Boneteria
+			</a>
+		</div>
+	</x-titlePage>
+
 	<div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
 		<div class="w-full overflow-x-auto">
-			<table id="salesTable" class="w-full whitespace-no-wrap">
+			<table id="salesTable" class="w-full whitespace-no-wrap rounded-lg shadow-xs">
 				<thead>
 					<tr	class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 						<th class="px-4 py-3 text-center">Familia</th>
@@ -24,8 +36,10 @@
 				<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
 					@foreach ($thisYearSales as $tySales)
 					<tr class="text-gray-700 dark:text-gray-400">
-						<td class="px-4 py-3">							
-								{{ $tySales['name'] }} 							
+						<td class="px-4 py-3">
+							<a href="{{route('projectionamount.show',$tySales['id'])}}" class="text-blue-600 hover:underline">
+								{{ $tySales['name'] }} 
+							</a>
 						</td>		
 						<td class="px-4 py-3 " data-order="{{$tySales['total']}}">
 							<div class="flex flex-col items-end">
@@ -40,12 +54,7 @@
 							</div>
 						</td>		
 						<td class="px-4 py-3">
-							<div class="w-full bg-gray-800 rounded-full h-4 relative">
-								<div class="h-4 rounded-full bg-green-700" :style="'width: {{$tySales['totalVsProjection']*100}}%;'"></div>
-								<div class="absolute inset-0 mx-3 flex justify-end text-white text-xs font-semibold">
-								  {{number_format($tySales['totalVsProjection']*100,1)}}%
-								</div>
-							</div>
+							<x-projectionProgress :value="$tySales['totalVsProjection']"/>
 						</td>		
 						<td class="px-4 py-3 ">
 							{{ $tySales['purchase'] }}
@@ -54,12 +63,7 @@
 							{{$tySales['projection']['purchase']}}
 						</td>		
 						<td class="px-4 py-3">
-							<div class="w-full bg-gray-800 rounded-full h-4 relative">
-								<div class="h-4 rounded-full bg-green-700" :style="'width: {{$tySales['projection']['purchaseVsProjection']*100}}%;'"></div>
-								<div class="absolute inset-0 mx-3 flex justify-end text-white text-xs font-semibold">
-								  {{$tySales['projection']['purchaseVsProjection']*100}}%
-								</div>
-							</div>
+							<x-projectionProgress :value="$tySales['projection']['purchaseVsProjection']*100"/>
 						</td>		
 					</tr>
 					@endforeach
@@ -81,12 +85,7 @@
 							</div>
 						</td>						
 						<td class="px-4 py-3">
-							<div class="w-full bg-gray-800 rounded-full h-7 relative">
-								<div class="h-7 rounded-full bg-green-700" :style="'width: {{$projectionSalesTotal['totalVsProjection']}}%;'"></div>
-								<div class="absolute inset-0 mx-3 flex text-white justify-end text-lg font-semibold">
-								  {{$projectionSalesTotal['totalVsProjection']}}%								  
-								</div>
-							</div>
+							<x-projectionProgress :value="$projectionSalesTotal['totalVsProjection']" size="lg"/>
 						</td>
 						<td class="px-4 py-3 text-xl font-bold">
 							{{$thisYearSalesTotal['purchase']}}
@@ -95,12 +94,7 @@
 							{{$projectionSalesTotal['purchase']}}
 						</td>						
 						<td class="px-4 py-3">
-							<div class="w-full bg-gray-800 rounded-full h-7 relative">
-								<div class="h-7 rounded-full bg-green-700" :style="'width: {{$projectionSalesTotal['purchaseVsProjection']}}%;'"></div>
-								<div class="absolute inset-0 mx-3 flex text-white justify-end text-lg font-semibold">
-								  {{$projectionSalesTotal['purchaseVsProjection']}}%								  
-								</div>
-							</div>
+							<x-projectionProgress :value="$projectionSalesTotal['purchaseVsProjection']" size="lg"/>
 						</td>
 					</tr>
 				</tfoot>
@@ -109,24 +103,17 @@
 </div>
 </x-layout>
 
-
-
 <script>
-	// import DataTable from 'datatables.net-dt';
-	// import 'datatables.net-responsive-dt';
-	// console.log('este si funciona');
-	// let table = new DataTable('#salesTable', {
-	// 	responsive: true
-	// });
 	$(document).ready( function () {
 		$('#salesTable').DataTable({
+			dom: 't',
 			paging:false,
 			searching: false,
 			info: false,
 			lenghtChange: false,
 			"order": [[]],
             "columnDefs": [{
-                //"targets": 3, "orderable": false,                
+                //"targets": 3, "orderable": false,				
             }]
 		});
 	} );

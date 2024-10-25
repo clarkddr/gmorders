@@ -4,6 +4,7 @@ use App\Http\Controllers\FamilySalesOverYearsController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProjectionAmountController;
 use App\Http\Controllers\ProjectionController;
 use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\DB;
@@ -18,10 +19,11 @@ Route::middleware('guest')->group(function(){
 
 Route::middleware('auth')->group(function(){
     Route::get('/',function(){
-        return view('welcome');
+        return view('home');
     });
-    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'index'])->name('salesyearoy');
-    Route::get('/getsalesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');
+    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');
+    //Route::get('/getsalesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');
+    Route::resource('projectionamount',ProjectionAmountController::class);
 });
 
 Route::get('/plan', [ImageController::class,'plan'])->name('plan');
@@ -30,10 +32,6 @@ Route::get('/select', [GalleryController::class,'select'])->name('select');
 Route::resource('suppliers',SupplierController::class);
 Route::resource('galleries',GalleryController::class);
 Route::resource('images',ImageController::class);
-Route::resource('projection',ProjectionController::class);
-
-
-
 
 
 Route::get('/upload', function () {

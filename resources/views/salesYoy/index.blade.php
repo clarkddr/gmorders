@@ -3,27 +3,22 @@
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
     {{-- Encabezado con título y espacio para dropdowns --}}
-    <div class="w-full p-4  shadow mb-4 flex justify-between items-center dark:bg-gray-800 rounded-lg">
-        <h1 class="text-3xl font-semibold text-white ">Reporte de Ventas {{ $selectedCategory->Name ?? '' }} </h1>
-        <div class="flex space-x-4">
-            {{-- Aquí puedes agregar los dropdowns que necesites --}}
-			<form action ="/getsalesyearoy" method="GET" class="flex space-x-4 justify-end">				
-				<select id="dropdown" name="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-					<option>Departamento</option>					
-					@foreach ($categories as $category)						
-					<option {{ ($selectedCategory->CategoryId ?? null) == $category->CategoryId ? 'selected' : '' }}						
-					value="{{$category->CategoryId}}">{{$category->Name}}</option>
-					@endforeach
-				</select>
-				{{-- <input id="datess" class="text-xs px-2 border border-gray-600 dark:bg-gray-700 form-input text-white rounded-md" placeholder="Fechas" /> --}}
-				<input id="dates" name="dates" value="{{old('dates')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
-				<button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
-					Buscar
-				</button>
-			</form>
-		</div>
-			
-    </div>
+	<x-titlePage title="Reporte de ventas de {{$selectedCategory->Name ?? ''}}">
+		<form action ="/salesyearoy" method="GET" class="flex space-x-4 justify-end">				
+			<select id="dropdown" name="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+				<option>Departamento</option>					
+				@foreach ($categories as $category)						
+				<option {{ ($selectedCategory->CategoryId ?? null) == $category->CategoryId ? 'selected' : '' }}						
+				value="{{$category->CategoryId}}">{{$category->Name}}</option>
+				@endforeach
+			</select>
+			{{-- <input id="datess" class="text-xs px-2 border border-gray-600 dark:bg-gray-700 form-input text-white rounded-md" placeholder="Fechas" /> --}}
+			<input id="dates" name="dates" value="{{old('dates')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
+			<button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+				Buscar
+			</button>
+		</form>
+	</x-titlePage>
 	
 	<div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
 		<div class="rounded-lg">
@@ -34,8 +29,8 @@
 				</div>
 				{{-- End bars --}}
 				{{-- Table --}}
-				<div class="md:col-span-3"> <!-- Ocupa 4/12 -->
-					<table id="table" class="py-0 w-full whitespace-no-wrap mx-0">
+				<div class="md:col-span-3 rounded-lg shadow-xs"> <!-- Ocupa 4/12 -->
+					<table id="table" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs">
 						<thead>
 							<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 								<th class="px-4 py-3">Familia</th>
@@ -143,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 	$('#table').DataTable({
+		dom: 't',
 		paging:false,
 		searching: false,
 		info: false,

@@ -11,12 +11,13 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     </a>
     <ul class="mt-6">
     <li class="relative px-6 py-3">
-        @if (false)
-        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @if (request()->path() == '/')
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
+        
         <a
-        class="@if(Route::is('suppliers.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
-        href="index.html"
+        class="@if(request()->path() == '/') text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+        href="/"
         >
         <svg
             class="w-5 h-5"
@@ -37,9 +38,9 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     </li>
     </ul>
     <ul>
-    <li class="relative px-6 py-3">
+    {{-- <li class="relative px-6 py-3">
         @if (Route::is('suppliers.*'))
-        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
         <a
         class="@if(Route::is('suppliers.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
@@ -62,10 +63,10 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">Proveedores</span>
         </a>
-    </li>
-    <li class="relative px-6 py-3">
+    </li> --}}
+    {{-- <li class="relative px-6 py-3">
         @if (Route::is('galleries.*'))
-        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
         <a
         class="@if(Route::is('galleries.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
@@ -87,10 +88,10 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">Galerias</span>
         </a>
-    </li>
-    <li class="relative px-6 py-3">
+    </li> --}}
+    {{-- <li class="relative px-6 py-3">
         @if (Route::is('plan'))
-        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
         <a
         class="@if(Route::is('plan')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
@@ -112,23 +113,23 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         </svg>
         <span class="ml-4">C/V Familia</span>
         </a>
-    </li>
+    </li> --}}
     <li class="relative px-6 py-3">
-        @if (Route::is('projection.*'))
-        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @if (Route::is('projectionamount.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
-        <a class="@if(Route::is('projection.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
-         href="{{route('projection.index')}}">
+        <a class="@if(Route::is('projectionamount.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
+         href="{{route('projectionamount.index')}}">
             <svg class="w-6 h-6 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.6 16.733c.234.269.548.456.895.534a1.4 1.4 0 0 0 1.75-.762c.172-.615-.446-1.287-1.242-1.481-.796-.194-1.41-.861-1.241-1.481a1.4 1.4 0 0 1 1.75-.762c.343.077.654.26.888.524m-1.358 4.017v.617m0-5.939v.725M4 15v4m3-6v6M6 8.5 10.5 5 14 7.5 18 4m0 0h-3.5M18 4v3m2 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"/></svg>
             <span class="ml-4">Venta vs Proyección</span>
         </a>
     </li>
     <li class="relative px-6 py-3">
-        @if (Route::is('salesyearoy.*') || Route::is('getsalesyearoy.*'))
-        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @if (Route::is('salesyearoy.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
         @endif
         <a class="@if(Route::is('salesyearoy.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
-         href="{{route('salesyearoy')}}">
+         href="{{route('salesyearoy.show')}}">
          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
          <span class="ml-4">Venta de Familias</span>
         </a>
@@ -302,7 +303,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
     </ul>
     <div class="px-6 my-6">
     <button
-        class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+        class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
     >
         Create account
         <span class="ml-2" aria-hidden="true">+</span>
