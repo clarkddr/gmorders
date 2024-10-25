@@ -114,6 +114,18 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
         <span class="ml-4">C/V Familia</span>
         </a>
     </li> --}}
+    {{-- Proyecciones --}}
+    {{-- <li class="relative px-6 py-3">
+        @if (Route::is('projections.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+        @endif
+        <a class="@if(Route::is('projections.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
+         href="{{route('projections.index')}}">            
+            <svg class ="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>        
+            <span class="ml-4">Proyecciones</span>
+        </a>
+    </li> --}}
+    {{-- Venta vs Proyeccion --}}
     <li class="relative px-6 py-3">
         @if (Route::is('projectionamount.*'))
         <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
@@ -124,6 +136,7 @@ class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-
             <span class="ml-4">Venta vs Proyección</span>
         </a>
     </li>
+    {{-- Venta de Familias --}}
     <li class="relative px-6 py-3">
         @if (Route::is('salesyearoy.*'))
         <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            

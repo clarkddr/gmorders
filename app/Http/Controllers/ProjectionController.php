@@ -15,8 +15,13 @@ class ProjectionController extends Controller
 {
 
     public function index()
-    {       
-     
+    {     
+    $projections = Projection::all();  
+    $data = [
+        'projections' => $projections
+    ];
+
+    return view('projection.index', $data);   
         
     }
 

@@ -16,8 +16,12 @@ class ProjectionFactory extends Factory
      */
     public function definition(): array
     {
+        $start_date = fake()->dateTimeBetween('now','+4 years');
+        $end_date = fake()->dateTimeBetween($start_date, (clone $start_date)->modify('+8 months'));
         return [
-            //
+            'name' => fake()->regexify('[A-Z]{3}[0-9]{3}'),
+            'start' => $start_date,
+            'end' => $end_date,
         ];
     }
 }

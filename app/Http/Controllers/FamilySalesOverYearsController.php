@@ -49,9 +49,9 @@ class FamilySalesOverYearsController extends Controller
                 }
             }
 
-            $date1 = Carbon::createFromFormat('Y-m-d', $dates[0])->subYear(2);
-            $date2 = Carbon::createFromFormat('Y-m-d', $dates[1]);
-
+            $date1 = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(2);
+            $date2 = Carbon::createFromFormat('Y-m-d', $dates[1])->setTime(0,0,0);
+            
             $query = "
             EXEC dbo.DRGetFamilySalesOverYears @From = '{$date1}', @To = '{$date2}', @Category = {$category->CategoryId}
             ";

@@ -51,7 +51,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Invierno 24',
             'start' => '2024-09-01',
             'end' => '2024-12-31'
-        ]);      
+        ]);
+
+        Projection::factory(25)->create();
         
         //ProjectionAmount::factory(28)->create();
         ProjectionAmount::insert([
