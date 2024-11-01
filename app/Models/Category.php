@@ -19,4 +19,9 @@ class Category extends Model
         return $this->belongsToMany(Subcategory::class, 'CategoryHasSubcategory', 'CategoryId', 'SubcategoryId');
     }
 
+    public function families(): BelongsToMany
+    {
+        return $this->belongsToMany(Family::class, 'vw_FamilyHasCategory', 'CategoryId', 'FamilyId');
+    }
+
 }

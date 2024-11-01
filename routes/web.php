@@ -19,8 +19,8 @@ Route::middleware('guest')->group(function(){
 
 Route::middleware('auth')->group(function(){
     Route::get('/',function(){  return view('home');  });
-    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');
-    //Route::get('/getsalesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');
+    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');    
+    Route::get('/projections/amounts', [ProjectionController::class, 'amounts']);
     Route::resource('projections',ProjectionController::class);
     Route::resource('projectionamount',ProjectionAmountController::class);
 });
@@ -52,3 +52,6 @@ Route::get('/sql', function () {
     dd($sql);    
 });
 
+Route::get('/chart', function () {
+    return view('chart');
+});

@@ -3,9 +3,9 @@
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
 	<x-titlePage title="Proyección de {{$familyName ?? ''}} Invierno 2024 por Sucursal">
-<a href="{{ url()->previous() }}" class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
-    Regresar
-</a>
+	<a href="{{ url()->previous() }}" class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+		Regresar
+	</a>
 	</x-titlePage>
 	<div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
 		<div class="w-full overflow-x-auto">

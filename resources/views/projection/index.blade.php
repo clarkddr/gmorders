@@ -3,13 +3,10 @@
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
     {{-- Encabezado con título y espacio para dropdowns --}}
-	<x-titlePage title="Reporte de ventas de {{''}}">
-		
-	</x-titlePage>
-	
-	<div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
+	<x-titlePage title="Proyecciones" />
+	<div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg mb-6">
 		<div class="rounded-lg">
-			<div class="grid gap-6 mb-8 md:grid-cols-8">
+			<div class="grid gap-6 md:grid-cols-8">
 				{{-- Table --}}
 				<div class="md:col-span-8 rounded-lg shadow-xs"> <!-- Ocupa 4/12 -->
 					<table id="table" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs">
@@ -18,6 +15,7 @@
 								<th class="px-4 py-3">Codigo</th>
 								<th class="px-4 py-3">Fecha de inicio</th>
 								<th class="px-4 py-3">Fecha final</th>								
+								<th class="px-4 py-3"></th>								
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -25,29 +23,29 @@
 							<tr class="text-gray-700 dark:text-gray-400">
 								<td class="px-4 py-3">{{ $projection->name }}</td>
 								<td class="px-4 py-3">{{ $projection->start }}</td>
-								<td class="px-4 py-3">{{ $projection->end }}</td>								
+								<td class="px-4 py-3">{{ $projection->end }}</td>
+								<td class="px-4 py-3 flex justify-end "> 
+									<div class="flex items-center space-x-4 text-sm">
+										<x-editButton href="/projections/{{$projection->id}}/edit" />
+										<x-deleteButton action="projections" id="{{$projection->id}}"/>
+										
+									</div>
+								</td>								
 							</tr>
                             @endforeach
 						</tbody>
-						<tfoot>
+						<tfoot class="px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                             <tr>
-                                <td colspan="2"></td>
-                            </tr>
-					
-							{{-- <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-								<td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>		
-								<td class="px-4 py-3 text-xl font-bold">
-									{{ 'sale0' }}
-								</td>
-								<td class="px-4 py-3 text-xl font-bold">
-									{{ 'sale1' }}
-								</td>
-							</tr> --}}
+                                <td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+                            </tr>					
 						</tfoot>
 					</table>
 				</div>
 				{{-- End Table --}}
 			</div>
+			{{-- <x-pagination/> --}}
 		</div>
 	</div>
 	
@@ -57,10 +55,10 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-	$('#table').DataTable({
+	$('#tables').DataTable({
 		// dom: 't',
-		paging:true,
-		searching: true,
+		paging:false,
+		searching: false,
 		info: false,
 		lenghtChange: false,        
 		"order": [[]],
@@ -85,19 +83,5 @@ document.addEventListener('DOMContentLoaded', function () {
         outline: none;
         background: none; /* Quita el fondo predeterminado */
         padding: 0; /* Quita el padding */
-    }
-        /* Estiliza los botones del paginador */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        @apply bg-blue-500 text-white rounded-md px-4 py-2 mx-1;
-    }
-
-    /* Estiliza los botones al pasar el cursor */
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        @apply bg-blue-700;
-    }
-
-    /* Estiliza el botón activo */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        @apply bg-blue-600 text-white font-bold;
     }
 </style>

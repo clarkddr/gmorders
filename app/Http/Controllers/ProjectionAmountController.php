@@ -89,7 +89,7 @@ class ProjectionAmountController extends Controller
         $finalDate = '2024-12-31';
         $query = "
         EXEC dbo.DRGetSalesReportByFamily @From = '{$initDate}', @To = '{$finalDate}', @Family = 0, @Category = {$categoryId}
-        ";        
+        ";
         $queryResults = DB::connection('mssql')->selectResultSets($query);        
         $saleResults = collect($queryResults[2]);
         $purchaseResults = collect($queryResults[3]);
@@ -254,7 +254,22 @@ class ProjectionAmountController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $familyid = $request->familyid;
+        $projectid = $request->projectid;
+        $amounts = $request->amount;
+
+        dd($request->all());
+
+
+        // foreach ($amounts as $branchid => $amount) {            
+        //     ProjectionAmount::create(['branch_id' => $branchid, 'project_id' => $projectid, 'family_id' => $familyid, 'amount' => $amount]);        
+        // }
+
+
+
+
+
+
     }
 
     /**
