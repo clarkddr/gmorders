@@ -33,7 +33,8 @@ class FamilySalesOverYearsController extends Controller
             'amounts' => [],
             'totalSales' => ['sale2' => 0, 'sale1' => 0, 'sale0' => 0,'relation0vs1' => 0, 'relation0vs2' => 0],
             'totalPurchase' => ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0,
-            'relation2' => 0, 'relation1' => 0, 'relation0' => 0],
+            'purchaseRelation2' => 0, 'purchaseRelation1' => 0,],
+            'year' => ['2' => '', '1' => '', '0' => ''],
             
         ];
 
@@ -56,7 +57,11 @@ class FamilySalesOverYearsController extends Controller
 
             $date1 = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(2);
             $date2 = Carbon::createFromFormat('Y-m-d', $dates[1])->setTime(0,0,0);
-            
+
+            $year['2'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(2)->year;
+            $year['1'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(1)->year;
+            $year['0'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->year;
+
             $query = "
             EXEC dbo.DRGetFamilySalesOverYears @From = '{$date1}', @To = '{$date2}', @Category = {$category->CategoryId}
             ";
@@ -87,17 +92,15 @@ class FamilySalesOverYearsController extends Controller
                 $purchase0 = $carry['purchase0'] + $item->purchase0;
                 $purchase1 = $carry['purchase1'] + $item->purchase1;
                 $purchase2 = $carry['purchase2'] + $item->purchase2;
-                $relation0 = $totalSales['sale0'] != 0 ? $purchase0 / $totalSales['sale0'] * 100 : 0; 
-                $relation1 = $totalSales['sale1'] != 0 ? $purchase1 / $totalSales['sale1'] * 100 : 0;
-                $relation2 = $totalSales['sale2'] != 0 ? $purchase2 / $totalSales['sale2'] * 100 : 0;
+                $purchaseRelation1 = $purchase1 != 0 ? $purchase0 / $purchase1 * 100 : 0;
+                $purchaseRelation2 = $purchase2 != 0 ? $purchase0 / $purchase2 * 100 : 0;
 
                 return collect([
                     'purchase2' => $purchase2,
                     'purchase1' => $purchase1,
                     'purchase0' => $purchase0,
-                    'relation2' => $relation2,
-                    'relation1' => $relation1,
-                    'relation0' => $relation0,
+                    'purchaseRelation2' => $purchaseRelation2,
+                    'purchaseRelation1' => $purchaseRelation1,
                 ]);    
             },['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0]);
             
@@ -111,9 +114,9 @@ class FamilySalesOverYearsController extends Controller
 
             $amounts = $results->map(function ($row) use ($purchaseResults) {
                 $purchase = $purchaseResults->where('familyid', $row->FamilyId)->first();
-                $relation0 = $row->sale0 != 0 ? $purchase->purchase0 / $row->sale0 * 100 : 0; 
-                $relation1 = $row->sale1 != 0 ? $purchase->purchase1 / $row->sale1 * 100 : 0;
-                $relation2 = $row->sale2 != 0 ? $purchase->purchase2 / $row->sale2 * 100 : 0;
+                $purchaseRelation0vs1 = $purchase->purchase1 != 0 ? $purchase->purchase0 / $purchase->purchase1 * 100 : 0; 
+                $purchaseRelation0vs2 = $purchase->purchase2 != 0 ? $purchase->purchase0 / $purchase->purchase2 * 100 : 0;
+
                 $relation0vs1 = $row->sale1 != 0 ? $row->sale0 / $row->sale1 * 100 : 0;
                 $relation0vs2 = $row->sale2 != 0 ? $row->sale0 / $row->sale2 * 100 : 0;
                 return collect([
@@ -124,12 +127,11 @@ class FamilySalesOverYearsController extends Controller
                     'sale0' => number_format($row->sale0,0),
                     'relation0vs1' => number_format($relation0vs1,0),
                     'relation0vs2' => number_format($relation0vs2,0),
-                    'purchase2' => number_format($purchase->purchase2,0),
-                    'relation2' => number_format($relation2,0),
-                    'purchase1' => number_format($purchase->purchase1,0),
-                    'relation1' => number_format($relation1,0),
+                    'purchaseRelation0vs1' => number_format($purchaseRelation0vs1,0),
+                    'purchaseRelation0vs2' => number_format($purchaseRelation0vs2,0),
+                    'purchase2' => number_format($purchase->purchase2,0),                    
+                    'purchase1' => number_format($purchase->purchase1,0),                    
                     'purchase0' => number_format($purchase->purchase0,0),
-                    'relation0' => number_format($relation0,0),
                 ]); 
             });    
 
@@ -144,6 +146,7 @@ class FamilySalesOverYearsController extends Controller
                 'amounts' => $amounts,
                 'totalSales' => $totalSalesFormatted,
                 'totalPurchase' => $totalPurchaseFormatted,
+                'year' => $year,
             ];
 
         }

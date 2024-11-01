@@ -32,72 +32,63 @@
 					<thead>
 						<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 							<th class="px-4 py-3">Familia</th>
-							<th class="px-4 py-3">Venta 2024</th>
-							<th class="px-4 py-3">% v23</th>
-							<th class="px-4 py-3">% v22</th>
-							<th class="px-4 py-3">Venta 2023</th>							
-							<th class="px-4 py-3">Venta 2022</th>
-							<th class="px-4 py-3">Compra 2024</th>
-							<th class="px-4 py-3 text-center">% C/V</th>
-							<th class="px-4 py-3">Compra 2023</th>
-							<th class="px-4 py-3 text-center">% C/V</th>						
-							<th class="px-4 py-3">Compra 2022</th>
-							<th class="px-4 py-3 text-center">% C/V</th>						
+							<th class="px-4 py-3 border-r border-gray-700">Venta {{$year['0']}}</th>
+							<th class="px-4 py-3">Venta {{$year['1']}}</th>							
+							<th class="px-4 py-3 border-r border-gray-700">% vs{{$thisYearSub = substr($year['0'],2,4)}}</th>
+							<th class="px-4 py-3">Venta {{$year['2']}}</th>
+							<th class="px-4 py-3 border-r-4 border-gray-700">% vs{{$thisYearSub}}</th>
+							<th class="px-4 py-3 border-r border-gray-700">Compra {{$year['0']}}</th>
+							<th class="px-4 py-3">Compra {{$year['1']}}</th>
+							<th class="px-4 py-3 text-center border-r border-gray-700">% vs{{$thisYearSub}}</th>
+							<th class="px-4 py-3">Compra {{$year['2']}}</th>												
+							<th class="px-4 py-3 text-center">% vs{{$thisYearSub}}</th>						
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-						@foreach ($amounts as $family)
-							
+						@foreach ($amounts as $family)							
 						<tr class="text-gray-700 dark:text-gray-400">
 							<td class="px-4 py-3">{{ $family['name'] }}</td>
-							<td class="px-4 py-3">{{ $family['sale0'] }}</td>
-							<td class="px-4 py-3">
-								<x-percentageButton :value="$family['relation0vs1']" above="green" below="red" min="90" max="90" />
-							</td>
-							<td class="px-4 py-3">
-								<x-percentageButton :value="$family['relation0vs2']" above="green" below="red" min="90" max="90" />
-							</td>
+							<td class="px-4 py-3 border-r border-gray-700">{{ $family['sale0'] }}</td>
 							<td class="px-4 py-3">{{ $family['sale1'] }}</td>
+							<td class="py-3 border-r border-gray-700">		
+								<x-percentageButton :value="$family['relation0vs1']" above="green" below="red" min="100" max="99" />
+							</td>
 							<td class="px-4 py-3">{{ $family['sale2'] }}</td>								
-							<td class="px-4 py-3">{{ $family['purchase0'] }}</td>
-							<td class="px-4 py-3 text-center">
-								<x-percentageButton :value="$family['relation0']" above="red" below="green" min="30" max="50" />
+							<td class="py-3 border-r-4 border-gray-700">								
+								<x-percentageButton :value="$family['relation0vs2']" above="green" below="red" min="100" max="99" />
 							</td>
+							<td class="px-4 py-3 border-r border-gray-700">{{ $family['purchase0'] }}</td>
 							<td class="px-4 py-3">{{ $family['purchase1'] }}</td>
-							<td class="px-4 py-3 text-center">
-								<x-percentageButton :value="$family['relation1']" above="red" below="green" min="30" max="50" />
-							</td>							
-							<td class="px-4 py-3">{{ $family['purchase2'] }}</td>								
-							<td class="px-4 py-3 text-center">
-								<x-percentageButton :value="$family['relation2']" above="red" below="green" min="30" max="50" />
+							<td class="py-3 text-center border-r border-gray-700">
+								<x-percentageButton :value="$family['purchaseRelation0vs1']" above="green" below="red" min="100" max="99" />
 							</td>
+							<td class="px-4 py-3">{{ $family['purchase2'] }}</td>								
+							<td class="py-3 text-center">
+								<x-percentageButton :value="$family['purchaseRelation0vs2']" above="green" below="red" min="100" max="99" />
+							</td>							
 						</tr>
 						@endforeach							
 					</tbody>
-					<tfoot>
-				
+					<tfoot class="dark:divide-gray-700">				
 						<tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
 							<td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>		
-							<td class="px-4 py-3 text-xl font-bold"> {{$totalSales['sale0']}} </td>
-							<td class="px-4 py-3 text-xl font-bold">
-								<x-percentageButton :value="$totalSales['relation0vs1']" above="red" below="green" min="30" max="50" size="xl"/>
-							</td>
-							<td class="px-4 py-3 text-xl font-bold">
-								<x-percentageButton :value="$totalSales['relation0vs1']" above="red" below="green" min="30" max="50" size="xl"/>
-							</td>
+							<td class="px-4 py-3 text-xl font-bold border-r border-gray-700"> {{$totalSales['sale0']}} </td>
 							<td class="px-4 py-3 text-xl font-bold"> {{$totalSales['sale1']}} </td>
-							<td class="px-4 py-3 text-xl font-bold"> {{$totalSales['sale2']}} </td>
-							<td class="px-4 py-3 text-xl font-bold">{{$totalPurchase['purchase0']}}</td>
-							<td class="px-4 py-3 text-xl font-bold">
-								<x-percentageButton :value="$totalPurchase['relation0']" above="red" below="green" min="30" max="50" size="xl"/>
+							<td class="px-4 py-3 text-xl font-bold border-r border-gray-700">
+								<x-percentageButton :value="$totalSales['relation0vs1']" above="green" below="red" min="100" max="99" size="xl"/>
 							</td>
+							<td class="px-4 py-3 text-xl font-bold"> {{$totalSales['sale2']}} </td>
+							<td class="px-4 py-3 text-xl font-bold border-r-4 border-gray-700">
+								<x-percentageButton :value="$totalSales['relation0vs2']" above="green" below="red" min="100" max="99" size="xl"/>
+							</td>
+							<td class="px-4 py-3 text-xl font-bold border-r border-gray-700">{{$totalPurchase['purchase0']}}</td>
 							<td class="px-4 py-3 text-xl font-bold">{{$totalPurchase['purchase1']}}</td>
-							<td class="px-4 py-3 text-xl font-bold">
-								<x-percentageButton :value="$totalPurchase['relation1']" above="red" below="green" min="30" max="50" size="xl"/>
+							<td class="px-4 py-3 text-xl font-bold border-r border-gray-700">
+								<x-percentageButton :value="$totalPurchase['purchaseRelation1']" above="green" below="red" min="100" max="99" size="xl"/>
 							</td>							
 							<td class="px-4 py-3 text-xl font-bold">{{$totalPurchase['purchase2']}}</td>
 							<td class="px-4 py-3 text-xl font-bold">
-								<x-percentageButton :value="$totalPurchase['relation2']" above="red" below="green" min="30" max="50" size="xl"/>
+								<x-percentageButton :value="$totalPurchase['purchaseRelation2']" above="green" below="red" min="100" max="99" size="xl"/>
 							</td>							
 						</tr>
 					</tfoot>

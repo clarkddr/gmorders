@@ -44,10 +44,10 @@ class ProjectionController extends Controller
         $initDate = $projection->start;
         $finalDate = $projection->end;
         // Se sacan las fechas para los dos ciclos
-        $yearBeforeLastInitialDate = Carbon::createFromFormat('Y-m-d', $initDate)->setTime(0,0,0)->subYear(2);
-        $yearBeforeLastFinalDate = Carbon::createFromFormat('Y-m-d', $finalDate)->setTime(0,0,0)->subYear(2);
-        $yearLastInitialDate = Carbon::createFromFormat('Y-m-d', $initDate)->setTime(0,0,0)->subYear(1);
-        $yearLastFinalDate = Carbon::createFromFormat('Y-m-d', $finalDate)->setTime(0,0,0)->subYear(1);
+        $yearBeforeLastInitialDate = Carbon::createFromFormat('Y-m-d H:i:s', $initDate)->setTime(0,0,0)->subYear(2);
+        $yearBeforeLastFinalDate = Carbon::createFromFormat('Y-m-d H:i:s', $finalDate)->setTime(0,0,0)->subYear(2);
+        $yearLastInitialDate = Carbon::createFromFormat('Y-m-d H:i:s', $initDate)->setTime(0,0,0)->subYear(1);
+        $yearLastFinalDate = Carbon::createFromFormat('Y-m-d H:i:s', $finalDate)->setTime(0,0,0)->subYear(1);
 
         // Se consiguen los ProjectionAmount guardados de la familia 
         $projectionAmounts = ProjectionAmount::where('projection_id', $projection->id)->where('FamilyId', $family->FamilyId)->get();        
