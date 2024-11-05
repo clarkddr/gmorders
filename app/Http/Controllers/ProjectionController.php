@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Category;
-use App\Models\CategoryHasFamily;
 use App\Models\Family;
 use App\Models\Projection;
 use App\Models\ProjectionAmount;
-use App\Models\Subcategory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;    
 use Illuminate\Support\Facades\DB;
@@ -19,6 +17,7 @@ class ProjectionController extends Controller
     public function index()
     {     
     $projections = Projection::paginate(10);
+    
     $data = [
         'projections' => $projections
     ];
@@ -119,18 +118,19 @@ class ProjectionController extends Controller
                 $yearBeforeLastPurchase = collect($yearBeforeLastPurchaseResults->where('branchid', $branch->BranchId)->first());
                 $yearLastSale = collect($yearLastSaleResults->where('branchid', $branch->BranchId)->first());
                 $yearLastPurchase = collect($yearLastPurchaseResults->where('branchid', $branch->BranchId)->first());
-                $projectionAmounts = $projectionAmounts->where('BranchId', $branch->BranchId);
+                $projectionAmounts = $projectionAmounts->where('BranchId', $branch->BranchId)->first();
+                
                 return collect([
                     'branchid' => $branch->BranchId,
                     'name' => $branch->Name,
                     'current_year' => [
-                        'old_sale' => number_format($projectionAmounts->sum('old_sale') ?? 0,0),
-                        'new_sale' => number_format($projectionAmounts->sum('new_sale') ?? 0,0),
-                        'total_sale' => number_format($projectionAmounts->sum('total_sale') ?? 0,0),
-                        'purchase_cost' => number_format($projectionAmounts->sum('purchase') ?? 0,0),
-                        'relation' => $projectionAmounts->sum('new_sale') != 0 
-                        ? number_format($projectionAmounts->sum('new_sale') / ($projectionAmounts->sum('purchase')*3) * 100, 0)
-                        : 0
+                        'projection_amount_id' => $projectionAmounts->id ?? null,          
+                        'old_sale' => number_format($projectionAmounts->old_sale ?? 0,0),
+                        'new_sale' => number_format($projectionAmounts->new_sale ?? 0,0),
+                        'total_sale' => number_format($projectionAmounts->total_sale ?? 0,0),
+                        'purchase_cost' => number_format($projectionAmounts->purchase ?? 0,0),
+                        'relation' => isset($projectionAmounts->new_sale, $projectionAmounts->purchase) && $projectionAmounts->purchase != 0 
+                        ? number_format($projectionAmounts->new_sale / ($projectionAmounts->purchase * 3 ) * 100, 0) : 0,
                     ],
                     'beforelast_year' => [
                         'old_sale' => number_format($yearBeforeLastSale['Old'] ?? 0,0),
@@ -139,8 +139,7 @@ class ProjectionController extends Controller
                         'purchase_cost' => number_format($yearBeforeLastPurchase['Costo'] ?? 0,0),
                         'purchase_sale' => number_format($yearBeforeLastPurchase['Venta'] ?? 0,0),
                         'relation' => isset($yearBeforeLastSale['Current'], $yearBeforeLastPurchase['Venta']) && $yearBeforeLastPurchase['Venta'] != 0 
-                        ? number_format($yearBeforeLastSale['Current'] / $yearBeforeLastPurchase['Venta'] * 100, 0)
-                        : 0
+                        ? number_format($yearBeforeLastSale['Current'] / $yearBeforeLastPurchase['Venta'] * 100, 0) : 0
                     ],
                     'last_year' => [
                         'old_sale' => number_format($yearLastSale['Old'] ?? 0,0),
@@ -149,8 +148,7 @@ class ProjectionController extends Controller
                         'purchase_cost' => number_format($yearLastPurchase['Costo'] ?? 0,0),
                         'purchase_sale' => number_format($yearLastPurchase['Venta'] ?? 0,0),
                         'relation' => isset($yearLastSale['Current'], $yearLastPurchase['Venta']) && $yearLastPurchase['Venta'] != 0
-                        ? number_format($yearLastSale['Current'] / $yearLastPurchase['Venta'] * 100, 0)
-                        : 0
+                        ? number_format($yearLastSale['Current'] / $yearLastPurchase['Venta'] * 100, 0) : 0
                     ],
                 ]);
             }
@@ -160,7 +158,7 @@ class ProjectionController extends Controller
         $data['beforelast_year'] = $yearBeforeLastInitialDate->year;
         $data['last_year'] =$yearLastInitialDate->year;
         $data['total'] = $totalAmounts;
-        
+// dd($data);        
 
         return view('projection.amounts',$data);
        

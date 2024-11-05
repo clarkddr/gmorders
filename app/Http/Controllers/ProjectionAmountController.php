@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Family;
+use App\Models\Projection;
 use App\Models\ProjectionAmount;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -220,7 +222,7 @@ class ProjectionAmountController extends Controller
                 'total' => number_format($item['total'], 0, '.', ','),
                 'purchase' => number_format($item['purchase'], 0, '.', ','),
                 'totalVsProjection' => number_format($item['totalVsProjection'],1,'.',','),
-                'projection' => [
+                'projection' => [                    
                     'current' => number_format($item['projection']['current'],0) ?? 0,
                     'old' => number_format($item['projection']['old'],0) ?? 0,
                     'amount' => number_format($item['projection']['amount'],0) ?? 0,
@@ -235,7 +237,7 @@ class ProjectionAmountController extends Controller
             'thisYearSales' => $thisYearSalesFormatted,
             'thisYearSalesTotal' => $thisYearSalesTotalFormatted,
             'projectionSalesTotal' => $projectionSalesTotalFormatted,
-        ];
+        ];       
 
         return view('projectionAmounts.index',$data);        
         
@@ -254,21 +256,53 @@ class ProjectionAmountController extends Controller
      */
     public function store(Request $request)
     {
-        $familyid = $request->familyid;
-        $projectid = $request->projectid;
-        $amounts = $request->amount;
+        // dd($request->all());
+        $family = Family::findOrFail($request->familyid);
+        $projection = Projection::findOrFail($request->projectionid);
+        // dd([$family,$projection]);
+        $data = collect($request->input('data'));
+        
+        $transformedData = $data->map(function ($row) use ($projection, $family) {
+            $row['new_sale'] = (float) filter_var($row['new_sale'], FILTER_SANITIZE_NUMBER_INT);
+            $row['old_sale'] = (float) filter_var($row['old_sale'], FILTER_SANITIZE_NUMBER_INT);
+            $row['purchase'] = (float) filter_var($row['purchase'], FILTER_SANITIZE_NUMBER_INT);
 
-        dd($request->all());
+            $new_row['id'] = (int) $row['id'];
+            $new_row['BranchId'] = (int) $row['branchid'];
+            $new_row['projection_id'] = $projection->id;
+            $new_row['FamilyId'] = $family->FamilyId;
+            $new_row['new_sale'] = (float) $row['new_sale'];
+            $new_row['old_sale'] = (float) $row['old_sale'];
+            $new_row['purchase'] = (float) $row['purchase'];
+            
+            return $new_row;
+        
+        });
+        
 
+        $projectionAmounts = ProjectionAmount::where('projection_id',$projection->id)->where('FamilyId',$family->FamilyId)->get();
 
-        // foreach ($amounts as $branchid => $amount) {            
-        //     ProjectionAmount::create(['branch_id' => $branchid, 'project_id' => $projectid, 'family_id' => $familyid, 'amount' => $amount]);        
-        // }
+        foreach ($transformedData as $row) {
+            $existing = $projectionAmounts->where('id',$row['id'] ?? null)->first();
+            if($existing){
+                if($existing->new_sale != $row['new_sale'] ||
+                   $existing->old_sale != $row['old_sale'] || 
+                   $existing->purchase != $row['purchase']){                
+                   $existing->update($row); 
+                }
+            } else {                
+                ProjectionAmount::create([
+                    'projection_id' => $row['projection_id'],
+                    'BranchId' => $row['BranchId'],
+                    'FamilyId' => $row['FamilyId'],
+                    'new_sale' => $row['new_sale'],
+                    'old_sale' => $row['old_sale'],
+                    'purchase' => $row['purchase'],
+                ]);
+            }
+        }
 
-
-
-
-
+        return redirect()->back()->with('success', 'Se han guardado los cambios');
 
     }
 

@@ -1,9 +1,15 @@
+@php
+	use Carbon\Carbon;
+	Carbon::setLocale('es');
+@endphp
 <x-layout>	
 	@if(session('banner'))
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
     {{-- Encabezado con título y espacio para dropdowns --}}
-	<x-titlePage title="Proyecciones" />
+	<x-titlePage title="Proyecciones" >
+		
+	</x-titlePage>
 	<div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg mb-6">
 		<div class="rounded-lg">
 			<div class="grid gap-6 md:grid-cols-8">
@@ -13,8 +19,8 @@
 						<thead>
 							<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 								<th class="px-4 py-3">Codigo</th>
-								<th class="px-4 py-3">Fecha de inicio</th>
-								<th class="px-4 py-3">Fecha final</th>								
+								<th class="px-4 py-3 text-right">Fecha de inicio</th>
+								<th class="px-4 py-3 text-right">Fecha final</th>								
 								<th class="px-4 py-3"></th>								
 							</tr>
 						</thead>
@@ -22,8 +28,8 @@
 							@foreach ($projections as $projection)
 							<tr class="text-gray-700 dark:text-gray-400">
 								<td class="px-4 py-3">{{ $projection->name }}</td>
-								<td class="px-4 py-3">{{ $projection->start }}</td>
-								<td class="px-4 py-3">{{ $projection->end }}</td>
+								<td class="px-4 py-3 text-right">{{ Carbon::parse($projection->start)->isoFormat('DD MMMM Y') }}</td>
+								<td class="px-4 py-3 text-right">{{ Carbon::parse($projection->end)->isoFormat('DD MMMM Y') }}</td>
 								<td class="px-4 py-3 flex justify-end "> 
 									<div class="flex items-center space-x-4 text-sm">
 										<x-editButton href="/projections/{{$projection->id}}/edit" />

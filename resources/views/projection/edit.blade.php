@@ -1,9 +1,12 @@
+@php
+	use Carbon\Carbon;	
+@endphp
 <x-layout>	
 	@if(session('banner'))
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
     {{-- Encabezado con título y espacio para dropdowns --}}
-	<x-titlePage title="Proyección {{$projection['name']}}" subtitle="{{'Del '.$projection['start'].' al '.$projection['end'].''}}" >
+	<x-titlePage title="Proyección {{$projection['name']}}" subtitle="{{'Del '.Carbon::parse($projection['start'])->isoFormat('DD MMM YY').' al '.Carbon::parse($projection['end'])->isoFormat('DD MMM YY').''}}" >
 		<x-backButton :url="'/projections'" />
 	</x-titlePage>
 

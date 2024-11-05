@@ -1,9 +1,18 @@
+@php
+	use Carbon\Carbon;
+//	Carbon::setLocale('es');
+@endphp
 <x-layout>	
 	@if(session('banner'))
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
     {{-- Encabezado con título y espacio para dropdowns --}}
-	<x-titlePage title="Proyección {{$projection->name}} de {{$family->Name}}" subtitle="Del {{$projection->start}} al {{$projection->end}}">				
+	<x-titlePage title="Proyección {{$projection->name}} de {{$family->Name}}" subtitle="Del {{Carbon::parse($projection->start)->isoFormat('DD MMM YY') }} al {{Carbon::parse($projection->end)->isoFormat('DD MMM YY')}}">
+		@if (session('success'))
+		<p id="flash-message" class="dark:text-gray-200 text-gray-500 px-4 py-1 rounded text-center">			
+			Los cambios se han guardado exitosamente.
+		</p>
+		@endif
 		<x-backButton :url="'/projections/'.$projection->id.'/edit'"/>
 		<button type="submit" form="amounts" 
 			class="px-4 py-2 text-sm font-medium leading-5 text-gray-200 dark:text-gray-300 transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:shadow-outline-blue">
@@ -34,9 +43,11 @@
 				<form name="amounts" id="amounts" action="/projectionamount" method="POST"> @csrf
 				<input type="hidden" name="projectionid" value="{{$projection->id}}">
 				<input type="hidden" name="familyid" value="{{$family->FamilyId}}">
-
+				
 				<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
 					@foreach($amounts as $branch)
+					<input type="hidden" name="data[{{$loop->index}}][id]" value="{{$branch['current_year']['projection_amount_id']}}">
+					<input type="hidden" name="data[{{$loop->index}}][branchid]" value="{{$branch['branchid']}}">
 					<tr class="text-gray-700 dark:text-gray-400">
 						<td class="px-4 py-3 text-center border-r border-gray-700">{{$branch['name']}}</td>		
 						<td class="px-4 py-3 text-right">{{$branch['beforelast_year']['new_sale']}}</td>
@@ -63,15 +74,18 @@
 						</td>
 						<td class="py-3 text-right">							
 							<input class="w-24 text-sm text-right border:gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" 
-							value="{{$branch['current_year']['new_sale']}}" placeholder="Venta Nuevo" name="amount_new[{{$branch['branchid']}}]"/>
+							value="{{$branch['current_year']['new_sale']}}" placeholder="Venta Nuevo" 
+							name="data[{{$loop->index}}][new_sale]"/>
 						</td>
 						<td class="py-3 text-right">
 							<input class="w-24 text-sm text-right border:gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" 
-							value="{{$branch['current_year']['old_sale']}}" placeholder="Venta Viejo" name="amount_old[{{$branch['branchid']}}]"/>
+							value="{{$branch['current_year']['old_sale']}}" placeholder="Venta Viejo" 
+							name="data[{{$loop->index}}][old_sale]"/>
 						</td>
 						<td class="py-3 text-right">
-								<input class="w-24 text-sm text-right border:gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" 
-								value="{{$branch['current_year']['purchase_cost']}}" placeholder="Compra" name="amount_purchase[{{$branch['branchid']}}]"/>
+							<input class="w-24 text-sm text-right border:gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input" 
+							value="{{$branch['current_year']['purchase_cost']}}" placeholder="Compra" 
+							name="data[{{$loop->index}}][purchase]"/>
 						</td>
 						<td class="py-3 text-center ">
 							<x-percentageButton below="red" above="green" min="50" max="60" :value="$branch['current_year']['relation']" />							
@@ -126,6 +140,17 @@
 </x-layout>
 
 <script>
+	setTimeout(() => {
+		const flashMessage = document.getElementById('flash-message');
+		if (flashMessage) {
+			flashMessage.style.transition = 'opacity 0.5s ease';
+			flashMessage.style.opacity = '0';
+			setTimeout(() => flashMessage.remove(), 500); // Elimina el elemento después de la transición
+		}
+	}, 3000);	
+</script>
+<script>
+
 document.addEventListener('DOMContentLoaded', function () {
 	$('#table').DataTable({	
 		dom: 't',
@@ -143,7 +168,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			//"targets": 3, "orderable": false,                
 		}]
 	});
+    
+
+
 });
+
 </script>
 
 <style>    

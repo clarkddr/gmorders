@@ -110,7 +110,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 	const data = @json($amounts);
-	const labels = data.map(item => item.name);	
+	const yearTitles = @json($year);
+	const labels = data.map(item => item.name);
 	const sale0 = data.map(item => parseInt(item.sale0.replace(/,/g, ''))); // Convertir a número
 	const sale1 = data.map(item => parseInt(item.sale1.replace(/,/g, ''))); // Convertir a número
 	const sale2 = data.map(item => parseInt(item.sale2.replace(/,/g, '')));
@@ -125,8 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			datasets: [
 			{
 				type: 'line',
-				label: 'Compra 2022',				
-				borderColor: 'rgba(28, 100, 242,1)',				
+				label: 'Compra ' + yearTitles[2],				
+				borderColor: 'rgba(239,68,68,1)',				
 				borderWidth: 2,
 				borderRadius: 5,
 				data: purchase2,
@@ -134,8 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			{
 				type: 'line',
-				label: 'Compra 2023',				
-				borderColor: 'rgba(126, 58, 242, 1)',				
+				label: 'Compra ' + yearTitles[1],				
+				borderColor: 'rgba(59,130,246, 1)',				
 				borderWidth: 1,
 				borderRadius: 5,
 				data: purchase1,
@@ -143,32 +144,35 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			{
 				type: 'line',
-				label: 'Compra 2024',				
-				borderColor: 'rgba(6, 148, 162, 1)',        
+				label: 'Compra ' + yearTitles[0],				
+				borderColor: 'rgba(34,197,94, 1)',        
 				borderWidth: 2,
 				borderRadius: 5,
 				data: purchase0,				
 			},
 			{
-				label: 'Venta 2022',
-				backgroundColor: 'rgba(28, 100, 242, 0.5)',
-				borderColor: 'rgba(28, 100, 242,1)',				
+				label: 'Venta ' + yearTitles[2],
+				// backgroundColor: 'rgba(28, 100, 242, 0.5)',
+				backgroundColor: 'rgba(239,68,68,0.3)',
+				borderColor: 'rgba(239,68,68,0.7)',				
 				borderWidth: 2,
 				borderRadius: 5,
 				data: sale2,
 			},
 			{
-				label: 'Venta 2023',
-				backgroundColor: 'rgba(126, 58, 242, 0.5)',				
-				borderColor: 'rgba(126, 58, 242, 1)',				
+				label: 'Venta ' + yearTitles[1],
+				//backgroundColor: 'rgba(126, 58, 242, 0.5)',				
+				backgroundColor: 'rgba(59,130,246,0.3)',				
+				borderColor: 'rgba(59,130,246,0.7)',				
 				borderWidth: 2,
 				borderRadius: 5,
 				data: sale1,
 			},
 			{
-				label: 'Venta 2024',
-				backgroundColor: 'rgba(6, 148, 162, 0.5)',        
-				borderColor: 'rgba(6, 148, 162, 1)',        
+				label: 'Venta ' + yearTitles[0],
+				//backgroundColor: 'rgba(6, 148, 162, 0.5)',        
+				backgroundColor: 'rgba(34,197,94,0.3)',        
+				borderColor: 'rgba(34,197,94,0.7)',        
 				borderWidth: 2,
 				borderRadius: 5,
 				data: sale0,				
