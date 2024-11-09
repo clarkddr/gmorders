@@ -243,8 +243,7 @@ class ProjectionController extends Controller
                     $has_projection = ProjectionAmount::where('projection_id',$projection->id)->where('FamilyId', $family->FamilyId)->exists();
                     $total_sale = $projectiontotalsPerFamily->where('FamilyId', $family->FamilyId)->sum('total_sale');
                     $total_purchase = $projectiontotalsPerFamily->where('FamilyId', $family->FamilyId)->sum('total_purchase');
-                    $relation = $total_sale !=0 ? (float)$total_purchase/$total_sale *100: 0;
-                    
+                    $relation = $total_sale !=0 ? (float)$total_purchase/$total_sale *100: 0;                    
                     return [
                         'FamilyId' => $family->FamilyId,
                         'Name' => $family->Name,

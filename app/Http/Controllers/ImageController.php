@@ -68,7 +68,6 @@ class ImageController extends Controller
 
     public function plan(Request $request){
         $rows = collect([
-<<<<<<< HEAD
             ["family" => "Basico", "sucursal" => "San Luis 1", "venta" => 25319.70, "compra" => 15260.787000],
             ["family" => "Basico", "sucursal" => "Mia", "venta" => 42986.70, "compra" => 18816.681000],
             ["family" => "Basico", "sucursal" => "Loa", "venta" => 36127.50, "compra" => 14280.609000],
@@ -97,7 +96,6 @@ class ImageController extends Controller
             ["family" => "Blusa", "sucursal" => "Fase", "venta" => 141152.60, "compra" => 51430.781000],
             ["family" => "Blusa", "sucursal" => "Carranza", "venta" => 707530.65, "compra" => 296689.048500],
             ["family" => "Blusa", "sucursal" => "Loa", "venta" => 138430.60, "compra" => 57865.638000],
-=======
             ["family" => "Basico", "sucursal" => "Mia", "venta" => 41358.70, "compra" => 12716.916000],
             ["family" => "Basico", "sucursal" => "Morelos", "venta" => 29350.80, "compra" => 11262.075000],
             ["family" => "Basico", "sucursal" => "Glamour", "venta" => 22391.30, "compra" => 9854.331000],
@@ -128,10 +126,8 @@ class ImageController extends Controller
             ["family" => "Blusa", "sucursal" => "Carranza", "venta" => 636498.45, "compra" => 255223.384500],
             ["family" => "Bodysuit", "sucursal" => "Maluk", "venta" => 28970.70, "compra" => 8629.111500],
             ["family" => "Bodysuit", "sucursal" => "Morelos", "venta" => 1303.50, "compra" => 0.000000],
->>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
             ["family" => "Bodysuit", "sucursal" => "Oaxaca", "venta" => 510.00, "compra" => 0.000000],
             ["family" => "Bodysuit", "sucursal" => "Glamour", "venta" => 414.60, "compra" => 0.000000],
-<<<<<<< HEAD
             ["family" => "Bodysuit", "sucursal" => "Loa", "venta" => 930.50, "compra" => 0.000000],
             ["family" => "Bodysuit", "sucursal" => "Mia", "venta" => 4448.40, "compra" => 1300.137000],
             ["family" => "Bodysuit", "sucursal" => "Fase", "venta" => 1180.20, "compra" => 0.000000],
@@ -181,7 +177,6 @@ class ImageController extends Controller
             ["family" => "Kimono", "sucursal" => "Glamour", "venta" => 560.00, "compra" => 0.000000],
             ["family" => "Kimono", "sucursal" => "Galerias", "venta" => 544.00, "compra" => 0.000000],
             ["family" => "Monoshort", "sucursal" => "Telaviv", "venta" => 1139.40, "compra" => 1507.500000],
-=======
             ["family" => "Bodysuit", "sucursal" => "Mia", "venta" => 2285.00, "compra" => 1300.137000],
             ["family" => "Bodysuit", "sucursal" => "Fase", "venta" => 1180.20, "compra" => 0.000000],
             ["family" => "Bodysuit", "sucursal" => "Loa", "venta" => 930.50, "compra" => 0.000000],
@@ -230,11 +225,9 @@ class ImageController extends Controller
             ["family" => "Kimono", "sucursal" => "Oaxaca", "venta" => 102.50, "compra" => 0.000000],
             ["family" => "Kimono", "sucursal" => "Galerias", "venta" => 544.00, "compra" => 0.000000],
             ["family" => "Monoshort", "sucursal" => "Telaviv", "venta" => 684.70, "compra" => 1507.500000],
->>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
             ["family" => "Monoshort", "sucursal" => "Fase", "venta" => 512.50, "compra" => 0.000000],
             ["family" => "Monoshort", "sucursal" => "San Luis 2", "venta" => 5258.50, "compra" => 1562.085000],
             ["family" => "Monoshort", "sucursal" => "Mia", "venta" => 487.50, "compra" => 0.000000],
-<<<<<<< HEAD
             ["family" => "Monoshort", "sucursal" => "Glamour", "venta" => 1204.50, "compra" => 0.000000],
             ["family" => "Monoshort", "sucursal" => "Carranza", "venta" => 31558.90, "compra" => 16472.046600],
             ["family" => "Monoshort", "sucursal" => "Galerias", "venta" => 1006.20, "compra" => 0.000000],
@@ -314,7 +307,6 @@ class ImageController extends Controller
 ["family" => "Total", "sucursal" => "Glamour", "venta" => 323613.90, "compra" => 162578.581700],
 ["family" => "Total", "sucursal" => "Hermosillo", "venta" => 469242.56, "compra" => 203187.072900],
 ["family" => "Total", "sucursal" => "Telaviv", "venta" => 243088.10, "compra" => 145425.591900],
-=======
             ["family" => "Monoshort", "sucursal" => "San Luis 2", "venta" => 4319.50, "compra" => 1562.085000],
             ["family" => "Monoshort", "sucursal" => "San Luis 3", "venta" => 40584.10, "compra" => 16170.546600],
             ["family" => "Monoshort", "sucursal" => "Glamour", "venta" => 1204.50, "compra" => 0.000000],
@@ -381,7 +373,6 @@ class ImageController extends Controller
             ["family" => "Vestido", "sucursal" => "San Luis 1", "venta" => 26534.30, "compra" => 8588.850000],
             ["family" => "Vestido", "sucursal" => "Carranza", "venta" => 235280.90, "compra" => 98339.461000],
             ["family" => "Vestido", "sucursal" => "Hermosillo", "venta" => 40970.20, "compra" => 16611.175000],
->>>>>>> parent of adea7bf (Se guardan cambios antes de integrar Proyeccion y DB Branix)
         ]);
 
         $families = $rows->pluck('family')->unique();

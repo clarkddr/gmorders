@@ -355,17 +355,17 @@ class ProjectionAmountController extends Controller
         $purchaseTotal = $purchaseResults->reduce(function($carry,$item){
             return $carry + $item->Costo;
         },0);        
-        $projectionSalesTotal = $filteredProjection->reduce(function ($carry,$item) {                     
+        $projectionSalesTotal = $filteredProjection->reduce(function ($carry,$item, $purchaseTotal) {                     
             $new = $item['current'];            
             $old = $item['old'];            
             $amount = $item['amount'];
-            $purchase = $item['purchase'];
+            $purchase = $item['purchase'];            
             return [
                 'name' => 'Todas',
                 'current' => $carry['current'] + $new,
                 'old' => $carry['old'] + $old,
                 'total' => $carry['total'] + $amount,
-                'purchase' => $carry['purchase'] + $purchase
+                'purchase' => $carry['purchase'] + $purchase,
             ];
         },['name'=>'Todas','current' => 0, 'old' => 0, 'total' => 0, 'purchase' => 0]);
         
@@ -383,6 +383,7 @@ class ProjectionAmountController extends Controller
             $projectionAmount = (float) ($projectionSale['amount'] ?? 0);
             $totalVsProjection = $projectionAmount != 0 ? (float) $row->Amount / (float)$projectionAmount * 100 : 0; // Aquí manejas la división
             $purchaseVsProjection = $projectionSale['purchase'] != 0 ? (float)$purchase/$projectionSale['purchase'] *100 : 0 ;
+            $toPurchaseDlls = ($projectionSale['purchase'] - $purchase) / 19.5;
             return [
                 'name' => $branch->Name,
                 'id' => $branch->BranchId,
@@ -396,7 +397,8 @@ class ProjectionAmountController extends Controller
                     'old' => (float) $projectionSale['old'] ?? 0,
                     'amount' => (float) $projectionSale['amount'] ?? 0,
                     'purchase' => (float) $projectionSale['purchase'] ?? 0,
-                    'purchaseVsProjection' => $purchaseVsProjection
+                    'purchaseVsProjection' => $purchaseVsProjection,     
+                    'toPurchaseDlls' => $toPurchaseDlls               
                 ]
             ];
         });        
@@ -408,7 +410,7 @@ class ProjectionAmountController extends Controller
             'current' => number_format($thisYearSalesTotal['current'], 0, '.', ','), // Formato de moneda
             'old' => number_format($thisYearSalesTotal['old'], 0, '.', ','),
             'total' => number_format($thisYearSalesTotal['total'], 0, '.', ','),
-            'purchase' => number_format($purchaseTotal, 0, '.', ',')
+            'purchase' => number_format($purchaseTotal, 0, '.', ','),          
           
         ];
 
@@ -422,9 +424,10 @@ class ProjectionAmountController extends Controller
             'current' => number_format($projectionSalesTotal['current'], 0, '.', ','), // Formato de moneda
             'old' => number_format($projectionSalesTotal['old'], 0, '.', ','),
             'total' => number_format($projectionSalesTotal['total'], 0, '.', ','),
-            'purchase' => number_format($projectionSalesTotal['purchase'], 0, '.', ','),
+            'purchase' => number_format($projectionSalesTotal['purchase'], 0, '.', ','),            
             'totalVsProjection' => $totalVsProjection,
-            'purchaseVsProjection' => $purchaseProjectionvsPurchaseTotal
+            'purchaseVsProjection' => $purchaseProjectionvsPurchaseTotal,
+            'toPurchaseDlls' => number_format(($projectionSalesTotal['purchase'] - $purchaseTotal ) / 19.5,0),
         ];
 
 
@@ -442,7 +445,8 @@ class ProjectionAmountController extends Controller
                     'old' => number_format($item['projection']['old'],0) ?? 0,
                     'amount' => number_format($item['projection']['amount'],0) ?? 0,
                     'purchase' => number_format($item['projection']['purchase'],0) ?? 0,
-                    'purchaseVsProjection' => number_format($item['projection']['purchaseVsProjection'],1)
+                    'purchaseVsProjection' => number_format($item['projection']['purchaseVsProjection'],1),
+                    'toPurchaseDlls' => number_format($item['projection']['toPurchaseDlls'],0)
                 ]
             ];
         });        

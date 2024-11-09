@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FamilySalesOverYearsController;
+use App\Http\Controllers\PurchaseOverSaleController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
@@ -23,6 +24,8 @@ Route::middleware('auth')->group(function(){
     Route::get('/projections/amounts', [ProjectionController::class, 'amounts']);
     Route::resource('projections',ProjectionController::class);
     Route::resource('projectionamount',ProjectionAmountController::class);
+    Route::get('purchaseoversale',[PurchaseOverSaleController::class,'index'])->name('purchaseoversale.index');
+    Route::get('purchaseoversale/{id}',[PurchaseOverSaleController::class,'show'])->name('purchaseoversale.show');
 });
 
 Route::get('/plan', [ImageController::class,'plan'])->name('plan');

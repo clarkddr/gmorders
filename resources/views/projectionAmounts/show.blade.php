@@ -19,6 +19,7 @@
 						<th class="px-4 py-3 text-right">Compra</th>
 						<th class="px-4 py-3 text-right">Proyección Compra</th>						
 						<th class="px-4 py-3">Avance Proyección Compra</th>
+						<th class="px-4 py-3">Por Comprar Dlls</th>
 					</tr>
 				</thead>
 				<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -50,7 +51,11 @@
 						</td>		
 						<td class="px-4 py-3">	
 							<x-projectionProgress :value="$tySales['projection']['purchaseVsProjection']"/>						
-						</td>		
+						</td>
+						<td class="px-4 py-3">	
+							{{ $tySales['projection']['toPurchaseDlls']}}
+						</td>
+						
 					</tr>
 					@endforeach
 				</tbody>
@@ -81,6 +86,9 @@
 						</td>						
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$projectionSalesTotal['purchaseVsProjection']" size="lg"/>
+						</td>
+						<td class="px-4 py-3 text-xl font-bold">
+							{{$projectionSalesTotal['toPurchaseDlls']}}
 						</td>
 					</tr>
 				</tfoot>
