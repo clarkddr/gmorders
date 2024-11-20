@@ -20,7 +20,8 @@ Route::middleware('guest')->group(function(){
 
 Route::middleware('auth')->group(function(){
     Route::get('/',function(){  return view('home');  });
-    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'show'])->name('salesyearoy.show');    
+    Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'index'])->name('salesyearoy.index');
+    Route::get('/salesyearoy/categories',[FamilySalesOverYearsController::class,'categories'])->name('salesyearoy.categories');
     Route::get('/projections/amounts', [ProjectionController::class, 'amounts']);
     Route::resource('projections',ProjectionController::class);
     Route::resource('projectionamount',ProjectionAmountController::class);
@@ -29,11 +30,15 @@ Route::middleware('auth')->group(function(){
 });
 
 Route::get('/plan', [ImageController::class,'plan'])->name('plan');
-Route::get('/select', [GalleryController::class,'select'])->name('select');
 
 Route::resource('suppliers',SupplierController::class);
 Route::resource('galleries',GalleryController::class);
 Route::resource('images',ImageController::class);
+
+Route::get('test', function () {
+    return view();
+});
+
 
 
 Route::get('/upload', function () {

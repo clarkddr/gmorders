@@ -9,22 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class FamilySalesOverYearsController extends Controller
 {
-    public function index(){
-        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
-        $data = [
-            'selectedDate' => '',
-            'selectedCategory' => 0,
-            'categories' => $categories,
-            'amounts' => [],
-            'totalSales' => ['sale2' => 0, 'sale1' => 0, 'sale0' => 0,'relation0vs1' => 0, 'relation0vs2' => 0],
-            'totalPurchase' => ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0,
-            'relation2' => 0, 'relation1' => 0, 'relation0' => 0],
-        ];
-        
-        return view('salesYoy.index',$data);
-    }
-
-    public function show(Request $request){
+    public function index(Request $request){
         $categories = Category::whereIn('CategoryId',[1,4,12])->get();
         $data = [
             'selectedDate' => '',
@@ -156,4 +141,82 @@ class FamilySalesOverYearsController extends Controller
 
         
     }
+
+    public function categories(Request $request){
+        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
+        $data = [
+            'selectedDate' => '',
+            'selectedCategory' => 0,
+            'categories' => $categories,
+            'amounts' => [],
+            'totalSales' => ['sale2' => 0, 'sale1' => 0, 'sale0' => 0,'relation0vs1' => 0, 'relation0vs2' => 0],
+            'totalPurchase' => ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0,
+            'purchaseRelation2' => 0, 'purchaseRelation1' => 0,],
+            'year' => ['2' => '', '1' => '', '0' => ''],
+            
+        ];
+
+        if($request->all() != []){
+
+            $request->validate([
+            'dates1' => ['required'],
+            'dates2' => ['required'],
+            'category' => ['required','not_in:Departamento'], 
+            ]);
+            $inputCategory = $request->input('category');
+            $inputDates1 = $request->input('dates1');
+            $inputDates2 = $request->input('dates2');
+
+            
+            $category = Category::findOrFail($inputCategory);        
+
+            if($inputDates1 != '' && $inputDates1 != 0 &&
+            $inputDates2 != '' && $inputDates2 != 0){
+                $dates1 = array_map('trim', explode('to', $inputDates1));
+                $dates2 = array_map('trim', explode('to', $inputDates2));
+                if(count($dates1) == 1){
+                    $dates1[] = $dates1[0];
+                }
+                if(count($dates2) == 1){
+                    $dates2[] = $dates1[0];
+                }
+            }
+
+            $fromDate1 = Carbon::createFromFormat('Y-m-d', $dates1[0])->setTime(0,0,0);
+            $toDate1 = Carbon::createFromFormat('Y-m-d', $dates1[1])->setTime(0,0,0);
+
+            $fromDate2 = Carbon::createFromFormat('Y-m-d', $dates2[0])->setTime(0,0,0);
+            $toDate2 = Carbon::createFromFormat('Y-m-d', $dates2[1])->setTime(0,0,0);
+
+    // Validación adicional
+    if ($fromDate1 >= $fromDate2) {
+        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+    }
+
+    if ($toDate1 >= $toDate2) {
+        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+    }
+    if ($toDate1 >= $fromDate2) {
+        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+    }
+            dd([$fromDate1,$toDate1,$fromDate2,$toDate2]);
+
+
+            $data = [
+                'selectedDate' => $request->input('dates'),
+                'selectedCategory' => $category,
+                'categories' => $categories,                
+            ];
+
+            dd($data);
+
+        }
+        
+
+        return view('salesYoy.categories',$data);
+
+        
+    }
+
+
 }
