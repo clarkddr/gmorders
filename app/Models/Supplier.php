@@ -10,6 +10,8 @@ class Supplier extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $connection = 'mssql';
+    protected $table = 'Supplier';
+    protected $primaryKey = 'SupplierId';
 
 }

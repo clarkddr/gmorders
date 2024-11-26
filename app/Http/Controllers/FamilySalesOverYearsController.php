@@ -2,62 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\Category;
+use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class FamilySalesOverYearsController extends Controller
 {
-    public function index(Request $request){
-        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
+    public function index(Request $request)
+    {
+        $categories = Category::whereIn('CategoryId', [1, 4, 12])->get();
         $data = [
             'selectedDate' => '',
             'selectedCategory' => 0,
             'categories' => $categories,
             'amounts' => [],
-            'totalSales' => ['sale2' => 0, 'sale1' => 0, 'sale0' => 0,'relation0vs1' => 0, 'relation0vs2' => 0],
+            'totalSales' => ['sale2' => 0, 'sale1' => 0, 'sale0' => 0, 'relation0vs1' => 0, 'relation0vs2' => 0],
             'totalPurchase' => ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0,
-            'purchaseRelation2' => 0, 'purchaseRelation1' => 0,],
+                'purchaseRelation2' => 0, 'purchaseRelation1' => 0,],
             'year' => ['2' => '', '1' => '', '0' => ''],
-            
+
         ];
 
-        if($request->all() != []){
+        if ($request->all() != []) {
 
             $request->validate([
-            'dates' => ['required'],
-            'category' => ['required','not_in:Departamento'], 
+                'dates' => ['required'],
+                'category' => ['required', 'not_in:Departamento'],
             ]);
             $inputCategory = $request->input('category');
             $inputDates = $request->input('dates');
 
-            $category = Category::findOrFail($inputCategory);        
-            if($inputDates != '' && $inputDates != 0){
+            $category = Category::findOrFail($inputCategory);
+            if ($inputDates != '' && $inputDates != 0) {
                 $dates = array_map('trim', explode('to', $inputDates));
-                if(count($dates) == 1){
+                if (count($dates) == 1) {
                     $dates[] = $dates[0];
                 }
             }
 
-            $date1 = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(2);
-            $date2 = Carbon::createFromFormat('Y-m-d', $dates[1])->setTime(0,0,0);
+            $date1 = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->subYear(2);
+            $date2 = Carbon::createFromFormat('Y-m-d', $dates[1])->setTime(0, 0, 0);
 
-            $year['2'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(2)->year;
-            $year['1'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->subYear(1)->year;
-            $year['0'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0,0,0)->year;
+            $year['2'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->subYear(2)->year;
+            $year['1'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->subYear(1)->year;
+            $year['0'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->year;
 
             $query = "
             EXEC dbo.DRGetFamilySalesOverYears @From = '{$date1}', @To = '{$date2}', @Category = {$category->CategoryId}
             ";
             $queryResults = DB::connection('mssql')->selectResultSets($query);
-            
+
             // Resultados de Ventas
             $results = collect($queryResults[0]);
             // Resultado de compras
-            $purchaseResults = collect($queryResults[1]);
+            $familyPurchaseResults = collect($queryResults[1]);
 
-            
+
             $totalSales = $results->reduce(function ($carry, $item) {
                 $sale2 = $carry['sale2'] + $item->sale2;
                 $sale1 = $carry['sale1'] + $item->sale1;
@@ -70,10 +73,10 @@ class FamilySalesOverYearsController extends Controller
                     'sale0' => $sale0,
                     'relation0vs1' => $relation0vs1,
                     'relation0vs2' => $relation0vs2,
-                ]);    
-            },['sale2' => 0, 'sale1' => 0, 'sale0' => 0]);
+                ]);
+            }, ['sale2' => 0, 'sale1' => 0, 'sale0' => 0]);
 
-            $totalPurchase = $purchaseResults->reduce(function ($carry, $item) use($totalSales) {
+            $totalPurchase = $familyPurchaseResults->reduce(function ($carry, $item) use ($totalSales) {
                 $purchase0 = $carry['purchase0'] + $item->purchase0;
                 $purchase1 = $carry['purchase1'] + $item->purchase1;
                 $purchase2 = $carry['purchase2'] + $item->purchase2;
@@ -86,20 +89,20 @@ class FamilySalesOverYearsController extends Controller
                     'purchase0' => $purchase0,
                     'purchaseRelation2' => $purchaseRelation2,
                     'purchaseRelation1' => $purchaseRelation1,
-                ]);    
-            },['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0]);
-            
+                ]);
+            }, ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0]);
+
             $totalPurchaseFormatted = collect($totalPurchase)->map(function ($value) {
                 return number_format($value, 0); // Formatea cada valor
             });
-            
+
             $totalSalesFormatted = collect($totalSales)->map(function ($value) {
                 return number_format($value, 0); // Formatea cada valor
             });
 
-            $amounts = $results->map(function ($row) use ($purchaseResults) {
-                $purchase = $purchaseResults->where('familyid', $row->FamilyId)->first();
-                $purchaseRelation0vs1 = $purchase->purchase1 != 0 ? $purchase->purchase0 / $purchase->purchase1 * 100 : 0; 
+            $amounts = $results->map(function ($row) use ($familyPurchaseResults) {
+                $purchase = $familyPurchaseResults->where('familyid', $row->FamilyId)->first();
+                $purchaseRelation0vs1 = $purchase->purchase1 != 0 ? $purchase->purchase0 / $purchase->purchase1 * 100 : 0;
                 $purchaseRelation0vs2 = $purchase->purchase2 != 0 ? $purchase->purchase0 / $purchase->purchase2 * 100 : 0;
 
                 $relation0vs1 = $row->sale1 != 0 ? $row->sale0 / $row->sale1 * 100 : 0;
@@ -107,20 +110,20 @@ class FamilySalesOverYearsController extends Controller
                 return collect([
                     'familyid' => $row->FamilyId,
                     'name' => $row->Name,
-                    'sale2' => number_format($row->sale2,0),
-                    'sale1' => number_format($row->sale1,0),
-                    'sale0' => number_format($row->sale0,0),
-                    'relation0vs1' => number_format($relation0vs1,0),
-                    'relation0vs2' => number_format($relation0vs2,0),
-                    'purchaseRelation0vs1' => number_format($purchaseRelation0vs1,0),
-                    'purchaseRelation0vs2' => number_format($purchaseRelation0vs2,0),
-                    'purchase2' => number_format($purchase->purchase2,0),                    
-                    'purchase1' => number_format($purchase->purchase1,0),                    
-                    'purchase0' => number_format($purchase->purchase0,0),
-                ]); 
-            });    
+                    'sale2' => number_format($row->sale2, 0),
+                    'sale1' => number_format($row->sale1, 0),
+                    'sale0' => number_format($row->sale0, 0),
+                    'relation0vs1' => number_format($relation0vs1, 0),
+                    'relation0vs2' => number_format($relation0vs2, 0),
+                    'purchaseRelation0vs1' => number_format($purchaseRelation0vs1, 0),
+                    'purchaseRelation0vs2' => number_format($purchaseRelation0vs2, 0),
+                    'purchase2' => number_format($purchase->purchase2, 0),
+                    'purchase1' => number_format($purchase->purchase1, 0),
+                    'purchase0' => number_format($purchase->purchase0, 0),
+                ]);
+            });
 
-               
+
             // Resultados de Compras
 
 
@@ -135,88 +138,11 @@ class FamilySalesOverYearsController extends Controller
             ];
 
         }
-        
 
-        return view('salesYoy.index',$data);
 
-        
+        return view('salesYoy.index', $data);
+
+
     }
-
-    public function categories(Request $request){
-        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
-        $data = [
-            'selectedDate' => '',
-            'selectedCategory' => 0,
-            'categories' => $categories,
-            'amounts' => [],
-            'totalSales' => ['sale2' => 0, 'sale1' => 0, 'sale0' => 0,'relation0vs1' => 0, 'relation0vs2' => 0],
-            'totalPurchase' => ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0,
-            'purchaseRelation2' => 0, 'purchaseRelation1' => 0,],
-            'year' => ['2' => '', '1' => '', '0' => ''],
-            
-        ];
-
-        if($request->all() != []){
-
-            $request->validate([
-            'dates1' => ['required'],
-            'dates2' => ['required'],
-            'category' => ['required','not_in:Departamento'], 
-            ]);
-            $inputCategory = $request->input('category');
-            $inputDates1 = $request->input('dates1');
-            $inputDates2 = $request->input('dates2');
-
-            
-            $category = Category::findOrFail($inputCategory);        
-
-            if($inputDates1 != '' && $inputDates1 != 0 &&
-            $inputDates2 != '' && $inputDates2 != 0){
-                $dates1 = array_map('trim', explode('to', $inputDates1));
-                $dates2 = array_map('trim', explode('to', $inputDates2));
-                if(count($dates1) == 1){
-                    $dates1[] = $dates1[0];
-                }
-                if(count($dates2) == 1){
-                    $dates2[] = $dates1[0];
-                }
-            }
-
-            $fromDate1 = Carbon::createFromFormat('Y-m-d', $dates1[0])->setTime(0,0,0);
-            $toDate1 = Carbon::createFromFormat('Y-m-d', $dates1[1])->setTime(0,0,0);
-
-            $fromDate2 = Carbon::createFromFormat('Y-m-d', $dates2[0])->setTime(0,0,0);
-            $toDate2 = Carbon::createFromFormat('Y-m-d', $dates2[1])->setTime(0,0,0);
-
-    // Validación adicional
-    if ($fromDate1 >= $fromDate2) {
-        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
-    }
-
-    if ($toDate1 >= $toDate2) {
-        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
-    }
-    if ($toDate1 >= $fromDate2) {
-        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
-    }
-            dd([$fromDate1,$toDate1,$fromDate2,$toDate2]);
-
-
-            $data = [
-                'selectedDate' => $request->input('dates'),
-                'selectedCategory' => $category,
-                'categories' => $categories,                
-            ];
-
-            dd($data);
-
-        }
-        
-
-        return view('salesYoy.categories',$data);
-
-        
-    }
-
 
 }

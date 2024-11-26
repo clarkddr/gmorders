@@ -1,10 +1,10 @@
 <li class="relative px-6 py-3">
     @if (request()->path() == '/')
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
-    
+
     <a
-    class="@if(request()->path() == '/') text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+    class="@if(request()->path() == '/') text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
     href="/"
     >
     <svg
@@ -28,11 +28,11 @@
 <ul>
 {{-- <li class="relative px-6 py-3">
     @if (Route::is('suppliers.*'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a
-    class="@if(Route::is('suppliers.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
-    
+    class="@if(Route::is('suppliers.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
+
     href="{{route('suppliers.index')}}"
     >
     <svg
@@ -54,10 +54,10 @@
 </li> --}}
 {{-- <li class="relative px-6 py-3">
     @if (Route::is('galleries.*'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a
-    class="@if(Route::is('galleries.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+    class="@if(Route::is('galleries.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
     href="{{route('galleries.index')}}"
     >
     <svg
@@ -79,10 +79,10 @@
 </li> --}}
 {{-- <li class="relative px-6 py-3">
     @if (Route::is('plan'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a
-    class="@if(Route::is('plan')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "        
+    class="@if(Route::is('plan')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
     href="{{route('plan')}}"
     >
     <svg
@@ -105,31 +105,31 @@
 {{-- Proyecciones --}}
 <li class="relative px-6 py-3">
     @if (Route::is('projections.*') || Request::is('projections/amounts*'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a class="@if (Route::is('projections.*') || Request::is('projections/amounts*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
-     href="{{route('projections.index')}}">            
-        <svg class ="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>        
+     href="{{route('projections.index')}}">
+        <svg class ="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
         <span class="ml-4">Proyecciones</span>
     </a>
 </li>
 {{-- Compra vs Venta --}}
 <li class="relative px-6 py-3">
     @if (Route::is('purchaseoversale.*'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a class="@if(Route::is('purchaseoversale.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
-     href="{{route('purchaseoversale.index')}}">            
+     href="{{route('purchaseoversale.index')}}">
      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
-      </svg>          
+      </svg>
         <span class="ml-4">Compra vs Venta</span>
     </a>
 </li>
 {{-- Venta vs Proyeccion --}}
 <li class="relative px-6 py-3">
     @if (Route::is('projectionamount.*'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a class="@if(Route::is('projectionamount.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
      href="{{route('projectionamount.index')}}">
@@ -140,12 +140,23 @@
 {{-- Venta de Familias --}}
 <li class="relative px-6 py-3">
     @if (Route::is('salesyearoy.*'))
-    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>            
+    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
     @endif
     <a class="@if(Route::is('salesyearoy.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
      href="{{route('salesyearoy.index')}}">
      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
      <span class="ml-4">Venta/Compra vs Años</span>
+    </a>
+</li>
+{{-- Venta vs Proyeccion --}}
+<li class="relative px-6 py-3">
+    @if (Route::is('saleandpurchase.*'))
+        <span class="absolute inset-y-0 left-0 w-1 bg-blue-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
+    @endif
+    <a class="@if(Route::is('saleandpurchase.*')) text-gray-800 dark:text-gray-100 @endif inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 "
+       href="{{route('saleandpurchase.index')}}">
+        <svg class="w-6 h-6 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.6 16.733c.234.269.548.456.895.534a1.4 1.4 0 0 0 1.75-.762c.172-.615-.446-1.287-1.242-1.481-.796-.194-1.41-.861-1.241-1.481a1.4 1.4 0 0 1 1.75-.762c.343.077.654.26.888.524m-1.358 4.017v.617m0-5.939v.725M4 15v4m3-6v6M6 8.5 10.5 5 14 7.5 18 4m0 0h-3.5M18 4v3m2 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"/></svg>
+        <span class="ml-4">Ventas y Compras Periodos</span>
     </a>
 </li>
 

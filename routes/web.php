@@ -3,11 +3,13 @@
 use App\Http\Controllers\FamilySalesOverYearsController;
 use App\Http\Controllers\PurchaseOverSaleController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\SaleandPurchaseController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProjectionAmountController;
 use App\Http\Controllers\ProjectionController;
 use App\Http\Controllers\SessionController;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -21,7 +23,7 @@ Route::middleware('guest')->group(function(){
 Route::middleware('auth')->group(function(){
     Route::get('/',function(){  return view('home');  });
     Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'index'])->name('salesyearoy.index');
-    Route::get('/salesyearoy/categories',[FamilySalesOverYearsController::class,'categories'])->name('salesyearoy.categories');
+    Route::get('/saleandpurchase',[SaleAndPurchaseController::class,'index'])->name('saleandpurchase.index');
     Route::get('/projections/amounts', [ProjectionController::class, 'amounts']);
     Route::resource('projections',ProjectionController::class);
     Route::resource('projectionamount',ProjectionAmountController::class);
@@ -57,9 +59,52 @@ Route::get('/php', function () {
 
 Route::get('/sql', function () {
     $sql = DB::connection('mssql')->select('select * from branch');
-    dd($sql);    
+    dd($sql);
 });
 
 Route::get('/chart', function () {
     return view('chart');
+});
+
+
+Route::get('/dates', function () {
+
+
+});
+
+Route::get('/hour', function () {
+    $today = Carbon::today()->format('Y-m-d');
+    $lastYear = Carbon::today()->subYear()->format('Y-m-d');
+
+    $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
+    $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
+    $lastyearResults = collect($lastyearResults[0]);
+
+    $queryToday = "EXEC dbo.DRSalesByHour @From = '{$today}' , @To = '{$today}'";
+    $todayResults = DB::connection('mssql')->selectResultSets($queryToday);
+    $todayResults = collect($todayResults[0]);
+
+    $todayAccumulated = 0; $lastYearAccumulated = 0;
+    $amounts = $lastyearResults->map(function ($hour) use (&$todayAccumulated, &$lastYearAccumulated, $todayResults) {
+        $amount = $hour->Amount;
+        $todaySale = $todayResults->where('Hour', $hour->Hour)->first()->Amount ?? 0;
+        $lastYearAccumulated += $amount;
+        $todayAccumulated += $todaySale;
+        $relation = $todayAccumulated / $lastYearAccumulated ?? 0;
+
+       return collect([
+           'hour' => $hour->Hour,
+           'lastYear' => $amount,
+           'today' => $todaySale,
+           'lastYearAccumulated' => $lastYearAccumulated,
+           'todayAccumulated' => $todayAccumulated,
+           'relation' => $relation,
+       ]);
+    });
+
+    dd($amounts);
+
+
+
+
 });
