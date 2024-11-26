@@ -1,0 +1,219 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Branch;
+use App\Models\Category;
+use App\Models\Supplier;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class SaleandPurchaseController extends Controller
+{
+    public function index(Request $request){
+        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
+        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+
+        // Obtener fechas para el dropdown de fechas
+        //Ayer
+        $dates['yesterday'] = Carbon::today()->subDay()->format('Y-m-d');
+        $dates['sameWeekdayLastYear'] = Carbon::today()->subDay()->subYear()
+            ->next(Carbon::today()->subDay()->format('l'))
+            ->format('Y-m-d');
+        /// Mes Actual
+        $dates['thisMonthInitial'] = Carbon::today()->startOfMonth()->format('Y-m-d');
+        $dates['yesterday'] = Carbon::today()->subDay()->format('Y-m-d');
+        $dates['thisMonthInitialLastYear'] = Carbon::today()->subYear()->startOfMonth()->format('Y-m-d');
+        $dates['yesterdayLastYear'] = Carbon::today()->subDay()->subYear()->format('Y-m-d');
+        // Mes Pasado
+        $dates['lastMonthInitial'] = Carbon::today()->subMonth()->startOfMonth()->format('Y-m-d');
+        $dates['lastMonthEnd'] = Carbon::today()->subMonth()->endOfMonth()->format('Y-m-d');
+        $dates['lastMonthInitialLastYear'] = Carbon::today()->subYear()->subMonth()->startOfMonth()->format('Y-m-d');
+        $dates['lastMonthEndLastYear'] = Carbon::today()->subYear()->subMonth()->endOfMonth()->format('Y-m-d');
+        // Semana
+        $day = Carbon::yesterday();
+        $initialWeekdayLastYear = $day->copy()->addDays(2)->subYear()->startOfWeek(Carbon::MONDAY);
+        $dayDifference = $day->copy()->getDaysFromStartOfWeek(1);
+        $dates['initialWeekday'] = $day->copy()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+        $dates['initialWeekdayLastYear'] = $initialWeekdayLastYear->format('Y-m-d');
+        $dates['finalWeekdayLastYear'] = $initialWeekdayLastYear->copy()->addDays($dayDifference)->format('Y-m-d');
+        // Whole Year
+        $yesterday = Carbon::yesterday();
+        $dates['initialYear'] = $yesterday->copy()->firstOfYear()->format('Y-m-d');
+        $dates['initialLastYear'] = $yesterday->copy()->subYear()->firstOfYear()->format('Y-m-d');
+        $dates['finalLastYear'] = $yesterday->copy()->subYear()->format('Y-m-d');
+
+        $data = [
+            'selectedDate1' => '',
+            'selectedDate2' => '',
+            'selectedCategory' => 0,
+            'categories' => $categories,
+            'suppliers' => [],
+            'families' => [],
+            'branches'  => [],
+            'totals' => ['sale1'=>0,'sale2'=>0,'sale0'=>0,'purchase1'=>0,'purchase2'=>0,'purchase0'=>0,'saleRelation'=>0,'purchaseRelation'=>0],
+            'dates' => $dates,
+        ];
+
+//        dd($data);
+
+        if($request->all() != []){
+
+            $request->validate([
+                'dates1' => ['required'],
+                'dates2' => ['required'],
+                'category' => ['required','not_in:Departamento'],
+            ]);
+            $inputCategory = $request->input('category');
+            $inputDates1 = $request->input('dates1');
+            $inputDates2 = $request->input('dates2');
+
+
+            $category = Category::findOrFail($inputCategory);
+            $families = $category->families;
+
+            if($inputDates1 != '' && $inputDates1 != 0 &&
+                $inputDates2 != '' && $inputDates2 != 0){
+                $dates1 = array_map('trim', explode('to', $inputDates1));
+                $dates2 = array_map('trim', explode('to', $inputDates2));
+                if(count($dates1) == 1){
+                    $dates1[] = $dates1[0];
+                }
+                if(count($dates2) == 1){
+                    $dates2[] = $dates2[0];
+                }
+            }
+
+            $fromDate1 = Carbon::createFromFormat('Y-m-d', $dates1[0])->setTime(0,0,0);
+            $toDate1 = Carbon::createFromFormat('Y-m-d', $dates1[1])->setTime(0,0,0);
+
+            $fromDate2 = Carbon::createFromFormat('Y-m-d', $dates2[0])->setTime(0,0,0);
+            $toDate2 = Carbon::createFromFormat('Y-m-d', $dates2[1])->setTime(0,0,0);
+
+            // Validación adicional
+            if ($fromDate1 >= $fromDate2) {
+                return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+            }
+
+            //    if ($toDate1 >= $toDate2) {
+            //        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+            //    }
+            if ($toDate1 >= $fromDate2) {
+                return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+            }
+
+//            dd([$fromDate1,$toDate2]);
+
+
+            $query = "
+            EXEC dbo.DRGetFamilySalesPurchasesTwoDates @From = '{$fromDate1}', @to1 = '{$toDate1}',
+                @From2 = '{$fromDate2}', @To = '{$toDate2}',
+                @Category = {$category->CategoryId}
+            ";
+            $queryResults = DB::connection('mssql')->selectResultSets($query);
+
+            // Resultados de Ventas y compras tabla familias
+            $familySaleResult = collect($queryResults[0]);
+            $familyPurchaseResult = collect($queryResults[1]);
+//            dd($familySaleResult);
+            $totals = collect([
+                'sale1' => number_format($familySaleResult->sum('firstRange'),0),
+                'sale2' => number_format($familySaleResult->sum('secondRange'),0),
+                'purchase1' => number_format($familyPurchaseResult->sum('firstRange'),0),
+                'purchase2' => number_format($familyPurchaseResult->sum('secondRange'),0),
+                'saleRelation' => number_format($familySaleResult->sum('firstRange') != 0 ?
+                    $familySaleResult->sum('secondRange') / $familySaleResult->sum('firstRange') * 100 : 0,0),
+                'purchaseRelation' => number_format($familyPurchaseResult->sum('firstRange') != 0 ?
+                    $familyPurchaseResult->sum('secondRange') / $familyPurchaseResult->sum('firstRange') * 100 : 0,0),
+            ]);
+            $familiesAmounts = $families->map(function ($family) use ($familySaleResult, $familyPurchaseResult) {
+                $sale1 = $familySaleResult->where('FamilyId', $family->FamilyId)->first()->firstRange ?? 0;
+                $sale2 = $familySaleResult->where('FamilyId', $family->FamilyId)->first()->secondRange ?? 0;
+                $saleRelation = $sale1 != 0 ? $sale2 / $sale1 * 100 : 0;
+                $purchase1 = $familyPurchaseResult->where('FamilyId', $family->FamilyId)->first()->firstRange ?? 0;
+                $purchase2 = $familyPurchaseResult->where('FamilyId', $family->FamilyId)->first()->secondRange ?? 0;
+                $purchaseRelation = $purchase1 != 0 ? $purchase2 / $purchase1 * 100 : 0;
+                return collect([
+                    'familyid' => $family->FamilyId,
+                    'name' => $family->Name,
+                    'sale1' => number_format($sale1,0),
+                    'sale2' => number_format($sale2,0),
+                    'saleRelation' => number_format($saleRelation,0),
+                    'purchase1' => number_format($purchase1,0),
+                    'purchase2' => number_format($purchase2,0),
+                    'purchaseRelation' => number_format($purchaseRelation,0),
+                ]);
+            });
+            // Resultados de Ventas y compras tabla sucursales
+            $branchSaleResult = collect($queryResults[2]);
+            $branchPurchaseResult = collect($queryResults[3]);
+
+            $branchesAmounts = $branches->map(function ($branch) use ($branchSaleResult, $branchPurchaseResult) {
+                $sale1 = $branchSaleResult->where('BranchId', $branch->BranchId)->first()->firstRange ?? 0;
+                $sale2 = $branchSaleResult->where('BranchId', $branch->BranchId)->first()->secondRange ?? 0;
+                $saleRelation = $sale1 != 0 ? $sale2 / $sale1 * 100 : 0;
+                $purchase1 = $branchPurchaseResult->where('BranchId', $branch->BranchId)->first()->firstRange ?? 0;
+                $purchase2 = $branchPurchaseResult->where('BranchId', $branch->BranchId)->first()->secondRange ?? 0;
+                $purchaseRelation = $purchase1 != 0 ? $purchase2 / $purchase1 * 100 : 0;
+                return collect([
+                    'branchid' => $branch->BranchId,
+                    'name' => $branch->Name,
+                    'sale1' => number_format($sale1,0),
+                    'sale2' => number_format($sale2,0),
+                    'saleRelation' => number_format($saleRelation,0),
+                    'purchase1' => number_format($purchase1,0),
+                    'purchase2' => number_format($purchase2,0),
+                    'purchaseRelation' => number_format($purchaseRelation,0),
+                ]);
+            });
+
+            // Resultados de Ventas y compras tabla Proveedores
+            $supplierSaleResult = collect($queryResults[4]);
+            $supplierPurchaseResult = collect($queryResults[5]);
+            $suppliers = Supplier::all()->keyBy('SupplierId');
+
+            $suppliersAmounts = $suppliers->map(function ($supplier) use ($supplierSaleResult, $supplierPurchaseResult) {
+                $supplierId = $supplier->SupplierId;
+                $sale1 = $supplierSaleResult->where('SupplierId', $supplierId)->first()->firstRange ?? 0;
+                $sale2 = $supplierSaleResult->where('SupplierId', $supplierId)->first()->secondRange ?? 0;
+                $saleRelation = $sale1 != 0 ? $sale2 / $sale1 * 100 : 0;
+                $purchase1 = $supplierPurchaseResult->where('SupplierId', $supplierId)->first()->firstRange ?? 0;
+                $purchase2 = $supplierPurchaseResult->where('SupplierId', $supplierId)->first()->secondRange ?? 0;
+                $purchaseRelation = $purchase1 != 0 ? $purchase2 / $purchase1 * 100 : 0;
+                // Retorna nulo si todas las métricas son 0 (para filtrar luego)
+                if ($sale1 == 0 && $sale2 == 0 && $purchase1 == 0 && $purchase2 == 0) {
+                    return null;
+                }
+                return collect([
+                    'supplierid' => $supplierId,
+                    'name' => $supplier->Name,
+                    'sale1' => number_format($sale1,0),
+                    'sale2' => number_format($sale2,0),
+                    'saleRelation' => number_format($saleRelation,0),
+                    'purchase1' => number_format($purchase1,0),
+                    'purchase2' => number_format($purchase2,0),
+                    'purchaseRelation' => number_format($purchaseRelation,0),
+                ]);
+            })->filter();
+
+
+            $data['selectedDate1'] = $inputDates1;
+            $data['selectedDate2'] = $inputDates2;
+            $data['selectedCategory'] = $inputCategory;
+            $data['families'] = $familiesAmounts;
+            $data['branches'] = $branchesAmounts;
+            $data['suppliers'] = $suppliersAmounts;
+            $data['totals'] = $totals;
+
+//            dd($data);
+
+//            dd($data);
+        }
+
+//        dd($data);
+
+
+        return view('saleandpurchase.index',$data);
+    }
+}
