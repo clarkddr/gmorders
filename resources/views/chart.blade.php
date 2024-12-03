@@ -1,8 +1,8 @@
-<x-layout>	
+<x-layout>
     @if(session('banner'))
     <x-banner message="{{session('banner.message')}}" type="success" class=""/>
     @endif
-    
+
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
         <div class="rounded-lg">
             <div class="grid gap-6 mb-8 md:grid-cols-8">
@@ -16,9 +16,9 @@
             </div>
         </div>
     </div>
-    
-    
-    
+
+
+
 </x-layout>
 
 <script>
@@ -27,17 +27,17 @@
         const sale0 = [2300, 1500, 6500, 4500]; // Datos de ventas 2024
         const sale1 = [1536, 6523, 4578, 4200]; // Datos de ventas 2023
         const sale2 = [2544, 4566, 5211, 5000]; // Datos de ventas 2022
-        
+
         const purchase0 = [1200, 800, 4000, 2500]; // Datos de compra 2024
         const purchase1 = [800, 3000, 2500, 1800]; // Datos de compra 2023
         const purchase2 = [1000, 2200, 3000, 2300]; // Datos de compra 2022
-        
+
         const barConfig = {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                
+
                 {
                     label: '2024 Ventas',
                     backgroundColor: 'rgba(28, 100, 242, 0.3)', // Color de las ventas
@@ -45,9 +45,9 @@
                     borderWidth: 2,
                     data: sale0,
                     borderRadius: 5,
-                    
+
                 },
-                
+
                 {
                     label: '2024 Compra',
                     type: 'line',
@@ -58,13 +58,13 @@
                 },
                 {
                     label: '2023 Ventas',
-                    backgroundColor: 'rgba(126, 58, 242, 0.3)',                    
-                    borderColor: 'rgba(126, 58, 242, 1)',                    
+                    backgroundColor: 'rgba(126, 58, 242, 0.3)',
+                    borderColor: 'rgba(126, 58, 242, 1)',
                     borderWidth: 2,
                     borderRadius: 5,
                     data: sale1,
                 },
-                
+
                 {
                     label: '2023 Compra',
                     type: 'line',
@@ -72,15 +72,15 @@
                     borderWidth: 1,
                     data: purchase0,
                     borderRadius: 5,
-                },			
-                
-                
-                
-                
-                
-                
-                
-                
+                },
+
+
+
+
+
+
+
+
                 ],
             },
             options: {
@@ -99,12 +99,12 @@
                 plugins: {
                     annotation:{
                         annotations: [
-                        {                   
+                        {
                             type: 'line',
                             mode: 'horizontal',
                             scaleID: 'y',
-                            value: 2000,                       
-                            
+                            value: 2000,
+
                             borderColor: 'rgba(255, 0, 0, 1)', // Color de la linea roja
                             borderWidth: 2,
                         }
@@ -116,19 +116,19 @@
                 },
             },
         };
-        
+
         // Crear la gráfica
         const myChart = new Chart(document.getElementById('myChart'), barConfig);
-        
+
     });
-    
+
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const labels = ['Basico', 'Blusa', 'Bodysuit', 'Chamarra', 'Falda', 'Kimono', 'Monoshort', 'Pantalon', 'Saco/Sueter', 'Short', 'Vestido'];
         const sale2 = [1.3, 0.51, 1.17, 1.82, 0.59, 0, 0.32, 0.79, 1.78, 0.62, 0.54];
         const annotationValue = 0.6; // Valor de la línea de anotación
-        
+
         // Función para obtener el color dependiendo de la comparación con la línea de anotación
         const getBarColor = (value) => {
             return value < annotationValue ? 'rgba(255, 99, 132, 0.6)' : 'rgba(28, 100, 242, 0.3)'; // Rojo si está por debajo, azul si no
@@ -136,7 +136,7 @@
         const getBorderColor = (value) => {
             return value < annotationValue ? 'rgba(255, 99, 132, 0.9)' : 'rgba(28, 100, 242, 0.8)'; // Rojo si está por debajo, azul si no
         };
-    
+
         const barConfig = {
             type: 'bar',
             data: {
@@ -146,7 +146,7 @@
                         label: '2024 Ventas',
                         // Aplica el color dinámicamente para cada barra
                         backgroundColor: sale2.map(value => getBarColor(value)),
-                        borderColor: sale2.map(value => getBorderColor(value)),                        
+                        borderColor: sale2.map(value => getBorderColor(value)),
                         borderWidth: 2,
                         data: sale2,
                         borderRadius: 5,
@@ -203,7 +203,7 @@
                     },
                     annotation: {
                         annotations: [
-                            {                   
+                            {
                                 type: 'line',
                                 mode: 'horizontal',
                                 scaleID: 'y',
@@ -221,9 +221,8 @@
             // Habilitar el plugin datalabels globalmente
             plugins: [ChartDataLabels]
         };
-        
+
         // Crear la gráfica
         const myChart = new Chart(document.getElementById('myChart2'), barConfig);
     });
     </script>
-    

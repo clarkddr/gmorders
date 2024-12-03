@@ -73,8 +73,18 @@ Route::get('/dates', function () {
 });
 
 Route::get('/hour', function () {
-    $today = Carbon::today()->format('Y-m-d');
-    $lastYear = Carbon::today()->subYear()->format('Y-m-d');
+    $day = Carbon::today();
+    $today = $day->copy()->format('Y-m-d'); // Fecha de hoy
+
+    $lastYear = $day->copy()
+        ->subYear() // Ir al mismo día del año pasado
+        ->next($day->copy()->format('l')) // Ajustar al mismo día de la semana
+        ->format('Y-m-d');
+//    $today = '2024-11-26';
+//    $lastYear = '2023-11-28';
+
+    $hourNow = (int) Carbon::now()->format('H');
+//    $hourNow = 23;
 
     $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
     $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
@@ -85,24 +95,99 @@ Route::get('/hour', function () {
     $todayResults = collect($todayResults[0]);
 
     $todayAccumulated = 0; $lastYearAccumulated = 0;
-    $amounts = $lastyearResults->map(function ($hour) use (&$todayAccumulated, &$lastYearAccumulated, $todayResults) {
+    $amounts = $lastyearResults->map(function ($hour) use ($hourNow, &$todayAccumulated, &$lastYearAccumulated, $todayResults) {
         $amount = $hour->Amount;
         $todaySale = $todayResults->where('Hour', $hour->Hour)->first()->Amount ?? 0;
         $lastYearAccumulated += $amount;
         $todayAccumulated += $todaySale;
-        $relation = $todayAccumulated / $lastYearAccumulated ?? 0;
+        $relation = $todayAccumulated / $lastYearAccumulated * 100 ?? 0;
+        $hour = (int) $hour->Hour;
+        if($hour > $hourNow) {
+            return collect([
+                'hour' => $hour,
+                'lastYear' => null,
+                'today' => null,
+                'lastYearAccumulated' => null,
+                'todayAccumulated' => null,
+                'relation' => null,
+            ]);
+        }
+
 
        return collect([
-           'hour' => $hour->Hour,
-           'lastYear' => $amount,
-           'today' => $todaySale,
-           'lastYearAccumulated' => $lastYearAccumulated,
-           'todayAccumulated' => $todayAccumulated,
-           'relation' => $relation,
+           'hour' => $hour,
+           'lastYear' => number_format($amount,0),
+           'today' => number_format($todaySale,0),
+           'lastYearAccumulated' => number_format($lastYearAccumulated,0),
+           'todayAccumulated' => number_format($todayAccumulated,0),
+           'relation' =>$relation,
        ]);
+    })->filter();
+    $data = [
+        'amounts' => $amounts,
+    ];
+
+    return view('chartHour', $data);
+
+
+
+
+});
+
+Route::get('/hourData', function () {
+    $day = Carbon::today();
+    $today = $day->copy()->format('Y-m-d'); // Fecha de hoy
+
+    $lastYear = $day->copy()
+        ->subYear() // Ir al mismo día del año pasado
+        ->next($day->copy()->format('l')) // Ajustar al mismo día de la semana
+        ->format('Y-m-d');
+//    $today = '2024-11-26';
+//    $lastYear = '2023-11-28';
+
+    $hourNow = (int) Carbon::now()->format('H');
+//    $hourNow = 23;
+
+    $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
+    $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
+    $lastyearResults = collect($lastyearResults[0]);
+
+    $queryToday = "EXEC dbo.DRSalesByHour @From = '{$today}' , @To = '{$today}'";
+    $todayResults = DB::connection('mssql')->selectResultSets($queryToday);
+    $todayResults = collect($todayResults[0]);
+
+    $todayAccumulated = 0; $lastYearAccumulated = 0;
+    $amounts = $lastyearResults->map(function ($hour) use ($hourNow, &$todayAccumulated, &$lastYearAccumulated, $todayResults) {
+        $amount = $hour->Amount;
+        $todaySale = $todayResults->where('Hour', $hour->Hour)->first()->Amount ?? 0;
+        $lastYearAccumulated += $amount;
+        $todayAccumulated += $todaySale;
+        $relation = $todayAccumulated / $lastYearAccumulated * 100 ?? 0;
+        $hour = (int) $hour->Hour;
+        if($hour > $hourNow) {
+            return collect([
+                'hour' => $hour,
+                'lastYear' => null,
+                'today' => null,
+                'lastYearAccumulated' => null,
+                'todayAccumulated' => null,
+                'relation' => null,
+            ]);
+        }
+
+
+       return [
+           'hour' => $hour,
+           'lastYear' => number_format($amount,0),
+           'today' => number_format($todaySale,0),
+           'lastYearAccumulated' => number_format($lastYearAccumulated,0),
+           'todayAccumulated' => number_format($todayAccumulated,0),
+           'relation' =>$relation,
+       ];
     });
 
-    dd($amounts);
+
+    return response()->json($amounts);
 
 
 

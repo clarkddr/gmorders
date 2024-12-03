@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\Family;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +17,11 @@ class SaleandPurchaseController extends Controller
         $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
 
         // Obtener fechas para el dropdown de fechas
+        // Hoy
+        $dates['today'] = Carbon::today()->format('Y-m-d');
+        $dates['todaySameWeekdayLastYear'] = Carbon::today()->subYear()
+            ->next(Carbon::today()->format('l'))
+            ->format('Y-m-d');
         //Ayer
         $dates['yesterday'] = Carbon::today()->subDay()->format('Y-m-d');
         $dates['sameWeekdayLastYear'] = Carbon::today()->subDay()->subYear()
@@ -63,15 +69,20 @@ class SaleandPurchaseController extends Controller
             $request->validate([
                 'dates1' => ['required'],
                 'dates2' => ['required'],
-                'category' => ['required','not_in:Departamento'],
+                'category' => ['required'],
             ]);
+
             $inputCategory = $request->input('category');
             $inputDates1 = $request->input('dates1');
             $inputDates2 = $request->input('dates2');
 
+            if($inputCategory == 0){
+                $families = Family::all();
+            } else {
+                $category = Category::findOrFail($inputCategory);
+                $families = $category->families;
+            }
 
-            $category = Category::findOrFail($inputCategory);
-            $families = $category->families;
 
             if($inputDates1 != '' && $inputDates1 != 0 &&
                 $inputDates2 != '' && $inputDates2 != 0){
@@ -109,7 +120,7 @@ class SaleandPurchaseController extends Controller
             $query = "
             EXEC dbo.DRGetFamilySalesPurchasesTwoDates @From = '{$fromDate1}', @to1 = '{$toDate1}',
                 @From2 = '{$fromDate2}', @To = '{$toDate2}',
-                @Category = {$category->CategoryId}
+                @Category = {$inputCategory}
             ";
             $queryResults = DB::connection('mssql')->selectResultSets($query);
 
