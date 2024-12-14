@@ -15,6 +15,9 @@ class SaleandPurchaseController extends Controller
     public function index(Request $request){
         $categories = Category::whereIn('CategoryId',[1,4,12])->get();
         $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+        $familiesList = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
+
+
 
         // Obtener fechas para el dropdown de fechas
         // Hoy
@@ -50,11 +53,36 @@ class SaleandPurchaseController extends Controller
         $dates['initialLastYear'] = $yesterday->copy()->subYear()->firstOfYear()->format('Y-m-d');
         $dates['finalLastYear'] = $yesterday->copy()->subYear()->format('Y-m-d');
 
+        // Invierno this year
+
+        $dates['initialWinter'] = Carbon::now()->startOfYear()->month(9)->day(1)->format('Y-m-d');
+        $isWinter = Carbon::today()->isAfter($dates['initialWinter']);
+        $dates['initialWinterLastYear'] = Carbon::now()->startOfYear()->subYear()->month(9)->day(1)->format('Y-m-d');
+        $dates['finalWinter'] = $isWinter ? $dates['yesterday'] : Carbon::now()->startOfYear()->subYear()->month(12)->day(31)->format('Y-m-d');
+        $dates['finalWinterLastYear'] = $isWinter ? $dates['yesterdayLastYear'] : Carbon::now()->startOfYear()->subYear()->month(12)->day(31)->format('Y-m-d');
+
+        //Verano
+        $dates['finalSummer'] = $isWinter ? Carbon::now()->startOfYear()->month(8)->day(31)->format('Y-m-d') : $day;
+        $dates['finalSummerLastYear'] = $isWinter ? Carbon::now()->startOfYear()->subYear()->month(8)->day(31)->format('Y-m-d') : $dates['yesterday'];
+
+//        dd([
+//            $dates['initialWinter'],
+//            $dates['initialWinterLastYear'],
+//            $dates['finalWinter'],
+//            $dates['finalWinterLastYear'],
+//            $dates['finalSummer'],
+//            $dates['finalSummerLastYear'],
+//        ]);
+
         $data = [
             'selectedDate1' => '',
             'selectedDate2' => '',
             'selectedCategory' => 0,
-            'categories' => $categories,
+            'selectedBranch' => 0,
+            'selectedFamily' => 0,
+            'categoriesList' => $categories,
+            'branchesList' => $branches,
+            'familiesList' => $familiesList,
             'suppliers' => [],
             'families' => [],
             'branches'  => [],
@@ -73,6 +101,8 @@ class SaleandPurchaseController extends Controller
             ]);
 
             $inputCategory = $request->input('category');
+            $inputBranch = $request->input('branch');
+            $inputFamily = $request->input('family');
             $inputDates1 = $request->input('dates1');
             $inputDates2 = $request->input('dates2');
 
@@ -118,9 +148,9 @@ class SaleandPurchaseController extends Controller
 
 
             $query = "
-            EXEC dbo.DRGetFamilySalesPurchasesTwoDates @From = '{$fromDate1}', @to1 = '{$toDate1}',
+            EXEC dbo.DRGetFamilySalesPurchasesTwoDates2 @From = '{$fromDate1}', @to1 = '{$toDate1}',
                 @From2 = '{$fromDate2}', @To = '{$toDate2}',
-                @Category = {$inputCategory}
+                @Category = {$inputCategory}, @branch = {$inputBranch}, @family = {$inputFamily}
             ";
             $queryResults = DB::connection('mssql')->selectResultSets($query);
 
@@ -212,6 +242,8 @@ class SaleandPurchaseController extends Controller
             $data['selectedDate1'] = $inputDates1;
             $data['selectedDate2'] = $inputDates2;
             $data['selectedCategory'] = $inputCategory;
+            $data['selectedFamily'] = $inputFamily;
+            $data['selectedBranch'] = $inputBranch;
             $data['families'] = $familiesAmounts;
             $data['branches'] = $branchesAmounts;
             $data['suppliers'] = $suppliersAmounts;

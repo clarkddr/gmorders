@@ -113,7 +113,6 @@ Route::get('/hour', function () {
             ]);
         }
 
-
        return collect([
            'hour' => $hour,
            'lastYear' => number_format($amount,0),
@@ -184,7 +183,7 @@ Route::get('/hourData', function () {
            'todayAccumulated' => number_format($todayAccumulated,0),
            'relation' =>$relation,
        ];
-    });
+    })->OrderBy('hour');
 
 
     return response()->json($amounts);

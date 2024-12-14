@@ -10,30 +10,57 @@
 				<li>{{ $error }}</li>
 			@endforeach
 		</ul>
-	</div>
-	@endif
+
+    </div>
+        @endif
+
         @php
             $selectedCategory = request('category', old('category'));
         @endphp
-	<x-titlePage title="Reporte de ventas {{$selectedCategory->name ?? ''}}">
+	<x-titlePage title="Ventas/Compras {{$selectedCategory->name ?? ''}}">
 		<form action ="/saleandpurchase" method="GET" class="flex space-x-4 justify-end">
-            <select id="presetSelect" onchange="applyDates2()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                <option disabled selected>Fechas</option>
-                <option value="year">Anual</option>
-                <option value="lastMonth">Mes Anterior</option>
-                <option value="thisMonth">Este Mes</option>
-                <option value="week">Semana</option>
-                <option value="yesterday">Ayer</option>
-                <option value="today">Hoy</option>
+            <select name="branch" id="branch" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option value="0"  {{ $selectedBranch ? '' : 'selected' }}>Sucursal</option>
+                @foreach ($branchesList as $branch)
+                    <option value="{{ $branch->BranchId }}"
+                        {{ $selectedBranch == $branch->BranchId ? 'selected' : '' }}>
+                        {{ $branch->Name }}
+                    </option>
+                @endforeach
+            </select>
+            <select name="family" id="family" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option value="0"  {{ $selectedFamily ? '' : 'selected' }}>Familia</option>
+                @foreach ($familiesList as $category)
+                    <optgroup label="{{ $category->Name }}">
+                    @foreach ($category->families as $family)
+                        <option value="{{ $family->FamilyId }}"
+                            {{ $selectedFamily == $family->FamilyId ? 'selected' : '' }}>
+                            {{ $family->Name }}
+                        </option>
+                    @endforeach
+                @endforeach
+
+
             </select>
             <select name="category" id="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                <option value="0"  {{ $selectedCategory ? '' : 'selected' }}>Departamento</option>
-                @foreach ($categories as $category)
+                <option value="0"  {{ $selectedCategory ? '' : 'selected' }}>Depto</option>
+                @foreach ($categoriesList as $category)
                     <option value="{{ $category->CategoryId }}"
                         {{ $selectedCategory == $category->CategoryId ? 'selected' : '' }}>
                         {{ $category->Name }}
                     </option>
                 @endforeach
+            </select>
+            <select id="presetSelect" onchange="applyDates2()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option disabled selected>Fechas</option>
+                <option value="year">Anual</option>
+                <option value="summer">Verano</option>
+                <option value="winter">Invierno</option>
+                <option value="lastMonth">Mes Anterior</option>
+                <option value="thisMonth">Este Mes</option>
+                <option value="week">Semana</option>
+                <option value="yesterday">Ayer</option>
+                <option value="today">Hoy</option>
             </select>
 			<input id="dates2" name="dates2" value="{{old('dates2')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
 			<input id="dates1" name="dates1" value="{{old('dates1')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
@@ -59,10 +86,17 @@
 
 						</tr>
 					</thead>
+                    @php
+                       $urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates1' => $selectedDate1, 'dates2' => $selectedDate2];
+                    @endphp
 					<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                         @foreach($families as $family)
 						<tr class="text-gray-700 dark:text-gray-400">
-							<td class="px-4 py-3">{{ $family['name'] }}</td>
+							<td class="px-4 py-3">
+                                <a href="{{route('saleandpurchase.index',$urlParameters + ['family' => $family['familyid']])}}" class="text-blue-600 hover:underline" target="_blank">
+                                {{ $family['name'] }}
+                                </a>
+                            </td>
 							<td class="px-4 py-3">{{ $family['sale2'] }}</td>
 							<td class="px-4 py-3">{{ $family['sale1'] }}</td>
 							<td class="px-4 py-3">
@@ -110,10 +144,17 @@
 
                     </tr>
                     </thead>
+                    @php
+                        $urlParameters = ['category'=> $selectedCategory,'family' => $selectedFamily, 'dates1' => $selectedDate1, 'dates2' => $selectedDate2];
+                    @endphp
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($branches as $branch)
                         <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3">{{ $branch['name'] }}</td>
+                            <td class="px-4 py-3">
+                                <a href="{{route('saleandpurchase.index',$urlParameters + ['branch' => $branch['branchid']])}}" class="text-blue-600 hover:underline" target="_blank">
+                                {{ $branch['name'] }}
+                                </a>
+                            </td>
                             <td class="px-4 py-3">{{ $branch['sale2'] }}</td>
                             <td class="px-4 py-3">{{ $branch['sale1'] }}</td>
                             <td class="px-4 py-3">
@@ -289,6 +330,22 @@ document.addEventListener('DOMContentLoaded', function () {
             flatpickr1.setDate([initialLastYear, finalLastYear]);
             flatpickr2.setDate([initialYear,yesterday]);
         }
+        if (selectedValue === "winter") {
+            const initialWinter = "{{$dates['initialWinter']}}";
+            const initialWinterLastYear = "{{$dates['initialWinterLastYear']}}";
+            const finalWinter = "{{$dates['finalWinter']}}";
+            const finalWinterLastYear = "{{$dates['finalWinterLastYear']}}";
+            flatpickr1.setDate([initialWinterLastYear, finalWinterLastYear]);
+            flatpickr2.setDate([initialWinter,finalWinter]);
+        }
+        if (selectedValue === "summer") {
+            const initialSummer = "{{$dates['initialYear']}}";
+            const initialSummerLastYear = "{{$dates['initialLastYear']}}";
+            const finalSummer = "{{$dates['finalSummer']}}";
+            const finalSummerLastYear = "{{$dates['finalSummerLastYear']}}";
+            flatpickr1.setDate([initialSummerLastYear, finalSummerLastYear]);
+            flatpickr2.setDate([initialSummer,finalSummer]);
+        }
     };
     // Registrar la función en el ámbito global
     window.applyDates2 = applyDates2;
@@ -301,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //     url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json"
         // },
         "lenghtChange": false,
-		"order": [[]],
+		"order": [[1, "desc"]],
 		"columnDefs": [{/*"targets": 3, "orderable": false,*/}]
 	});
     $('#branchesTable').DataTable({
@@ -310,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		searching: false,
 		info: false,
         "lenghtChange": false,
-		"order": [[]],
+        "order": [[1, "desc"]],
 		"columnDefs": [{
 			//"targets": 3, "orderable": false,
 		}]
@@ -324,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //     url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json"
         // },
         "lenghtChange": false,
-		"order": [[]],
+        "order": [[1, "desc"]],
 		"columnDefs": [
 
 		]

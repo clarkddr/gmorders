@@ -1,4 +1,4 @@
-<x-layout>	
+<x-layout>
 	@if(session('banner'))
 	<x-banner message="{{session('banner.message')}}" type="success" class=""/>
 	@endif
@@ -26,10 +26,10 @@
 					<tr	class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 						<th class="px-4 py-3 text-center">Familia</th>
 						<th class="px-4 py-3 text-right">Venta</th>
-						<th class="px-4 py-3 text-right">Proyección Venta</th>						
+						<th class="px-4 py-3 text-right">Proyección Venta</th>
 						<th class="px-4 py-3">Avance Proyección Venta</th>
 						<th class="px-4 py-3 text-right">Compra</th>
-						<th class="px-4 py-3 text-right">Proyección Compra</th>						
+						<th class="px-4 py-3 text-right">Proyección Compra</th>
 						<th class="px-4 py-3">Avance Proyección Compra</th>
 					</tr>
 				</thead>
@@ -38,9 +38,9 @@
 					<tr class="text-gray-700 dark:text-gray-400">
 						<td class="px-4 py-3">
 							<a href="{{route('projectionamount.show',$tySales['id'])}}" class="text-blue-600 hover:underline">
-								{{ $tySales['name'] }} 
+								{{ $tySales['name'] }}
 							</a>
-						</td>		
+						</td>
 						<td class="px-4 py-3 " data-order="{{$tySales['total']}}">
 							<div class="flex flex-col items-end">
 								<span class="text">{{$tySales['total']}}</span>
@@ -52,26 +52,26 @@
 								<span class="text">{{$tySales['projection']['amount']}}</span>
 								<span class="text-xs text-gray-500">{{$tySales['projection']['current'].' / '.$tySales['projection']['old']}}</span>
 							</div>
-						</td>		
+						</td>
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$tySales['totalVsProjection']"/>
-						</td>		
+						</td>
 						<td class="px-4 py-3 ">
 							{{ $tySales['purchase'] }}
 						</td>
 						<td class="px-4 py-3">
 							{{$tySales['projection']['purchase']}}
-						</td>		
+						</td>
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$tySales['projection']['purchaseVsProjection']*100"/>
-						</td>		
+						</td>
 					</tr>
 					@endforeach
 				</tbody>
 				<tfoot>
-					
+
 					<tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-						<td class="px-4 py-3 font-bold text-xl"> {{ $thisYearSalesTotal['name'] }} </td>		
+						<td class="px-4 py-3 font-bold text-xl"> {{ $thisYearSalesTotal['name'] }} </td>
 						<td class="px-4 py-3">
 							<div class="flex flex-col items-end">
 								<span class="text-xl font-bold">{{$thisYearSalesTotal['total']}}</span>
@@ -83,7 +83,7 @@
 								<span class="text-xl font-bold">{{$projectionSalesTotal['total']}}</span>
 								<span class="text-xs text-gray-500">{{$projectionSalesTotal['current'].' / '.$projectionSalesTotal['old']}}</span>
 							</div>
-						</td>						
+						</td>
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$projectionSalesTotal['totalVsProjection']" size="lg"/>
 						</td>
@@ -92,7 +92,7 @@
 						</td>
 						<td class="px-4 py-3 text-xl font-bold">
 							{{$projectionSalesTotal['purchase']}}
-						</td>						
+						</td>
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$projectionSalesTotal['purchaseVsProjection']" size="lg"/>
 						</td>
@@ -113,7 +113,7 @@
 			lenghtChange: false,
 			"order": [[]],
             "columnDefs": [{
-                //"targets": 3, "orderable": false,				
+                //"targets": 3, "orderable": false,
             }]
 		});
 	} );

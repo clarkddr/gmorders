@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    setInterval(fetchData, 120000); // Llama a fetchData cada 60 segundos
+    setInterval(fetchData, 120000); 
 
 });
 
