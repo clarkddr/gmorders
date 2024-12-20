@@ -21,7 +21,7 @@ Route::middleware('guest')->group(function(){
 });
 
 Route::middleware('auth')->group(function(){
-    Route::get('/',function(){  return view('home');  });
+//    Route::get('/',function(){  return view('home');  });
     Route::get('/salesyearoy',[FamilySalesOverYearsController::class,'index'])->name('salesyearoy.index');
     Route::get('/saleandpurchase',[SaleAndPurchaseController::class,'index'])->name('saleandpurchase.index');
     Route::get('/projections/amounts', [ProjectionController::class, 'amounts']);
@@ -72,7 +72,7 @@ Route::get('/dates', function () {
 
 });
 
-Route::get('/hour', function () {
+Route::get('/', function () {
     $day = Carbon::today();
     $today = $day->copy()->format('Y-m-d'); // Fecha de hoy
 
@@ -104,33 +104,34 @@ Route::get('/hour', function () {
         $hour = (int) $hour->Hour;
         if($hour > $hourNow) {
             return collect([
-                'hour' => $hour,
-                'lastYear' => null,
-                'today' => null,
+                'hour' => $hour+1,
+                'lastYear' => $amount,
+                'today' => $todaySale,
                 'lastYearAccumulated' => null,
                 'todayAccumulated' => null,
                 'relation' => null,
             ]);
         }
+        return collect([
+            'hour' => $hour+1,
+            'lastYear' => $amount,
+            'today' => $todaySale,
+            'lastYearAccumulated' => $lastYearAccumulated,
+            'todayAccumulated' => $todayAccumulated,
+            'relation' =>$relation,
+        ]);
+    });
 
-       return collect([
-           'hour' => $hour,
-           'lastYear' => number_format($amount,0),
-           'today' => number_format($todaySale,0),
-           'lastYearAccumulated' => number_format($lastYearAccumulated,0),
-           'todayAccumulated' => number_format($todayAccumulated,0),
-           'relation' =>$relation,
-       ]);
-    })->filter();
+//    dd($amounts);
+    // Si se hace la peticion con Ajax devuelve solo el Json
+    if(request()->ajax()) {
+        return response()->json($amounts);
+    }
+
     $data = [
         'amounts' => $amounts,
     ];
-
     return view('chartHour', $data);
-
-
-
-
 });
 
 Route::get('/hourData', function () {
@@ -165,30 +166,22 @@ Route::get('/hourData', function () {
         $hour = (int) $hour->Hour;
         if($hour > $hourNow) {
             return collect([
-                'hour' => $hour,
-                'lastYear' => null,
-                'today' => null,
+                'hour' => $hour+1,
+                'lastYear' => $amount,
+                'today' => $todaySale,
                 'lastYearAccumulated' => null,
                 'todayAccumulated' => null,
                 'relation' => null,
             ]);
         }
-
-
-       return [
-           'hour' => $hour,
-           'lastYear' => number_format($amount,0),
-           'today' => number_format($todaySale,0),
-           'lastYearAccumulated' => number_format($lastYearAccumulated,0),
-           'todayAccumulated' => number_format($todayAccumulated,0),
+       return collect([
+           'hour' => $hour+1,
+           'lastYear' => $amount,
+           'today' => $todaySale,
+           'lastYearAccumulated' => $lastYearAccumulated,
+           'todayAccumulated' => $todayAccumulated,
            'relation' =>$relation,
-       ];
-    })->OrderBy('hour');
-
-
+       ]);
+    });
     return response()->json($amounts);
-
-
-
-
 });
