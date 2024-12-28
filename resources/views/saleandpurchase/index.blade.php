@@ -75,13 +75,15 @@
 			<div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
 				<table id="familiesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
 					<thead>
-						<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+						<tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 							<th class="px-4 py-3">Familia</th>
 							<th class="px-4 py-3">Venta Periodo 1</th>
 							<th class="px-4 py-3">Venta Periodo 2</th>
 							<th class="px-4 py-3">%</th>
 							<th class="px-4 py-3">Compra Periodo 1</th>
+							<th class="px-4 py-3 dt-text-left">c/v</th>
 							<th class="px-4 py-3">Compra Periodo 2</th>
+							<th class="px-4 py-3 dt-text-left">c/v</th>
 							<th class="px-4 py-3">%</th>
 
 						</tr>
@@ -104,7 +106,9 @@
                             </td>
 
 							<td class="px-4 py-3">{{ $family['purchase2'] }}</td>
-							<td class="px-4 py-3">{{ $family['purchase1'] }}</td>
+                            <td class="px-4 py-3 dt-text-left text-sm">{{ $family['purchaseVsSale2'] }}%</td>
+                            <td class="px-4 py-3">{{ $family['purchase1'] }}</td>
+                            <td class="px-4 py-3 dt-text-left text-sm">{{ $family['purchaseVsSale1'] }}%</td>
 							<td class="px-4 py-3">
                                 <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$family['purchaseRelation']" />
                             </td>
@@ -120,11 +124,12 @@
                                 <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['saleRelation']" size="xl"/>
                             </td>
 							<td class="px-4 py-3 font-bold text-xl"> {{ $totals['purchase2'] }} </td>
+                            <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale2'] }}% </td>
 							<td class="px-4 py-3 font-bold text-xl"> {{ $totals['purchase1'] }} </td>
+                            <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale1'] }}% </td>
                             <td class="px-4 py-3 font-bold text-xl">
                                 <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['purchaseRelation']" size="xl"/>
                             </td>
-
 						</tr>
 					</tfoot>
 				</table>
@@ -139,7 +144,9 @@
                         <th class="px-4 py-3">Venta Periodo 2</th>
                         <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Compra Periodo 1</th>
+                        <th class="px-4 py-3 dt-text-left">c/v</th>
                         <th class="px-4 py-3">Compra Periodo 2</th>
+                        <th class="px-4 py-3 dt-text-left">c/v</th>
                         <th class="px-4 py-3">%</th>
 
                     </tr>
@@ -162,7 +169,9 @@
                             </td>
 
                             <td class="px-4 py-3">{{ $branch['purchase2'] }}</td>
+                            <td class="px-4 py-3 dt-text-left text-sm">{{ $branch['purchaseVsSale2'] }}%</td>
                             <td class="px-4 py-3">{{ $branch['purchase1'] }}</td>
+                            <td class="px-4 py-3 dt-text-left text-sm">{{ $branch['purchaseVsSale1'] }}%</td>
                             <td class="px-4 py-3">
                                 <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$branch['purchaseRelation']" />
                             </td>
@@ -178,7 +187,9 @@
                             <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['saleRelation']" size="xl"/>
                         </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ $totals['purchase2'] }} </td>
+                        <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale2'] }}% </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ $totals['purchase1'] }} </td>
+                        <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale1'] }}% </td>
                         <td class="px-4 py-3 font-bold text-xl">
                             <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['purchaseRelation']" size="xl"/>
                         </td>
@@ -196,7 +207,9 @@
                         <th class="px-4 py-3">Venta Periodo 2</th>
                         <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Compra Periodo 1</th>
+                        <th class="px-4 py-3 dt-text-left">c/v</th>
                         <th class="px-4 py-3">Compra Periodo 2</th>
+                        <th class="px-4 py-3 dt-text-left">c/v</th>
                         <th class="px-4 py-3">%</th>
 
                     </tr>
@@ -212,7 +225,9 @@
                             </td>
 
                             <td class="px-4 py-3">{{ $supplier['purchase2'] }}</td>
+                            <td class="px-4 py-3 dt-text-left text-sm">{{ $supplier['purchaseVsSale2'] }}%</td>
                             <td class="px-4 py-3">{{ $supplier['purchase1'] }}</td>
+                            <td class="px-4 py-3 dt-text-left text-sm">{{ $supplier['purchaseVsSale1'] }}%</td>
                             <td class="px-4 py-3">
                                 <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$supplier['purchaseRelation']" />
                             </td>
@@ -228,7 +243,9 @@
                             <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['saleRelation']" size="xl"/>
                         </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ $totals['purchase2'] }} </td>
+                        <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale2'] }}% </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ $totals['purchase1'] }} </td>
+                        <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale1'] }}% </td>
                         <td class="px-4 py-3 font-bold text-xl">
                             <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['purchaseRelation']" size="xl"/>
                         </td>
@@ -236,7 +253,6 @@
                     </tfoot>
                 </table>
             </div>
-
 		</div>
 	</div>
 
@@ -355,11 +371,10 @@ document.addEventListener('DOMContentLoaded', function () {
         searching: false,
         info: false,
         // language: {
-        //     url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json"
+        //     url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/es-MX.json"
         // },
         "lenghtChange": false,
 		"order": [[1, "desc"]],
-		"columnDefs": [{/*"targets": 3, "orderable": false,*/}]
 	});
     $('#branchesTable').DataTable({
 		dom: 't',
@@ -368,9 +383,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		info: false,
         "lenghtChange": false,
         "order": [[1, "desc"]],
-		"columnDefs": [{
-			//"targets": 3, "orderable": false,
-		}]
 	});
     $('#suppliersTable').DataTable({
 		// dom: 't',
@@ -382,9 +394,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // },
         "lenghtChange": false,
         "order": [[1, "desc"]],
-		"columnDefs": [
-
-		]
 	});
 
 });
@@ -451,5 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
     #suppliersTable_wrapper .dt-input {
         color: #c4c4c4; /* Color similar a gray-400 */
     }
-
+    .dt-text-left {
+        text-align: left !important;
+    }
 </style>

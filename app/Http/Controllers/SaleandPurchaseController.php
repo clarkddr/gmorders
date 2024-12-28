@@ -157,7 +157,7 @@ class SaleandPurchaseController extends Controller
             // Resultados de Ventas y compras tabla familias
             $familySaleResult = collect($queryResults[0]);
             $familyPurchaseResult = collect($queryResults[1]);
-//            dd($familySaleResult);
+            // Se sacan los totales solo una vez porque las tablas lo comparten
             $totals = collect([
                 'sale1' => number_format($familySaleResult->sum('firstRange'),0),
                 'sale2' => number_format($familySaleResult->sum('secondRange'),0),
@@ -167,6 +167,10 @@ class SaleandPurchaseController extends Controller
                     $familySaleResult->sum('secondRange') / $familySaleResult->sum('firstRange') * 100 : 0,0),
                 'purchaseRelation' => number_format($familyPurchaseResult->sum('firstRange') != 0 ?
                     $familyPurchaseResult->sum('secondRange') / $familyPurchaseResult->sum('firstRange') * 100 : 0,0),
+                'purchaseVsSale1' => number_format($familySaleResult->sum('firstRange') != 0 ?
+                    $familyPurchaseResult->sum('firstRange') / $familySaleResult->sum('firstRange') * 100 : 0,0),
+                'purchaseVsSale2' => number_format($familySaleResult->sum('secondRange') != 0 ?
+                    $familyPurchaseResult->sum('secondRange') / $familySaleResult->sum('secondRange') * 100 : 0,0),
             ]);
             $familiesAmounts = $families->map(function ($family) use ($familySaleResult, $familyPurchaseResult) {
                 $sale1 = $familySaleResult->where('FamilyId', $family->FamilyId)->first()->firstRange ?? 0;
@@ -174,6 +178,8 @@ class SaleandPurchaseController extends Controller
                 $saleRelation = $sale1 != 0 ? $sale2 / $sale1 * 100 : 0;
                 $purchase1 = $familyPurchaseResult->where('FamilyId', $family->FamilyId)->first()->firstRange ?? 0;
                 $purchase2 = $familyPurchaseResult->where('FamilyId', $family->FamilyId)->first()->secondRange ?? 0;
+                $purchaseVsSale1 = $sale1 != 0 ? $purchase1 / $sale1 * 100 : 0;
+                $purchaseVsSale2 = $sale2 != 0 ? $purchase2 / $sale2 * 100 : 0;
                 $purchaseRelation = $purchase1 != 0 ? $purchase2 / $purchase1 * 100 : 0;
                 return collect([
                     'familyid' => $family->FamilyId,
@@ -183,6 +189,8 @@ class SaleandPurchaseController extends Controller
                     'saleRelation' => number_format($saleRelation,0),
                     'purchase1' => number_format($purchase1,0),
                     'purchase2' => number_format($purchase2,0),
+                    'purchaseVsSale1' => number_format($purchaseVsSale1,0),
+                    'purchaseVsSale2' => number_format($purchaseVsSale2,0),
                     'purchaseRelation' => number_format($purchaseRelation,0),
                 ]);
             });
@@ -196,6 +204,8 @@ class SaleandPurchaseController extends Controller
                 $saleRelation = $sale1 != 0 ? $sale2 / $sale1 * 100 : 0;
                 $purchase1 = $branchPurchaseResult->where('BranchId', $branch->BranchId)->first()->firstRange ?? 0;
                 $purchase2 = $branchPurchaseResult->where('BranchId', $branch->BranchId)->first()->secondRange ?? 0;
+                $purchaseVsSale1 = $sale1 != 0 ? $purchase1 / $sale1 * 100 : 0;
+                $purchaseVsSale2 = $sale2 != 0 ? $purchase2 / $sale2 * 100 : 0;
                 $purchaseRelation = $purchase1 != 0 ? $purchase2 / $purchase1 * 100 : 0;
                 return collect([
                     'branchid' => $branch->BranchId,
@@ -205,6 +215,8 @@ class SaleandPurchaseController extends Controller
                     'saleRelation' => number_format($saleRelation,0),
                     'purchase1' => number_format($purchase1,0),
                     'purchase2' => number_format($purchase2,0),
+                    'purchaseVsSale1' => number_format($purchaseVsSale1,0),
+                    'purchaseVsSale2' => number_format($purchaseVsSale2,0),
                     'purchaseRelation' => number_format($purchaseRelation,0),
                 ]);
             });
@@ -221,6 +233,8 @@ class SaleandPurchaseController extends Controller
                 $saleRelation = $sale1 != 0 ? $sale2 / $sale1 * 100 : 0;
                 $purchase1 = $supplierPurchaseResult->where('SupplierId', $supplierId)->first()->firstRange ?? 0;
                 $purchase2 = $supplierPurchaseResult->where('SupplierId', $supplierId)->first()->secondRange ?? 0;
+                $purchaseVsSale1 = $sale1 != 0 ? $purchase1 / $sale1 * 100 : 0;
+                $purchaseVsSale2 = $sale2 != 0 ? $purchase2 / $sale2 * 100 : 0;
                 $purchaseRelation = $purchase1 != 0 ? $purchase2 / $purchase1 * 100 : 0;
                 // Retorna nulo si todas las métricas son 0 (para filtrar luego)
                 if ($sale1 == 0 && $sale2 == 0 && $purchase1 == 0 && $purchase2 == 0) {
@@ -234,6 +248,8 @@ class SaleandPurchaseController extends Controller
                     'saleRelation' => number_format($saleRelation,0),
                     'purchase1' => number_format($purchase1,0),
                     'purchase2' => number_format($purchase2,0),
+                    'purchaseVsSale1' => number_format($purchaseVsSale1,0),
+                    'purchaseVsSale2' => number_format($purchaseVsSale2,0),
                     'purchaseRelation' => number_format($purchaseRelation,0),
                 ]);
             })->filter();
@@ -248,14 +264,7 @@ class SaleandPurchaseController extends Controller
             $data['branches'] = $branchesAmounts;
             $data['suppliers'] = $suppliersAmounts;
             $data['totals'] = $totals;
-
-//            dd($data);
-
-//            dd($data);
         }
-
-//        dd($data);
-
 
         return view('saleandpurchase.index',$data);
     }

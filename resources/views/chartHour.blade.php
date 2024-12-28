@@ -98,6 +98,11 @@ document.addEventListener('DOMContentLoaded', function () {
             ],
         },
         options: {
+            layout: {
+                padding: {
+                    top: 20
+                }
+            },
             responsive: true,
             maintainAspectRatio: true,
             scales: {
@@ -269,7 +274,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchData() {
         try {
-            const response = await fetch('/hourData'); // Cambia esto al endpoint real
+            const response = await fetch('/',
+                {headers: {'X-Requested-With': 'XMLHttpRequest','Content-Type': 'application/json'}});
             amounts = await response.json();
             console.log(amounts);
             // Actualiza los datos del gráfico
