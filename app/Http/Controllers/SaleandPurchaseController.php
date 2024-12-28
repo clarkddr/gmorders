@@ -86,7 +86,7 @@ class SaleandPurchaseController extends Controller
             'suppliers' => [],
             'families' => [],
             'branches'  => [],
-            'totals' => ['sale1'=>0,'sale2'=>0,'sale0'=>0,'purchase1'=>0,'purchase2'=>0,'purchase0'=>0,'saleRelation'=>0,'purchaseRelation'=>0],
+            'totals' => ['sale1'=>0,'sale2'=>0,'sale0'=>0,'purchase1'=>0,'purchase2'=>0,'purchase0'=>0,'saleRelation'=>0,'purchaseVsSale1'=>0,'purchaseVsSale2'=>0,'purchaseRelation'=>0],
             'dates' => $dates,
         ];
 
