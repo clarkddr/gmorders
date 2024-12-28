@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $todayFormatted = Carbon::parse($today)->isoFormat('dddd D [de] MMMM YYYY');
         $lastYearFormatted = Carbon::parse($lastYear)->isoFormat('dddd D [de] MMMM YYYY');
         $hourNow = (int) Carbon::now()->format('H');
-//    $hourNow = 23;
+//      $hourNow = 23;
 
         $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
         $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
@@ -28,6 +28,13 @@ class DashboardController extends Controller
         $queryToday = "EXEC dbo.DRSalesByHour @From = '{$today}' , @To = '{$today}'";
         $todayResults = DB::connection('mssql')->selectResultSets($queryToday);
         $todayResults = collect($todayResults[0]);
+
+        // Verificar si la hora actual existe en los resultados
+        $hourNowExistsInTodayResults = $todayResults->where('Hour', $hourNow)->count() > 0;
+        $hourNowExistsInLastYearResults = $lastyearResults->where('Hour', $hourNow)->count() > 0;
+        if(!$hourNowExistsInTodayResults || !$hourNowExistsInLastYearResults) {
+            $hourNow = $lastyearResults->max('Hour');
+        }
 
         $todayAccumulated = 0; $lastYearAccumulated = 0;
         $amounts = $lastyearResults->map(function ($hour) use ($hourNow, &$todayAccumulated, &$lastYearAccumulated, $todayResults) {
@@ -56,17 +63,17 @@ class DashboardController extends Controller
                 'relation' =>$relation,
             ]);
         });
-
-        if (request()->header('X-Requested-With') === 'XMLHttpRequest'){
-            return response()->json($amounts);
-        }
-
         $data = [
             'amounts' => $amounts,
             'hourNow' => $hourNow,
             'todayFormatted' => $todayFormatted,
             'lastYearFormatted' => $lastYearFormatted
         ];
+
+        if (request()->header('X-Requested-With') === 'XMLHttpRequest'){
+            return response()->json($data);
+        }
+
         return view('dashboard.index', $data);
     }
 }

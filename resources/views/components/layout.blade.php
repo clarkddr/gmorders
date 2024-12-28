@@ -38,23 +38,23 @@
 		<!-- Flatpickr JS -->
 		{{-- <script src="{{asset('js/flatpickr.js')}}"></script>
 		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/rangePlugin.js"></script>		 --}}
-		
+
 		<script src="{{asset('datatables/jquery-3.7.1.min.js')}}"></script>
-		<link rel="stylesheet" href="{{asset('datatables/datatables.css')}}" />  
+		<link rel="stylesheet" href="{{asset('datatables/datatables.css')}}" />
 		<script src="{{asset('datatables/datatables.js')}}"></script>
 </head>
 <body>
-	<div class="flex h-screen bg-gray-50 dark:bg-gray-900" 	:class="{ 'overflow-hidden': isSideMenuOpen }" >	
-	
+	<div class="flex h-screen bg-gray-50 dark:bg-gray-900" 	:class="{ 'overflow-hidden': isSideMenuOpen }" >
+
 		<x-desktop-sidebar />
-		
+
 		<x-mobile-sidebar />
-		
-		
-		<div class="flex flex-col flex-1 w-full">        
+
+
+		<div class="flex flex-col flex-1 w-full">
 			<x-header />
 			<main class="h-full overflow-y-auto">
-				<div class="container px-6 mx-auto grid mt-6">
+				<div class="container px-2 mx-auto grid mt-6">
 						{{ $slot }}
 				</div>
 			</main>

@@ -1,26 +1,28 @@
 <x-layout>
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
-        <div class="rounded-lg space-y-4 sm:space-y-6 p-4">
+        <div class="rounded-lg space-y-4 sm:space-y-6">
             <p class="text-gray-700 dark:text-gray-200">
-                {{$todayFormatted}} vs {{ $lastYearFormatted }}
+                <span id="todaySpan" class="font-semibold">{{$todayFormatted}}</span>
+                <span class="font-semibold"> VS </span>
+                <span id="lastYearSpan" class="font-semibold">{{$lastYearFormatted}}</span>
             </p>
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Total Año Anterior</span>
-                    <span class="text-lg font-semibold text-gray-900 dark:text-white text-right">
-                      $ {{number_format($amounts->sum('lastYear'),0)}}
+                    <span id="lastYearTotal" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
+                      ${{number_format($amounts->sum('lastYear'),0)}}
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Al la hora Año Anterior</span>
-                    <span class="text-lg font-semibold text-gray-900 dark:text-white text-right">
-                        $ {{number_format($amounts->where('hour',$hourNow+1)->first()['lastYearAccumulated'],0)}}
+                    <span id="lastYearAccumulated" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
+                        ${{number_format($amounts->where('hour',$hourNow+1)->first()['lastYearAccumulated'],0)}}
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Año Actual </span>
-                    <span class="text-lg font-semibold text-gray-900 dark:text-white text-right">
-                        $ {{number_format($amounts->where('hour',$hourNow+1)->first()['todayAccumulated'],0)}}
+                    <span id="todayAccumulated" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
+                        ${{number_format($amounts->where('hour',$hourNow+1)->first()['todayAccumulated'],0)}}
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
@@ -48,7 +50,6 @@
                     <canvas height="250" id="bars-chart" class="w-full max-w-full"></canvas>
                 </div>
             </div>
-
         </div>
     </div>
 </x-layout>
@@ -56,6 +57,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         let amounts = @json($amounts);
+        let hourNow = @json($hourNow);
 
         // Función para obtener el color dependiendo de la comparación con la línea de anotación
         const getBorderColor = (value) => {
@@ -251,25 +253,38 @@
             try {
                 const response = await fetch('/',
                     {headers: {'X-Requested-With': 'XMLHttpRequest','Content-Type': 'application/json'}});
-                amounts = await response.json();
-                console.log(amounts);
+                data = await response.json();
+                console.log(data);
                 // Actualiza los datos del gráfico
-                salesChart.data.labels = amounts.map(amount => amount.hour);
-                salesChart.data.datasets[0].data = amounts.map(amount => amount.relation);
-                salesChart.data.datasets[0].backgroundColor = amounts.map(amount => getBorderColor(amount.relation));
-                salesChart.data.datasets[0].borderColor = amounts.map(amount => getBorderColor(amount.relation));
+                salesChart.data.labels = data.amounts.map(amount => amount.hour);
+                salesChart.data.datasets[0].data = data.amounts.map(amount => amount.relation);
+                salesChart.data.datasets[0].backgroundColor = data.amounts.map(amount => getBorderColor(amount.relation));
+                salesChart.data.datasets[0].borderColor = data.amounts.map(amount => getBorderColor(amount.relation));
                 salesChart.update();
-                barsChart.data.labels = amounts.map(amount => amount.hour);
-                barsChart.data.datasets[0].data = amounts.map(amount => amount.lastYear);
-                barsChart.data.datasets[1].data = amounts.map(amount => amount.today);
+                barsChart.data.labels = data.amounts.map(amount => amount.hour);
+                barsChart.data.datasets[0].data = data.amounts.map(amount => amount.lastYear);
+                barsChart.data.datasets[1].data = data.amounts.map(amount => amount.today);
                 barsChart.update();
-                console.log(amounts.map(amount => amount.lastYear));
-                console.log(amounts.map(amount => amount.today));
+                // Se actualizan las fechas
+                let thisYearSpan = document.getElementById('todaySpan');
+                let lastYearSpan = document.getElementById('lastYearSpan');
+                todaySpan.textContent = data.todayFormatted;
+                lastYearSpan.textContent = data.lastYearFormatted;
+                let lastYearTotal = document.getElementById('lastYearTotal');
+                let lastYearAccumulated = document.getElementById('lastYearAccumulated');
+                let todayAccumulated = document.getElementById('todayAccumulated');
+
+
+                let thisHourInfo = data.amounts.find(amount => amount.hour === hourNow);
+                console.log(thisHourInfo);
+
+
                 console.log('Datos actualizados');
             } catch (error) {
                 console.error('Error al traer los datos: ', error);
             }
         }
-        setInterval(fetchData, 120000);
+        setInterval(fetchData, 12000);
+
     });
 </script>
