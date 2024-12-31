@@ -286,6 +286,20 @@
                 todayAccumulatedSpan.textContent = '$'+todayAccumulatedValue;
                 relationSpan.textContent = relation+'%';
 
+                const isRelationLowerThan100 = relation < 100;
+                // Cambiar la clase de Tailwind del boton de porcentaje
+                if (isRelationLowerThan100) {
+                    relationSpan.classList.remove('bg-green-700');
+                    relationSpan.classList.remove('dark:bg-green-600');
+                    relationSpan.classList.add('bg-red-700');
+                    relationSpan.classList.add('dark:bg-red-600');
+                } else {
+                    relationSpan.classList.remove('bg-red-700');
+                    relationSpan.classList.remove('dark:bg-red-600');
+                    relationSpan.classList.add('bg-green-700');
+                    relationSpan.classList.add('dark:bg-green-600');
+                }
+
                 console.log(data.hourNow);
                 console.log(thisHourInfo);
 
@@ -294,7 +308,7 @@
                 console.error('Error al traer los datos: ', error);
             }
         }
-        setInterval(fetchData, 12000);
+        setInterval(fetchData, 60000);
 
     });
 </script>
