@@ -33,7 +33,8 @@ class DashboardController extends Controller
         $hourNowExistsInTodayResults = $todayResults->where('Hour', $hourNow)->count() > 0;
         $hourNowExistsInLastYearResults = $lastyearResults->where('Hour', $hourNow)->count() > 0;
         if(!$hourNowExistsInTodayResults || !$hourNowExistsInLastYearResults) {
-            $hourNow = $lastyearResults->max('Hour');
+            $hourNow = $todayResults->max('Hour') ?? $hourNow -1;
+//            $hourNow = $hourNow - 1;
         }
 
         $todayAccumulated = 0; $lastYearAccumulated = 0;
@@ -51,6 +52,8 @@ class DashboardController extends Controller
                     'today' => $todaySale,
                     'lastYearAccumulated' => null,
                     'todayAccumulated' => null,
+                    'lastYearAccumulatedFormatted' => null,
+                    'todayAccumulatedFormatted' => null,
                     'relation' => null,
                 ]);
             }
@@ -60,7 +63,9 @@ class DashboardController extends Controller
                 'today' => $todaySale,
                 'lastYearAccumulated' => $lastYearAccumulated,
                 'todayAccumulated' => $todayAccumulated,
-                'relation' =>$relation,
+                'lastYearAccumulatedFormatted' => number_format($lastYearAccumulated, 0),
+                'todayAccumulatedFormatted' => number_format($todayAccumulated, 0),
+                'relation' =>(int)round($relation),
             ]);
         });
         $data = [

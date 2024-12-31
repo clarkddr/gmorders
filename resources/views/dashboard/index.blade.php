@@ -1,6 +1,6 @@
 <x-layout>
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
-        <div class="rounded-lg space-y-4 sm:space-y-6">
+        <div class="rounded-lg space-y-2 sm:space-y-6">
             <p class="text-gray-700 dark:text-gray-200">
                 <span id="todaySpan" class="font-semibold">{{$todayFormatted}}</span>
                 <span class="font-semibold"> VS </span>
@@ -14,7 +14,7 @@
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
-                    <span class="text-gray-500 dark:text-gray-400 text-left">Al la hora Año Anterior</span>
+                    <span class="text-gray-500 dark:text-gray-400 text-left">A la hora Año Anterior</span>
                     <span id="lastYearAccumulated" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
                         ${{number_format($amounts->where('hour',$hourNow+1)->first()['lastYearAccumulated'],0)}}
                     </span>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Porcentaje</span>
-                    <span class="text-lg font-semibold text-gray-900 dark:text-white text-right">
+                    <span id="relationSpanContainer" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
                         <x-percentageButton below="red" above="green" :min="99" :max="100" :value="number_format($amounts->where('hour',$hourNow+1)->first()['relation'],0)" size="xl"/>
                     </span>
                 </div>
@@ -43,7 +43,7 @@
             </div>
             <!-- Gráfico de Barras -->
             <div class="rounded-lg shadow-xs">
-                <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs dark:bg-gray-800">
                     <h3 class="text-center text-lg sm:text-xl font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400 my-2">
                         {{ 'Barras' }}
                     </h3>
@@ -175,7 +175,7 @@
                                 return (value / 1000).toFixed(0) + 'K'; // Convierte a porcentaje
                             },
                             clip: false,
-                            offset: 30 // Mover las etiquetas hacia abajo para evitar que se encimen con las leyendas del eje x
+                            offset: 0 // Mover las etiquetas hacia abajo para evitar que se encimen con las leyendas del eje x
                         }
                     },{
                         label: 'Este Año',
@@ -197,7 +197,7 @@
                                 return (value / 1000).toFixed(0) + 'K'; // Convierte a porcentaje
                             },
                             clip: false,
-                            offset: 10 // Mover las etiquetas hacia abajo para evitar que se encimen con las leyendas del eje x
+                            offset: 0 // Mover las etiquetas hacia abajo para evitar que se encimen con las leyendas del eje x
                         }
                     }
                 ],
@@ -254,7 +254,6 @@
                 const response = await fetch('/',
                     {headers: {'X-Requested-With': 'XMLHttpRequest','Content-Type': 'application/json'}});
                 data = await response.json();
-                console.log(data);
                 // Actualiza los datos del gráfico
                 salesChart.data.labels = data.amounts.map(amount => amount.hour);
                 salesChart.data.datasets[0].data = data.amounts.map(amount => amount.relation);
@@ -270,14 +269,25 @@
                 let lastYearSpan = document.getElementById('lastYearSpan');
                 todaySpan.textContent = data.todayFormatted;
                 lastYearSpan.textContent = data.lastYearFormatted;
-                let lastYearTotal = document.getElementById('lastYearTotal');
-                let lastYearAccumulated = document.getElementById('lastYearAccumulated');
-                let todayAccumulated = document.getElementById('todayAccumulated');
+                // Se capturan los elementos html
+                let lastYearTotalSpan = document.getElementById('lastYearTotal');
+                let lastYearAccumulatedSpan = document.getElementById('lastYearAccumulated');
+                let todayAccumulatedSpan = document.getElementById('todayAccumulated');
+                const relationSpanContainer = document.getElementById('relationSpanContainer');
+                const relationSpan = relationSpanContainer.querySelector('span');
+                // Se localiza la hora actual en el array de horas
+                let thisHourInfo = data.amounts.find(amount => amount.hour === data.hourNow+1);
+                // captura cada valor
+                let lastYearAccumulatedValue = thisHourInfo.lastYearAccumulatedFormatted;
+                let todayAccumulatedValue = thisHourInfo.todayAccumulatedFormatted;
+                var relation = thisHourInfo.relation;
+                // Se actualizan los valores en los elementos html
+                lastYearAccumulatedSpan.textContent = '$'+lastYearAccumulatedValue;
+                todayAccumulatedSpan.textContent = '$'+todayAccumulatedValue;
+                relationSpan.textContent = relation+'%';
 
-
-                let thisHourInfo = data.amounts.find(amount => amount.hour === hourNow);
+                console.log(data.hourNow);
                 console.log(thisHourInfo);
-
 
                 console.log('Datos actualizados');
             } catch (error) {
