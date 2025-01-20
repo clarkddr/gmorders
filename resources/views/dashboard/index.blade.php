@@ -56,7 +56,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        let amounts = @json($amounts);
+        let amounts = @json($amounts->values()->toArray());
+        console.log(amounts);
         let hourNow = @json($hourNow);
 
         // Función para obtener el color dependiendo de la comparación con la línea de anotación
@@ -101,7 +102,7 @@
             options: {
                 layout: {
                     padding: {
-                        top: 20
+                        top: 30
                     }
                 },
                 responsive: true,
@@ -117,7 +118,7 @@
                     // Habilitar el plugin de datos
                     datalabels: {
                         display: true,
-                        align: 'top', // Alineación en la parte superior de las barras
+                        align: 'top', // Alineación en la parte superior de las lineas
                         font: {
                             size: 12,
                         },
@@ -254,15 +255,17 @@
                 const response = await fetch('/',
                     {headers: {'X-Requested-With': 'XMLHttpRequest','Content-Type': 'application/json'}});
                 data = await response.json();
+                const amountsArray = Array.isArray(data.amounts) ? data.amounts : Object.values(data.amounts);
+
                 // Actualiza los datos del gráfico
-                salesChart.data.labels = data.amounts.map(amount => amount.hour);
-                salesChart.data.datasets[0].data = data.amounts.map(amount => amount.relation);
-                salesChart.data.datasets[0].backgroundColor = data.amounts.map(amount => getBorderColor(amount.relation));
-                salesChart.data.datasets[0].borderColor = data.amounts.map(amount => getBorderColor(amount.relation));
+                salesChart.data.labels = amountsArray.map(amount => amount.hour);
+                salesChart.data.datasets[0].data = amountsArray.map(amount => amount.relation);
+                salesChart.data.datasets[0].backgroundColor = amountsArray.map(amount => getBorderColor(amount.relation));
+                salesChart.data.datasets[0].borderColor = amountsArray.map(amount => getBorderColor(amount.relation));
                 salesChart.update();
-                barsChart.data.labels = data.amounts.map(amount => amount.hour);
-                barsChart.data.datasets[0].data = data.amounts.map(amount => amount.lastYear);
-                barsChart.data.datasets[1].data = data.amounts.map(amount => amount.today);
+                barsChart.data.labels = amountsArray.map(amount => amount.hour);
+                barsChart.data.datasets[0].data = amountsArray.map(amount => amount.lastYear);
+                barsChart.data.datasets[1].data = amountsArray.map(amount => amount.today);
                 barsChart.update();
                 // Se actualizan las fechas
                 let thisYearSpan = document.getElementById('todaySpan');
@@ -276,7 +279,7 @@
                 const relationSpanContainer = document.getElementById('relationSpanContainer');
                 const relationSpan = relationSpanContainer.querySelector('span');
                 // Se localiza la hora actual en el array de horas
-                let thisHourInfo = data.amounts.find(amount => amount.hour === data.hourNow+1);
+                let thisHourInfo = amountsArray.find(amount => amount.hour === data.hourNow);
                 // captura cada valor
                 let lastYearAccumulatedValue = thisHourInfo.lastYearAccumulatedFormatted;
                 let todayAccumulatedValue = thisHourInfo.todayAccumulatedFormatted;

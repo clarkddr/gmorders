@@ -14,7 +14,7 @@ class DashboardController extends Controller
 
         $lastYear = $day->copy()
             ->subYear() // Ir al mismo día del año pasado
-//        ->next($day->copy()->format('l')) // Ajustar al mismo día de la semana
+        ->next($day->copy()->format('l')) // Ajustar al mismo día de la semana
             ->format('Y-m-d');
         $todayFormatted = Carbon::parse($today)->isoFormat('dddd D [de] MMMM YYYY');
         $lastYearFormatted = Carbon::parse($lastYear)->isoFormat('dddd D [de] MMMM YYYY');
@@ -29,6 +29,12 @@ class DashboardController extends Controller
         $todayResults = DB::connection('mssql')->selectResultSets($queryToday);
         $todayResults = collect($todayResults[0]);
 
+        // Se hace merge de los dos resultados en el atributo Hora para hacer map sobre todas.
+        $allHoursObject = $lastyearResults->pluck('Hour')
+            ->merge($todayResults->pluck('Hour'))
+            ->unique()->sort()->values();
+        $allHours = collect($allHoursObject);
+
         // Verificar si la hora actual existe en los resultados
         $hourNowExistsInTodayResults = $todayResults->where('Hour', $hourNow)->count() > 0;
         $hourNowExistsInLastYearResults = $lastyearResults->where('Hour', $hourNow)->count() > 0;
@@ -37,18 +43,19 @@ class DashboardController extends Controller
 //            $hourNow = $hourNow - 1;
         }
 
+
         $todayAccumulated = 0; $lastYearAccumulated = 0;
-        $amounts = $lastyearResults->map(function ($hour) use ($hourNow, &$todayAccumulated, &$lastYearAccumulated, $todayResults) {
-            $amount = $hour->Amount;
-            $todaySale = $todayResults->where('Hour', $hour->Hour)->first()->Amount ?? 0;
-            $lastYearAccumulated += $amount;
+        $amounts = $allHours->map(function ($hour) use ($hourNow, &$todayAccumulated, &$lastYearAccumulated, $lastyearResults, $todayResults) {
+            $lastyearSale = $lastyearResults->where('Hour', $hour)->first()->Amount ?? 0;;
+            $todaySale = $todayResults->where('Hour', $hour)->first()->Amount ?? 0;
+            $lastYearAccumulated += $lastyearSale;
             $todayAccumulated += $todaySale;
-            $relation = $todayAccumulated / $lastYearAccumulated * 100 ?? 0;
-            $hour = (int) $hour->Hour;
+            $relation = $lastYearAccumulated > 0 ? $todayAccumulated / $lastYearAccumulated * 100 : 0;
+            $hour = (int) $hour;
             if($hour > $hourNow) {
                 return collect([
                     'hour' => $hour+1,
-                    'lastYear' => $amount,
+                    'lastYear' => $lastyearSale,
                     'today' => $todaySale,
                     'lastYearAccumulated' => null,
                     'todayAccumulated' => null,
@@ -59,7 +66,7 @@ class DashboardController extends Controller
             }
             return collect([
                 'hour' => $hour+1,
-                'lastYear' => $amount,
+                'lastYear' => $lastyearSale,
                 'today' => $todaySale,
                 'lastYearAccumulated' => $lastYearAccumulated,
                 'todayAccumulated' => $todayAccumulated,
