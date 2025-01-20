@@ -279,7 +279,7 @@
                 const relationSpanContainer = document.getElementById('relationSpanContainer');
                 const relationSpan = relationSpanContainer.querySelector('span');
                 // Se localiza la hora actual en el array de horas
-                let thisHourInfo = amountsArray.find(amount => amount.hour === data.hourNow);
+                let thisHourInfo = amountsArray.find(amount => amount.hour === data.hourNow +1);
                 // captura cada valor
                 let lastYearAccumulatedValue = thisHourInfo.lastYearAccumulatedFormatted;
                 let todayAccumulatedValue = thisHourInfo.todayAccumulatedFormatted;
