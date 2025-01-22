@@ -8,22 +8,22 @@ use App\Models\Family;
 use App\Models\Projection;
 use App\Models\ProjectionAmount;
 use Carbon\Carbon;
-use Illuminate\Http\Request;    
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProjectionController extends Controller
 {
 
     public function index()
-    {     
+    {
     $projections = Projection::paginate(10);
-    
+
     $data = [
         'projections' => $projections
     ];
 
-    return view('projection.index', $data);   
-        
+    return view('projection.index', $data);
+
     }
 
     /**
@@ -48,21 +48,21 @@ class ProjectionController extends Controller
         $yearLastInitialDate = Carbon::createFromFormat('Y-m-d H:i:s', $initDate)->setTime(0,0,0)->subYear(1);
         $yearLastFinalDate = Carbon::createFromFormat('Y-m-d H:i:s', $finalDate)->setTime(0,0,0)->subYear(1);
 
-        // Se consiguen los ProjectionAmount guardados de la familia 
-        $projectionAmounts = ProjectionAmount::where('projection_id', $projection->id)->where('FamilyId', $family->FamilyId)->get();        
+        // Se consiguen los ProjectionAmount guardados de la familia
+        $projectionAmounts = ProjectionAmount::where('projection_id', $projection->id)->where('FamilyId', $family->FamilyId)->get();
 
         // Se ejecuta el primer reporte de hace dos anios
         $query = "
         EXEC dbo.DRGetSalesReportByFamily @From = '{$yearBeforeLastInitialDate}', @To = '{$yearBeforeLastFinalDate}', @Category = 0, @Family = {$family->FamilyId}
         ";
-        $queryResults = DB::connection('mssql')->selectResultSets($query);        
+        $queryResults = DB::connection('mssql')->selectResultSets($query);
         $yearBeforeLastSaleResults = collect($queryResults[0]);
         $yearBeforeLastPurchaseResults = collect($queryResults[1]);
-        // Totales 
+        // Totales
         $yearBeforeLastSaleTotals = collect($queryResults[4]);
         $yearBeforeLastPurchaseTotals = collect($queryResults[5]);
-        
-        
+
+
         // Se ejecuta el reporte del anio anterior
         $query2 = "
         EXEC dbo.DRGetSalesReportByFamily @From = '{$yearLastInitialDate}', @To = '{$yearLastFinalDate}', @Category = 0, @Family = {$family->FamilyId}
@@ -73,7 +73,7 @@ class ProjectionController extends Controller
         // Totales
         $yearLastSaleTotals = collect($queryResults2[4]);
         $yearLastPurchaseTotals = collect($queryResults2[5]);
-        
+
         $yearBeforeLast_relation = 0;
         $yearLast_relation = 0;
         $projection_relation = 0;
@@ -92,7 +92,7 @@ class ProjectionController extends Controller
         }
 
 
-        
+
         // Se integran los totales
         $totalAmounts = collect([
             'yearBeforeLast_new_sale' => number_format($yearBeforeLastSaleTotals->sum('Current'),0) ?? 0,
@@ -119,17 +119,17 @@ class ProjectionController extends Controller
                 $yearLastSale = collect($yearLastSaleResults->where('branchid', $branch->BranchId)->first());
                 $yearLastPurchase = collect($yearLastPurchaseResults->where('branchid', $branch->BranchId)->first());
                 $projectionAmounts = $projectionAmounts->where('BranchId', $branch->BranchId)->first();
-                
+
                 return collect([
                     'branchid' => $branch->BranchId,
                     'name' => $branch->Name,
                     'current_year' => [
-                        'projection_amount_id' => $projectionAmounts->id ?? null,          
+                        'projection_amount_id' => $projectionAmounts->id ?? null,
                         'old_sale' => number_format($projectionAmounts->old_sale ?? 0,0),
                         'new_sale' => number_format($projectionAmounts->new_sale ?? 0,0),
                         'total_sale' => number_format($projectionAmounts->total_sale ?? 0,0),
                         'purchase_cost' => number_format($projectionAmounts->purchase ?? 0,0),
-                        'relation' => isset($projectionAmounts->new_sale, $projectionAmounts->purchase) && $projectionAmounts->purchase != 0 
+                        'relation' => isset($projectionAmounts->new_sale, $projectionAmounts->purchase) && $projectionAmounts->purchase != 0
                         ? number_format($projectionAmounts->new_sale / ($projectionAmounts->purchase * 3 ) * 100, 0) : 0,
                     ],
                     'beforelast_year' => [
@@ -138,7 +138,7 @@ class ProjectionController extends Controller
                         'total_sale' => number_format($yearBeforeLastSale['Amount'] ?? 0,0),
                         'purchase_cost' => number_format($yearBeforeLastPurchase['Costo'] ?? 0,0),
                         'purchase_sale' => number_format($yearBeforeLastPurchase['Venta'] ?? 0,0),
-                        'relation' => isset($yearBeforeLastSale['Current'], $yearBeforeLastPurchase['Venta']) && $yearBeforeLastPurchase['Venta'] != 0 
+                        'relation' => isset($yearBeforeLastSale['Current'], $yearBeforeLastPurchase['Venta']) && $yearBeforeLastPurchase['Venta'] != 0
                         ? number_format($yearBeforeLastSale['Current'] / $yearBeforeLastPurchase['Venta'] * 100, 0) : 0
                     ],
                     'last_year' => [
@@ -153,15 +153,15 @@ class ProjectionController extends Controller
                 ]);
             }
         );
-        
+
         $data['amounts'] = $amounts;
         $data['beforelast_year'] = $yearBeforeLastInitialDate->year;
         $data['last_year'] =$yearLastInitialDate->year;
         $data['total'] = $totalAmounts;
-// dd($data);        
+// dd($data);
 
         return view('projection.amounts',$data);
-       
+
     }
 
     /**
@@ -176,7 +176,7 @@ class ProjectionController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {       
+    {
 
     }
 
@@ -185,17 +185,17 @@ class ProjectionController extends Controller
      */
     public function edit(string $id)
     {
-        $projection = Projection::find($id);           
-        $categoryList = collect(Category::with('families')->whereIn('CategoryId',[1,4,12])->get());
+        $projection = Projection::find($id);
+        $categoryList = collect(Category::with('families')->whereIn('CategoryId',[1,4,12,2])->get());
         $categories = Family::with('category')->get();
         $families = Family::all();
 
         $projectionAmounts = ProjectionAmount::where('projection_id',$id)->get();
 
-        $totalesPorCategoria = $projectionAmounts->reduce(function ($carry, $item) use ($categories) {            
+        $totalesPorCategoria = $projectionAmounts->reduce(function ($carry, $item) use ($categories) {
             $category = $categories->firstWhere('FamilyId', $item['FamilyId'])->category->first();
             if(!isset($carry[$category->CategoryId])) {
-                $carry[$category->CategoryId] = [                    
+                $carry[$category->CategoryId] = [
                     'CategoryId' => $category->CategoryId,
                     'Name' => $category->Name,
                     'total_sale' => 0,
@@ -210,12 +210,12 @@ class ProjectionController extends Controller
         $totalsByCategory = collect($totalesPorCategoria);
 
         $totalesPorFamilia = $projectionAmounts->reduce(function ($carry, $item) use ($families) {
-            $key = $item['FamilyId']; // Creamos una clave única para FamilyId y CategoryId combinados            
+            $key = $item['FamilyId']; // Creamos una clave única para FamilyId y CategoryId combinados
             $family = $families->where('FamilyId', $item['FamilyId'])->first();
             // Si no existe la clave en el acumulador, inicializamos los valores
             if (!isset($carry[$key])) {
-                $carry[$key] = [                    
-                    'FamilyId' => $family->FamilyId,                    
+                $carry[$key] = [
+                    'FamilyId' => $family->FamilyId,
                     'total_sale' => 0,
                     'total_purchase' => 0,
                 ];
@@ -224,7 +224,7 @@ class ProjectionController extends Controller
             $carry[$key]['total_sale'] += $item['new_sale'] + $item['old_sale'];
             $carry[$key]['total_purchase'] += $item['purchase'];
             return $carry;
-        }, []);        
+        }, []);
         // Convertimos el resultado en una colección si necesitas manipularlo posteriormente
         $projectiontotalsPerFamily = collect($totalesPorFamilia);
 
@@ -239,11 +239,11 @@ class ProjectionController extends Controller
                 'sale' => number_format($sale,0),
                 'purchase' => number_format($purchase,0),
                 'relation' => number_format($relation,0),
-                'families' => $category->families->map(function ($family) use ($projectiontotalsPerFamily,$projection) {                    
+                'families' => $category->families->map(function ($family) use ($projectiontotalsPerFamily,$projection) {
                     $has_projection = ProjectionAmount::where('projection_id',$projection->id)->where('FamilyId', $family->FamilyId)->exists();
                     $total_sale = $projectiontotalsPerFamily->where('FamilyId', $family->FamilyId)->sum('total_sale');
                     $total_purchase = $projectiontotalsPerFamily->where('FamilyId', $family->FamilyId)->sum('total_purchase');
-                    $relation = $total_sale !=0 ? (float)$total_purchase/$total_sale *100: 0;                    
+                    $relation = $total_sale !=0 ? (float)$total_purchase/$total_sale *100: 0;
                     return [
                         'FamilyId' => $family->FamilyId,
                         'Name' => $family->Name,
@@ -254,11 +254,11 @@ class ProjectionController extends Controller
                     ];
                 }),
             ];
-        });        
-        
+        });
+
         $familyData = collect($familyListWithData);
 
-        $data = [  
+        $data = [
             'categories' => $familyData,
             'projection' => $projection,
         ];
@@ -282,5 +282,5 @@ class ProjectionController extends Controller
         //
     }
 
-    
+
 }

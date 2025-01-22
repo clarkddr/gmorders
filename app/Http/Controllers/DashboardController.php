@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $todayFormatted = Carbon::parse($today)->isoFormat('dddd D [de] MMMM YYYY');
         $lastYearFormatted = Carbon::parse($lastYear)->isoFormat('dddd D [de] MMMM YYYY');
         $hourNow = (int) Carbon::now()->format('H');
-//      $hourNow = 23;
+//        $hourNow = 2;
 
         $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
         $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
