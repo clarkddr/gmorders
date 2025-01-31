@@ -13,7 +13,7 @@ class Projection extends Model
 
     protected $fillable = ['name','start','end'];
 
-    public function amounts(): HasMany
+    public function projectionamounts(): HasMany
     {
         return $this->HasMany(ProjectionAmount::class);
     }

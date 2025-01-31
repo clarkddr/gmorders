@@ -193,8 +193,16 @@ class ProjectionController extends Controller
         $projectionAmounts = ProjectionAmount::where('projection_id',$id)->get();
 
         $totalesPorCategoria = $projectionAmounts->reduce(function ($carry, $item) use ($categories) {
-            $category = $categories->firstWhere('FamilyId', $item['FamilyId'])->category->first();
-            if(!isset($carry[$category->CategoryId])) {
+            $family = $categories->firstWhere('FamilyId', $item['FamilyId']);
+
+            if (!$family) {
+                return $carry; // Si no encuentra la familia, pasa al siguiente
+            }
+            $category = $family->category->first() ?? null;
+            if (!$category) {
+                return $carry; // Si la categoría es null, omite este registro
+            }
+            if (!isset($carry[$category->CategoryId])) {
                 $carry[$category->CategoryId] = [
                     'CategoryId' => $category->CategoryId,
                     'Name' => $category->Name,
@@ -202,11 +210,12 @@ class ProjectionController extends Controller
                     'total_purchase' => 0,
                 ];
             }
-                $carry[$category->CategoryId]['total_sale'] += $item['new_sale'] + $item['old_sale'];
-                $carry[$category->CategoryId]['total_purchase'] += $item['purchase'];
-                // dd($carry);
-                return $carry;
-        },[]);
+            $carry[$category->CategoryId]['total_sale'] += $item['new_sale'] + $item['old_sale'];
+            $carry[$category->CategoryId]['total_purchase'] += $item['purchase'];
+
+            return $carry;
+        }, []);
+
         $totalsByCategory = collect($totalesPorCategoria);
 
         $totalesPorFamilia = $projectionAmounts->reduce(function ($carry, $item) use ($families) {
