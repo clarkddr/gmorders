@@ -32,59 +32,59 @@
 	</x-titlePage>
     @if($categories->count() > 0)
     <div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
-                <div class="w-full overflow-x-auto">
-                    <table id="tablehead" class="w-full whitespace-no-wrap rounded-lg shadow-xs">
-                        <thead>
-                        <tr	class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                            <th class="px-4 py-3 text-center">Familia</th>
-                            <th class="px-4 py-3 text-right">Venta</th>
-                            <th class="px-4 py-3">vs Meta</th>
-                            <th class="px-4 py-3 text-right">Proyección Venta</th>
-                            <th class="px-4 py-3">Avance Proyección Venta</th>
-                            <th class="px-4 py-3 text-right">Compra</th>
-                            <th class="px-4 py-3 dt-text-left">c/v</th>
-                            <th class="px-4 py-3 text-right">Proyección Compra</th>
-                            <th class="px-4 py-3 dt-text-left">c/v</th>
-                            <th class="px-4 py-3">Avance Proyección Compra</th>
-                        </tr>
-                        </thead>
-                        <tfoot>
-                        <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-                            <td class="px-4 py-3 font-bold text-xl"> {{ 'Global' }} </td>
-                            <td class="px-4 py-3">
-                                <div class="flex flex-col items-end">
-                                    <span class="text-xl font-bold">{{$totals['total']}}</span>
-                                    <span class="text-xs text-gray-500">{{$totals['current'].' / '.$totals['old']}}</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 font-bold text-xl">
-                                <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['saleVsGoal']" size="xl"/>
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex flex-col items-end">
-                                    <span class="text-xl font-bold">{{$totals['projection']['total']}}</span>
-                                    <span class="text-xs text-gray-500">{{$totals['projection']['current'].' / '.$totals['projection']['old']}}</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3">
-                                <x-projectionProgress :value="$totals['totalVsProjection']" size="lg"/>
-                            </td>
-                            <td class="px-4 py-3 text-xl font-bold text-right">
-                                {{$totals['purchase']}}
-                            </td>
-                            <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale'] }}% </td>
-                            <td class="px-4 py-3 text-xl font-bold text-right">
-                                {{$totals['projection']['purchase']}}
-                            </td>
-                            <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['projection']['purchaseVsSale'] }}% </td>
-                            <td class="px-4 py-3">
-                                <x-projectionProgress :value="$totals['projection']['purchaseVsProjection']" size="lg"/>
-                            </td>
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+        <div class="w-full overflow-x-auto">
+            <table id="tablehead" class="w-full whitespace-no-wrap rounded-lg shadow-xs">
+                <thead>
+                <tr	class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                    <th class="px-4 py-3 text-center">Familia</th>
+                    <th class="px-4 py-3 text-right">Venta</th>
+                    <th class="px-4 py-3">vs Meta</th>
+                    <th class="px-4 py-3 text-right">Proyección Venta</th>
+                    <th class="px-4 py-3">Avance Proyección Venta</th>
+                    <th class="px-4 py-3 text-right">Compra</th>
+                    <th class="px-4 py-3 dt-text-left">c/v</th>
+                    <th class="px-4 py-3 text-right">Proyección Compra</th>
+                    <th class="px-4 py-3 dt-text-left">c/v</th>
+                    <th class="px-4 py-3">Avance Proyección Compra</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                    <td class="px-4 py-3 font-bold text-xl"> {{ 'Global' }} </td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-col items-end">
+                            <span class="text-xl font-bold">{{$totals['total']}}</span>
+                            <span class="text-xs text-gray-500">{{$totals['current'].' / '.$totals['old']}}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 font-bold text-xl">
+                        <x-percentageButton below="red" above="green" :min="99" :max="100" :value="$totals['saleVsGoal']" size="xl"/>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-col items-end">
+                            <span class="text-xl font-bold">{{$totals['projection']['total']}}</span>
+                            <span class="text-xs text-gray-500">{{$totals['projection']['current'].' / '.$totals['projection']['old']}}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <x-projectionProgress :value="$totals['totalVsProjection']" size="lg"/>
+                    </td>
+                    <td class="px-4 py-3 text-xl font-bold text-right">
+                        {{$totals['purchase']}}
+                    </td>
+                    <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['purchaseVsSale'] }}% </td>
+                    <td class="px-4 py-3 text-xl font-bold text-right">
+                        {{$totals['projection']['purchase']}}
+                    </td>
+                    <td class="px-4 py-3 font-bold text-xl dt-text-left"> {{ $totals['projection']['purchaseVsSale'] }}% </td>
+                    <td class="px-4 py-3">
+                        <x-projectionProgress :value="$totals['projection']['purchaseVsProjection']" size="lg"/>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        </div>
     @endif
 
     @foreach($categories as $category)
@@ -109,7 +109,7 @@
                     @foreach($category['families'] as $family)
 					<tr class="text-gray-700 dark:text-gray-400">
 						<td class="px-4 py-3">
-							<a href="{{route('projectionamount.show',$family['id'])}}" class="text-blue-600 hover:underline">
+							<a  href="{{route('projectionamount.branches',['family'=>$family['id'],'projection'=>$selectedProjection['id']])}}" class="text-blue-600 hover:underline" target="_blank">
 								{{ $family['name'] }}
 							</a>
 						</td>

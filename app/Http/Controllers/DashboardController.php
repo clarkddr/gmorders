@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $todayFormatted = Carbon::parse($today)->isoFormat('dddd D [de] MMMM YYYY');
         $lastYearFormatted = Carbon::parse($lastYear)->isoFormat('dddd D [de] MMMM YYYY');
         $hourNow = (int) Carbon::now()->format('H');
-//        $hourNow = 2;
+//        $hourNow = 23;
 
         $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
         $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
@@ -39,14 +39,13 @@ class DashboardController extends Controller
         $hourNowExistsInTodayResults = $todayResults->where('Hour', $hourNow)->count() > 0;
         $hourNowExistsInLastYearResults = $lastyearResults->where('Hour', $hourNow)->count() > 0;
         if(!$hourNowExistsInTodayResults || !$hourNowExistsInLastYearResults) {
-            $hourNow = $todayResults->max('Hour') ?? $hourNow -1;
+            $hourNow = $todayResults->max('Hour') ?? $hourNow -1 ?? 1;
 //            $hourNow = $hourNow - 1;
         }
 
-
         $todayAccumulated = 0; $lastYearAccumulated = 0;
         $amounts = $allHours->map(function ($hour) use ($hourNow, &$todayAccumulated, &$lastYearAccumulated, $lastyearResults, $todayResults) {
-            $lastyearSale = $lastyearResults->where('Hour', $hour)->first()->Amount ?? 0;;
+            $lastyearSale = $lastyearResults->where('Hour', $hour)->first()->Amount ?? 0;
             $todaySale = $todayResults->where('Hour', $hour)->first()->Amount ?? 0;
             $lastYearAccumulated += $lastyearSale;
             $todayAccumulated += $todaySale;

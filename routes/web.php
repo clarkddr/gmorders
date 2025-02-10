@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function(){
     Route::get('/saleandpurchase',[SaleAndPurchaseController::class,'index'])->name('saleandpurchase.index');
     Route::get('/projections/amounts', [ProjectionController::class, 'amounts']);
     Route::resource('projections',ProjectionController::class);
+    Route::get('projectionamount/branches',[ProjectionAmountController::class,'branches'])->name('projectionamount.branches');
     Route::resource('projectionamount',ProjectionAmountController::class);
     Route::get('purchaseoversale',[PurchaseOverSaleController::class,'index'])->name('purchaseoversale.index');
     Route::get('purchaseoversale/{id}',[PurchaseOverSaleController::class,'show'])->name('purchaseoversale.show');

@@ -393,7 +393,6 @@ class ProjectionAmountController extends Controller
      */
     public function show(string $id)
     {
-
         $familyid = $id;
         $family = Family::find($id);
         $familyName = $family->Name;
@@ -542,6 +541,231 @@ class ProjectionAmountController extends Controller
 
         return view('projectionAmounts.show',$data);
 
+    }
+
+    public function branches(Request $request)
+    {
+
+        $familyid = $request->family;
+        $family = Family::find($request->family);
+        $familyName = $family->Name;
+        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+        $projectionAmounts = ProjectionAmount::with('families')->where('projection_id',$request->projection)->where('FamilyId',$familyid)->get();
+        $projection = Projection::find($request->projection);
+        $lastYearStart = Carbon::parse($projection->start)->subYear();
+        $lastYearEnd = Carbon::parse($projection->end)->subYear();
+        $yesterdayLastYear = Carbon::yesterday()->subYear();
+        // Si el dia de ayer del año anterior se pasa del ultimo dia del periodo, entonces retorna el ultimo dia del periodo.
+        $yesterdayLastYear = $yesterdayLastYear->greaterThan($lastYearEnd) ? $lastYearEnd : $yesterdayLastYear;
+        /*=======  PASOS  =========== */
+        // 1. Se calcula la venta del año pasado del periodo completo
+        $lastYearQuery = "
+        EXEC dbo.DRGetSalesReportByFamily @From = '{$lastYearStart->format('Y-m-d')}', @To = '{$lastYearEnd->format('Y-m-d')}', @Family = {$familyid}, @Category = 0
+        ";
+        $lastYearQueryResults = DB::connection('mssql')->selectResultSets($lastYearQuery);
+        $lastYearSaleResults = collect($lastYearQueryResults[0]);
+
+        //2. Se saca la venta parcial, desde el inicio del periodo hasta ayer
+        $partialLastYearQuery = "
+        EXEC dbo.DRGetSalesReportByFamily @From = '{$lastYearStart->format('Y-m-d')}', @To = '{$yesterdayLastYear->format('Y-m-d')}', @Family = {$familyid}, @Category = 0
+        ";
+        $partialLastYearQueryResults = DB::connection('mssql')->selectResultSets($partialLastYearQuery);
+        $partialLastYearSaleResults = collect($partialLastYearQueryResults[0]);
+
+        // 3. Se compara la venta total del periodo con la venta proyectada del periodo.
+        $goal = $branches->map(function($branch) use ($lastYearSaleResults,$projectionAmounts, $partialLastYearSaleResults){
+            $branchid = $branch->BranchId;
+            $lastYearSale = $lastYearSaleResults->firstWhere('branchid',$branchid)->Amount ?? 0;
+            $projectionAmountNew = $projectionAmounts->firstWhere('BranchId',$branchid)->new_sale ?? 0;
+            $projectionAmountOld = $projectionAmounts->firstWhere('BranchId',$branchid)->old_sale ?? 0;
+            $projectionAmount = $projectionAmountNew + $projectionAmountOld;
+            $goal = $lastYearSale > 0 ? $projectionAmount / $lastYearSale : 0;
+            $partialLastYearSale = $partialLastYearSaleResults->firstWhere('branchid',$branchid)->Amount ?? 0;
+            $goalSale = $partialLastYearSale * $goal;
+            return collect([
+                'branchid' => $branchid,
+                'name' => $branch->Name,
+                'lastYearSale' => $lastYearSale,
+                'projectionAmount' => $projectionAmount,
+                'goal' => $goal,
+                'partialLastYearSale' => $partialLastYearSale,
+                'goalSale' => $goalSale
+            ]);
+        });
+//        $goal->each(function($item) {
+//            print_r($item['goalSale'] . '<br>');
+//        });
+
+        // Se obtienen las ventas del periodo año actual
+        $query = "
+        EXEC dbo.DRGetSalesReportByFamily @From = '{$projection->start}', @To = '{$projection->end}', @Family = {$familyid}, @Category = 0
+        ";
+        $queryResults = DB::connection('mssql')->selectResultSets($query);
+        $saleResults = collect($queryResults[0]);
+        $purchaseResults = collect($queryResults[1]);
+
+
+
+        $filteredProjection = $projectionAmounts->map(function ($row) use ($branches) {
+            $branch = $branches->firstWhere('BranchId',$row->BranchId);
+            $current = $row->new_sale;
+            $old = $row->old_sale;
+            $amount = $current + $old;
+            return collect([
+                'branchid' => $branch->BranchId,
+                'name' => $branch->Name,
+                'current' => $row->new_sale,
+                'old' => $row->old_sale,
+                'amount' => $amount,
+                'purchase' => $row->purchase,
+            ]);
+        });
+
+
+        $goalTotal = [
+            'totalSaleLastYear' => $goal->sum('lastYearSale'),
+            'totalSaleProjected' => $goal->sum('projectionAmount')
+        ];
+        $goalTotal['goal'] = $goalTotal['totalSaleLastYear'] > 0 ? $goalTotal['totalSaleProjected'] / $goalTotal['totalSaleLastYear'] : 0;
+        $goalTotal['partialSale'] = $goal->sum('partialLastYearSale');
+        $goalTotal['goalSale'] = $goalTotal['partialSale'] * $goalTotal['goal'];
+
+        $thisYearSalesTotal = $saleResults->reduce(function ($carry,$item) {
+            return [
+                'name' => 'Todas',
+                'current' => $carry['current'] + $item->Current,
+                'old' => $carry['old'] + $item->Old,
+                'total' => $carry['total'] + $item->Amount
+            ];
+        },['current' => 0, 'old' => 0, 'total' => 0, 'purchase' => 0]);
+        $thisYearSalesTotal['saleVsGoal'] = $goalTotal['goalSale'] > 0 ? $thisYearSalesTotal['total'] / $goalTotal['goalSale'] * 100 : 0;
+
+
+        $purchaseTotal = $purchaseResults->reduce(function($carry,$item){
+            return $carry + $item->Costo;
+        },0);
+        $thisYearSalesTotal['purchaseVsSale'] = $thisYearSalesTotal['total'] > 0 ? $purchaseTotal / $thisYearSalesTotal['total'] * 100 : 0;
+        $projectionSalesTotal = $filteredProjection->reduce(function ($carry,$item, $purchaseTotal) {
+            $new = $item['current'];
+            $old = $item['old'];
+            $amount = $item['amount'];
+            $purchase = $item['purchase'];
+            return [
+                'name' => 'Todas',
+                'current' => $carry['current'] + $new,
+                'old' => $carry['old'] + $old,
+                'total' => $carry['total'] + $amount,
+                'purchase' => $carry['purchase'] + $purchase,
+            ];
+        },['name'=>'Todas','current' => 0, 'old' => 0, 'total' => 0, 'purchase' => 0]);
+        $projectionPurchaseVsSale = $projectionSalesTotal['total'] > 0 ? $projectionSalesTotal['purchase'] / $projectionSalesTotal['total'] * 100 : 0;
+
+        $purchaseProjectionvsPurchaseTotal = 0;
+        if($projectionSalesTotal['purchase'] == 0){
+            $purchaseProjectionvsPurchaseTotal = 0;
+        } else {
+            $purchaseProjectionvsPurchaseTotal = number_format($purchaseTotal/$projectionSalesTotal['purchase']*100,1);
+        }
+
+        $thisYearSales = $saleResults->map(function ($row) use ($branches, $filteredProjection, $purchaseResults, $goal){
+            $branch = $branches->firstWhere('BranchId',$row->branchid);
+            $amount = $row->Amount;
+            $purchase = $purchaseResults->firstWhere('branchid', $row->branchid)->Costo ?? 0;
+            $projectionSale = $filteredProjection->where('branchid',$row->branchid)->first() ?? ['current' => 0, 'old' => 0, 'amount' => 0, 'purchase' => 0];
+            $projectionAmount = (float) ($projectionSale['amount'] ?? 0);
+            $totalVsProjection = $projectionAmount != 0 ? (float) $row->Amount / (float)$projectionAmount * 100 : 0; // Aquí manejas la división
+            $purchaseVsProjection = $projectionSale['purchase'] != 0 ? (float)$purchase/$projectionSale['purchase'] *100 : 0 ;
+            $toPurchaseDlls = ($projectionSale['purchase'] - $purchase) / 20;
+            $goalSale = $goal->firstWhere('branchid', $row->branchid)->get('goalSale') ?? 0;
+            $saleVsGoal = $goalSale != 0 ? (float) $row->Amount / (float) $goalSale * 100 : 0;
+            $purchaseVsSale = $amount > 0 ? $purchase / $amount * 100 : 0;
+            $projectionPurchaseVsSale = $projectionSale['amount'] > 0 ? $projectionSale['purchase'] / $projectionSale['amount'] * 100 : 0;
+            return [
+                'name' => $branch->Name,
+                'id' => $branch->BranchId,
+                'current' => (float) $row->Current,
+                'old' => (float) $row->Old,
+                'total' => (float) $row->Amount,
+                'goalSale' => (float) $goalSale,
+                'saleVsGoal' => $saleVsGoal,
+                'purchase' => (float) $purchase,
+                'purchaseVsSale' => $purchaseVsSale,
+                'totalVsProjection' => (float) $totalVsProjection,
+                'projection' => [
+                    'current' => (float) $projectionSale['current'] ?? 0,
+                    'old' => (float) $projectionSale['old'] ?? 0,
+                    'amount' => (float) $projectionSale['amount'] ?? 0,
+                    'purchase' => (float) $projectionSale['purchase'] ?? 0,
+                    'purchaseVsProjection' => $purchaseVsProjection,
+                    'toPurchaseDlls' => $toPurchaseDlls,
+                    'purchaseVsSale' => $projectionPurchaseVsSale
+                ]
+            ];
+        });
+
+//        dd($thisYearSales);
+
+        // Formatear numeros para la vista
+        // Formatear el totalizado para la vista
+        $thisYearSalesTotalFormatted = [
+            'name' => $thisYearSalesTotal['name'],
+            'current' => number_format($thisYearSalesTotal['current'], 0, '.', ','), // Formato de moneda
+            'old' => number_format($thisYearSalesTotal['old'], 0, '.', ','),
+            'total' => number_format($thisYearSalesTotal['total'], 0, '.', ','),
+            'purchase' => number_format($purchaseTotal, 0, '.', ','),
+            'saleVsGoal' => number_format($thisYearSalesTotal['saleVsGoal'], 0),
+            'purchaseVsSale' => number_format($thisYearSalesTotal['purchaseVsSale'], 0),
+        ];
+
+        if($projectionSalesTotal['total'] == 0){
+            $totalVsProjection = 0;
+        } else {
+            $totalVsProjection = number_format(($thisYearSalesTotal['total']/$projectionSalesTotal['total']*100),1);
+        }
+        $projectionSalesTotalFormatted = [
+            'name' => $projectionSalesTotal['name'],
+            'current' => number_format($projectionSalesTotal['current'], 0, '.', ','), // Formato de moneda
+            'old' => number_format($projectionSalesTotal['old'], 0, '.', ','),
+            'total' => number_format($projectionSalesTotal['total'], 0, '.', ','),
+            'purchase' => number_format($projectionSalesTotal['purchase'], 0, '.', ','),
+            'totalVsProjection' => $totalVsProjection,
+            'purchaseVsProjection' => $purchaseProjectionvsPurchaseTotal,
+            'toPurchaseDlls' => number_format(($projectionSalesTotal['purchase'] - $purchaseTotal ) / 19.5,0),
+            'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
+        ];
+
+
+        $thisYearSalesFormatted = $thisYearSales->map(function ($item){
+            return [
+                'name' => $item['name'],
+                'id' => $item['id'],
+                'current' => number_format($item['current'], 0, '.', ','), // Formato de moneda
+                'old' => number_format($item['old'], 0, '.', ','),
+                'total' => number_format($item['total'], 0, '.', ','),
+                'saleVsGoal' => number_format($item['saleVsGoal'], 0),
+                'purchase' => number_format($item['purchase'], 0, '.', ','),
+                'totalVsProjection' => number_format($item['totalVsProjection'], 1, '.', ','),
+                'purchaseVsSale' => number_format($item['purchaseVsSale'], 0),
+                'projection' => [
+                    'current' => number_format($item['projection']['current'],0) ?? 0,
+                    'old' => number_format($item['projection']['old'],0) ?? 0,
+                    'amount' => number_format($item['projection']['amount'],0) ?? 0,
+                    'purchase' => number_format($item['projection']['purchase'],0) ?? 0,
+                    'purchaseVsProjection' => number_format($item['projection']['purchaseVsProjection'],1),
+                    'toPurchaseDlls' => number_format($item['projection']['toPurchaseDlls'],0),
+                    'purchaseVsSale' => number_format($item['projection']['purchaseVsSale'],0)
+                ]
+            ];
+        });
+
+        $data = [
+            'familyName' => $familyName,
+            'projection' => $projection,
+            'thisYearSales' => $thisYearSalesFormatted,
+            'thisYearSalesTotal' => $thisYearSalesTotalFormatted,
+            'projectionSalesTotal' => $projectionSalesTotalFormatted,
+        ];
+        return view('projectionAmounts.branches',$data);
     }
 
     /**

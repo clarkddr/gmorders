@@ -191,6 +191,17 @@ class ProjectionController extends Controller
         $families = Family::all();
 
         $projectionAmounts = ProjectionAmount::where('projection_id',$id)->get();
+        $totals = collect([
+            'sale' => $projectionAmounts->sum('new_sale') + $projectionAmounts->sum('old_sale'),
+            'purchase' => $projectionAmounts->sum('purchase'),
+        ]);
+        $totals->put('purchaseVsSale', $totals['sale'] > 0 ? ($totals['purchase'] / $totals['sale'] * 100) : 0);
+
+        $totalsFormatted = collect([
+            'sale' => number_format($totals['sale'],0),
+            'purchase' => number_format($totals['purchase'],0),
+            'purchaseVsSale' => number_format($totals['purchaseVsSale'],0),
+        ]);
 
         $totalesPorCategoria = $projectionAmounts->reduce(function ($carry, $item) use ($categories) {
             $family = $categories->firstWhere('FamilyId', $item['FamilyId']);
@@ -268,6 +279,7 @@ class ProjectionController extends Controller
         $familyData = collect($familyListWithData);
 
         $data = [
+            'totals' => $totalsFormatted,
             'categories' => $familyData,
             'projection' => $projection,
         ];

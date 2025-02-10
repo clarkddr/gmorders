@@ -16,19 +16,19 @@
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">A la hora Año Anterior</span>
                     <span id="lastYearAccumulated" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
-                        ${{number_format($amounts->where('hour',$hourNow+1)->first()['lastYearAccumulated'],0)}}
+                        ${{ number_format($amounts->where('hour', $hourNow + 1)->first()['lastYearAccumulated'] ?? 0, 0) }}
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Año Actual </span>
                     <span id="todayAccumulated" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
-                        ${{number_format($amounts->where('hour',$hourNow+1)->first()['todayAccumulated'],0)}}
+                        ${{number_format($amounts->where('hour',$hourNow+1)->first()['todayAccumulated'] ?? 0,0)}}
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Porcentaje</span>
                     <span id="relationSpanContainer" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
-                        <x-percentageButton below="red" above="green" :min="99" :max="100" :value="number_format($amounts->where('hour',$hourNow+1)->first()['relation'],0)" size="xl"/>
+                        <x-percentageButton below="red" above="green" :min="99" :max="100" :value="number_format($amounts->where('hour',$hourNow+1)->first()['relation'] ?? 0,0)" size="xl"/>
                     </span>
                 </div>
             </div>
