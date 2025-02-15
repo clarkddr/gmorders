@@ -24,6 +24,7 @@ class ProjectionAmountController extends Controller
             'projectionList' => $projectionList,
             'thisYearSales' => collect([]),
             'categories' => collect([]),
+            'branches' => collect([]),
             'selectedProjection' => [
                 'id' => 0,
                 'name' => null,

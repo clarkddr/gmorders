@@ -183,6 +183,8 @@
 		</div>
 	</div>
     @endforeach
+
+    @if($categories->count() > 0)
         <!-- Tabla de totales por sucursal -->
         <h1 class="text-xl font-bold text-gray-700 dark:text-gray-200 ">Por Sucursal</h1>
         <div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
@@ -279,6 +281,7 @@
                 </table>
             </div>
         </div>
+    @endif
 </x-layout>
 
 <script>
