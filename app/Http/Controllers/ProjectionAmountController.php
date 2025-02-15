@@ -87,16 +87,36 @@ class ProjectionAmountController extends Controller
                 ]);
 
                 // Falta agregar las siguientes columnas
-                /* Avance de lo Real vs Una nueva estimacion que seria:
-                    - Sacar la relacion entre venta total proyectada y total año anterior (Meta)
-                    - Aumentar esa Meta a la venta al dia del año pasado
-                    - Relacion entre la venta al dia del año actual vs Meta al dia (Mostrarlo como boton de Color)
+                /*
+                 * Ventas del periodo completo del año anterior por sucursal
+                 * Ventas del periodo del año anterior pero parcial hasta un dia antes por sucursal
+                 * Con los dos datos anteriores crear el Goal por Sucursal
+                 * Ventas del periodo actual por sucursal
                 */
 
                 $selectedProjection = Projection::findOrFail($request->projection);
                 $projectionamounts = $selectedProjection->projectionamounts()->get();
                 $families = Family::all();
                 $categories = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
+                $branches = Branch::whereNotIn('BranchId', [4,5,10,14])->get();
+
+                // Se calculan las proyecciones totalizada por sucursal
+                $projectionResultBranches = $branches->map(function ($branch) use ($projectionamounts) {
+                    $branchid = $branch->BranchId;
+                    $new = $projectionamounts->where('BranchId', $branchid)->sum('new_sale');
+                    $old = $projectionamounts->where('BranchId', $branchid)->sum('old_sale');
+                    $total = $new + $old;
+                    $purchase = $projectionamounts->where('BranchId', $branchid)->sum('purchase');
+                    return collect([
+                        'branchid' => $branchid,
+                        'new' => $new ?? 0,
+                        'old' => $old ?? 0,
+                        'total' => $total ?? 0,
+                        'purchase' => $purchase ?? 0,
+                    ]);
+                });
+
+                // Se calculan las proyecciones tanto por categoria como por familia de una sola pasada
                 $projectionResults = $projectionamounts
                     ->groupBy('FamilyId')
                     ->map(function ($familyGroup) use ($categories, $families) {
@@ -127,9 +147,12 @@ class ProjectionAmountController extends Controller
                             'purchase' => $purchase
                         ]);
                     });
+
+
                 $lastYearStart = Carbon::parse($selectedProjection->start)->subYear();
                 $lastYearEnd = Carbon::parse($selectedProjection->end)->subYear();
                 $yesterdayLastYear = Carbon::yesterday()->subYear();
+
                 // Si el dia de ayer del año anterior se pasa del ultimo dia del periodo, entonces retorna el ultimo dia del periodo.
                 $yesterdayLastYear = $yesterdayLastYear->greaterThan($lastYearEnd) ? $lastYearEnd : $yesterdayLastYear;
 
@@ -139,7 +162,11 @@ class ProjectionAmountController extends Controller
                 EXEC dbo.DRGetSalesReportByFamily @From = '{$lastYearStart->format('Y-m-d')}', @To = '{$lastYearEnd->format('Y-m-d')}', @Family = 0, @Category = 0
                 ";
                 $lastYearQueryResultsPeriod = DB::connection('mssql')->selectResultSets($lastYearQueryWholePeriod);
+                // Este Result recolecta las ventas con categorias y familias
                 $lastYearSaleResults = collect($lastYearQueryResultsPeriod[2]);
+                // Este carga el mismo resultado de ventas pero por sucursal
+                $lastYearSaleResultsBranches = collect($lastYearQueryResultsPeriod[6]);
+
 
                 // Se sacan ventas del año anterior al periodo pero de un dia antes, no periodo completo para ver el avance
                 $lastYearQueryPartialPeriod = "
@@ -149,6 +176,8 @@ class ProjectionAmountController extends Controller
                 ";
                 $lastYearQueryResultsPartial = DB::connection('mssql')->selectResultSets($lastYearQueryPartialPeriod);
                 $lastYearPartialSaleResults = collect($lastYearQueryResultsPartial[2]);
+                // Recolectar las ventas parciales pero por sucursal
+                $lastYearPartialSaleResultsBranches = collect($lastYearQueryResultsPartial[6]);
 
 
                 $categoriesGoalSale = $categories->map(function ($category) use ($lastYearPartialSaleResults,$lastYearSaleResults,$projectionResults) {
@@ -191,9 +220,12 @@ class ProjectionAmountController extends Controller
                 EXEC dbo.DRGetSalesReportByFamily @From = '{$selectedProjection->start}', @To = '{$selectedProjection->end}', @Family = 0, @Category = 0
                 ";
                 $thisYearQueryResults = DB::connection('mssql')->selectResultSets($thisYearQquery);
+                //Se sacan resultados por categoria y familia
                 $saleResults = collect($thisYearQueryResults[2]);
                 $purchaseResults = collect($thisYearQueryResults[3]);
-
+                // Se sacan resultados totalizados por sucursal
+                $saleResultsBranches = collect($thisYearQueryResults[6]);
+                $purchaseResultsBranches = collect($thisYearQueryResults[7]);
 
                 $categoriesData = $categories->map(function ($category) use ($familiesGoalSale,$categoriesGoalSale,$saleResults, $purchaseResults, $projectionResults) {
                     $current = $saleResults->where('CategoryId', $category->CategoryId)->sum('Current');
@@ -270,6 +302,58 @@ class ProjectionAmountController extends Controller
                     ]);
                 });
 
+                $branchesGoalSale = $branches->map(function ($branch) use ($lastYearPartialSaleResultsBranches,$lastYearSaleResultsBranches,$projectionResultBranches) {
+                    $lastYearSale = $lastYearSaleResultsBranches->where('branchid', $branch->BranchId)->sum('Amount');
+                    $projection = $projectionResultBranches->where('branchid', $branch->BranchId)->sum('total');
+                    $relationGoal = $lastYearSale > 0 ? $projection / $lastYearSale : 0;
+                    $lastYearPartialSale = $lastYearPartialSaleResultsBranches->where('branchid', $branch->BranchId)->sum('Amount');
+                    $partialGoalSale = $relationGoal * $lastYearPartialSale;
+                    return collect([
+                        'branchid' => $branch->BranchId,
+                        'lastYearSale' => $lastYearSale,
+                        'projection' => $projection,
+                        'relationGoal' => $relationGoal,
+                        'lastYearPartialSale' => $lastYearPartialSale,
+                        'partialGoalSale' => $partialGoalSale,
+                    ]);
+                });
+
+                $branchesData = $branches->map(function ($branch) use ($projectionResultBranches,$saleResultsBranches,$purchaseResultsBranches,$branchesGoalSale){
+                    $current = $saleResultsBranches->where('branchid', $branch->BranchId)->sum('Current');
+                    $old = $saleResultsBranches->where('branchid', $branch->BranchId)->sum('Old');
+                    $total = $saleResultsBranches->where('branchid', $branch->BranchId)->sum('Amount');
+                    $purchase = $purchaseResultsBranches->where('branchid', $branch->BranchId)->sum('Costo');
+                    $purchaseVsSale = $total > 0 ? $purchase / $total * 100 : 0;
+                    $projectionCurrent = $projectionResultBranches->where('branchid', $branch->BranchId)->sum('new');
+                    $projectionOld = $projectionResultBranches->where('branchid', $branch->BranchId)->sum('old');
+                    $projectionTotal = $projectionResultBranches->where('branchid', $branch->BranchId)->sum('total');
+                    $projectionPurchase = $projectionResultBranches->where('branchid', $branch->BranchId)->sum('purchase');
+                    $projectionPurchaseVsSale = $projectionTotal > 0 ? $projectionPurchase / $projectionTotal * 100 : 0;
+                    $totalVsProjection = $projectionCurrent ? ($total/$projectionTotal*100) : 0;
+                    $purchaseVsProjection = $projectionPurchase ? ($purchase/$projectionPurchase*100) : 0;
+                    $branchGoalSale = $branchesGoalSale->firstWhere('branchid', $branch->BranchId)->get('partialGoalSale') ?? 0;
+                    $saleVsGoal = $branchGoalSale > 0 ? $total/$branchGoalSale*100 : 0;
+                    return collect([
+                        'id' => $branch->BranchId,
+                        'categoryPartialGoal' => $branchGoalSale, //46,273,621
+                        'saleVsGoal' => number_format($saleVsGoal,0),
+                        'name' => $branch->Name,
+                        'current' => number_format($current,0),
+                        'old' => number_format($old,0),
+                        'total' => number_format($total,0),
+                        'purchase' => number_format($purchase,0),
+                        'purchaseVsSale' => number_format($purchaseVsSale,0),
+                        'totalVsProjection' => number_format($totalVsProjection,0),
+                        'projection' => [
+                            'current' => number_format($projectionCurrent,0),
+                            'old' => number_format($projectionOld,0),
+                            'total' => number_format($projectionTotal,0),
+                            'purchase' => number_format($projectionPurchase,0),
+                            'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
+                            'purchaseVsProjection' => number_format($purchaseVsProjection,0)
+                        ],
+                    ]);
+                });
 
                 //Calculamos para la tabla del TOTAL
                 $totalsLastYearSale = $lastYearSaleResults->sum('Amount'); // Total de Venta año anterior 45,169,208
@@ -277,13 +361,7 @@ class ProjectionAmountController extends Controller
                 $relationGoal = $totalsLastYearSale > 0 ? $totalsProjection / $totalsLastYearSale : 0; // Relacion Venta Anterior y Proyeccion 49,565,713/45,169,208 = 1.0973
                 $lastYearPartialSale = $lastYearPartialSaleResults->sum('Amount'); // Total de Venta Parcial Año Anterior 1,772,687.3
                 $partialGoalSale = $lastYearPartialSale * $relationGoal; // Meta de Venta Parcial 1,945,169.77
-//                dd([
-//                    'ventaAnoAnterior' => number_format($totalsLastYearSale,0),
-//                    'proyeccion' => number_format($totalsProjection,0),
-//                    'relacionMeta' => $relationGoal,
-//                    'ventaParcialAnoAnterior' => number_format($lastYearPartialSale,0),
-//                    'metaVentaParcial' => number_format($partialGoalSale,0),
-//                ]);
+
                  // Relacion entre Meta de Venta Parcial y Venta actual - 2,438,972 / 1,945,169 = 1.2538
                 $totalsCurrent = $saleResults->sum('Current');
                 $totalsOld = $saleResults->sum('Old');
@@ -294,9 +372,9 @@ class ProjectionAmountController extends Controller
                 $totalsProjectionCurrent = $projectionResults->sum('current');
                 $totalsProjectionOld = $projectionResults->sum('old');
                 $totalsProjectionTotal = $projectionResults->sum('total');
-                $totalVsProjection = $totalsTotal ? ($totalsTotal/$totalsProjectionTotal*100) : 0;
+                $totalVsProjection = $totalsProjectionTotal > 0 ? ($totalsTotal/$totalsProjectionTotal*100) : 0;
                 $totalsProjectionPurchase = $projectionResults->sum('purchase');
-                $totalsProjectionPurchaseVsSale = $totalsTotal > 0 ? $totalsProjectionPurchase / $totalsProjectionTotal * 100 : 0;
+                $totalsProjectionPurchaseVsSale = $totalsProjectionTotal > 0 ? $totalsProjectionPurchase / $totalsProjectionTotal * 100 : 0;
                 $purchaseVsProjection = $totalsProjectionPurchase ? ($totalsPurchase/$totalsProjectionPurchase*100) : 0;
                 $totals = collect([
                     'saleVsGoal' => number_format($totalsSaleVsGoal,0),
@@ -317,6 +395,7 @@ class ProjectionAmountController extends Controller
                 ]);
 
                 $data['categories'] = $categoriesData;
+                $data['branches'] = $branchesData;
                 $data['selectedProjection'] = $selectedProjection;
                 $data['totals'] = $totals;
             }
