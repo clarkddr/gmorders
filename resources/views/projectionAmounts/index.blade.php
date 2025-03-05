@@ -295,6 +295,7 @@
 			"order": [[]],
             "columnDefs": [{
                 //"targets": 3, "orderable": false,
+                // este es un comentario de pruebasssss
             }]
 		});
 	} );
