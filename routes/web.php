@@ -13,6 +13,7 @@ use App\Http\Controllers\SessionController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BranchSalesTargetController;
 
 Route::middleware('guest')->group(function(){
     // Route::get('/register', [RegisteredUserController::class,'create']);
@@ -33,6 +34,8 @@ Route::middleware('auth')->group(function(){
     Route::get('purchaseoversale',[PurchaseOverSaleController::class,'index'])->name('purchaseoversale.index');
     Route::get('purchaseoversale/{id}',[PurchaseOverSaleController::class,'show'])->name('purchaseoversale.show');
 });
+
+Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
 
 Route::get('/plan', [ImageController::class,'plan'])->name('plan');
 
