@@ -32,6 +32,7 @@ class DashboardController extends Controller
         // Se hace merge de los dos resultados en el atributo Hora para hacer map sobre todas.
         $allHoursObject = $lastyearResults->pluck('Hour')
             ->merge($todayResults->pluck('Hour'))
+            ->merge([9])
             ->unique()->sort()->values();
         $allHours = collect($allHoursObject);
 
