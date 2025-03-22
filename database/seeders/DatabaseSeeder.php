@@ -44,9 +44,9 @@ class DatabaseSeeder extends Seeder
             'password' => 'almaraz123',
         ]);
 
-        $suppliers = Supplier::factory(4)->create();
-        Gallery::factory(8)->create();
-        Image::factory(100)->create();
+//        $suppliers = Supplier::factory(4)->create();
+//        Gallery::factory(8)->create();
+//        Image::factory(100)->create();
 
         Projection::factory()->create([
             'name' => 'Invierno 24',

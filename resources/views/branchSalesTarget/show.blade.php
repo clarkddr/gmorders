@@ -2,11 +2,11 @@
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg mt-16">
         <div class="rounded-lg space-y-2 sm:space-y-6">
             <p class="text-gray-700 dark:text-gray-200">
-                <span id="todaySpan" class="font-semibold text-6xl">{{$month}}</span><br>
+                <span id="todaySpan" class="font-semibold text-6xl">{{ucfirst($month)}}</span><br>
                 <span id="todaySpan" class="font-semibold">{{$today}}</span>
                 <span class="font-semibold"> VS </span>
                 <span id="lastYearSpan" class="font-semibold">{{$lastYear}}</span>
-                <span class="font-semibold">{{'Sucursal: ' . $branchid}}</span>
+                <span class="font-semibold">{{'Sucursal: ' . $name}}</span>
             </p>
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">

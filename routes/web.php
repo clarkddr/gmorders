@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function(){
     Route::resource('projectionamount',ProjectionAmountController::class);
     Route::get('purchaseoversale',[PurchaseOverSaleController::class,'index'])->name('purchaseoversale.index');
     Route::get('purchaseoversale/{id}',[PurchaseOverSaleController::class,'show'])->name('purchaseoversale.show');
+    Route::get('branches',[BranchSalesTargetController::class,'index'])->name('branchTarget.index');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
