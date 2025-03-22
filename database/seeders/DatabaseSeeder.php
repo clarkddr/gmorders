@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\BranchSalesTargetController;
 use App\Models\Gallery;
 use App\Models\Image;
 use App\Models\Projection;
@@ -43,9 +44,9 @@ class DatabaseSeeder extends Seeder
             'password' => 'almaraz123',
         ]);
 
-        $suppliers = Supplier::factory(4)->create();
-        Gallery::factory(8)->create();
-        Image::factory(100)->create();
+//        $suppliers = Supplier::factory(4)->create();
+//        Gallery::factory(8)->create();
+//        Image::factory(100)->create();
 
         Projection::factory()->create([
             'name' => 'Invierno 24',
@@ -54,7 +55,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Projection::factory(25)->create();
-        
+
         //ProjectionAmount::factory(28)->create();
         ProjectionAmount::insert([
             // Botin
@@ -119,6 +120,6 @@ class DatabaseSeeder extends Seeder
             ['projection_id' => 1, 'branchid' => 9, 'familyid' => 24, 'new_sale' => 93000, 'old_sale' => 0, 'purchase' => 49048],
             ['projection_id' => 1, 'branchid' => 1, 'familyid' => 24, 'new_sale' => 50000, 'old_sale' => 0, 'purchase' => 18048],
             ]);
-            
+
         }
 }
