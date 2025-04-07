@@ -192,7 +192,7 @@
                 <table id="salesTable" class="projectionTable w-full whitespace-no-wrap rounded-lg shadow-xs">
                     <thead>
                     <tr	class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                        <th class="px-4 py-3 text-center">Familia</th>
+                        <th class="px-4 py-3 text-center">Sucursal</th>
                         <th class="px-4 py-3 text-right">Venta</th>
                         <th class="px-4 py-3">vs Meta</th>
                         <th class="px-4 py-3 text-right">Proyección Venta</th>
@@ -208,9 +208,7 @@
                     @foreach($branches as $branch)
                         <tr class="text-gray-700 dark:text-gray-400">
                             <td class="px-4 py-3">
-                                <a  href="{{route('projectionamount.branches',1)}}" class="text-blue-600 hover:underline" target="_blank">
-                                    {{ $branch['name'] }}
-                                </a>
+                                {{ $branch['name'] }}
                             </td>
                             <td class="px-4 py-3 " data-order="{{$branch['total']}}">
                                 <div class="flex flex-col items-end">

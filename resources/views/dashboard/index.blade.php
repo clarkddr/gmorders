@@ -294,13 +294,21 @@
                 if (isRelationLowerThan100) {
                     relationSpan.classList.remove('bg-green-700');
                     relationSpan.classList.remove('dark:bg-green-600');
+                    relationSpan.classList.remove('text-gray-700');
+                    relationSpan.classList.remove('dark:text-gray-400');
                     relationSpan.classList.add('bg-red-700');
                     relationSpan.classList.add('dark:bg-red-600');
+                    relationSpan.classList.add('dark:text-white');
+                    relationSpan.classList.add('text-gray-900');
                 } else {
+                    relationSpan.classList.remove('text-gray-700');
+                    relationSpan.classList.remove('dark:text-gray-400');
                     relationSpan.classList.remove('bg-red-700');
                     relationSpan.classList.remove('dark:bg-red-600');
                     relationSpan.classList.add('bg-green-700');
                     relationSpan.classList.add('dark:bg-green-600');
+                    relationSpan.classList.add('dark:text-white');
+                    relationSpan.classList.add('text-gray-900');
                 }
 
                 console.log(data.hourNow);
@@ -312,6 +320,5 @@
             }
         }
         setInterval(fetchData, 60000);
-
     });
 </script>
