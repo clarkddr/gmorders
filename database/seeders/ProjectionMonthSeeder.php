@@ -35,7 +35,7 @@ class ProjectionMonthSeeder extends Seeder
         {
             DB::table('projection_months')->insert([
                 'FamilyId' => $familyid,
-                'projection_id' => 2,
+                'projection_id' => 1,
                 'month' => $month,
                 'percentage' => $percentage,
                 'created_at' => now(),

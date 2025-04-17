@@ -21,7 +21,7 @@ class ProjectionMonthController extends Controller
             'categories' => $categories,
             'percentages' => $percentages
         ];
-        return view('projectionmonth.index',$data);
+        return view('projectionMonth.index',$data);
     }
 
     /**
