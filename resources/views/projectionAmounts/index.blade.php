@@ -39,13 +39,14 @@
                     <th class="px-4 py-3 text-center">Familia</th>
                     <th class="px-4 py-3 text-right">Venta</th>
                     <th class="px-4 py-3">vs Meta</th>
-                    <th class="px-4 py-3 text-right">Proyección Venta</th>
-                    <th class="px-4 py-3">Avance Proyección Venta</th>
+                    <th class="px-4 py-3 text-right">Proy Venta</th>
+                    <th class="px-4 py-3">Avance Proy Venta</th>
                     <th class="px-4 py-3 text-right">Compra</th>
                     <th class="px-4 py-3 dt-text-left">c/v</th>
-                    <th class="px-4 py-3 text-right">Proyección Compra</th>
+                    <th class="px-4 py-3 text-right">Proy Compra</th>
                     <th class="px-4 py-3 dt-text-left">c/v</th>
-                    <th class="px-4 py-3">Avance Proyección Compra</th>
+                    <th class="px-4 py-3">Avance Proy Compra</th>
+                    <th class="px-4 py-3">Por Comprar Dlls</th>
                 </tr>
                 </thead>
                 <tfoot>
@@ -80,6 +81,7 @@
                     <td class="px-4 py-3">
                         <x-projectionProgress :value="$totals['projection']['purchaseVsProjection']" size="lg"/>
                     </td>
+                    <td class="px-4 py-3 text-xl font-bold text-right"> {{$totals['toPurchaseDlls']}} </td>
                 </tr>
                 </tfoot>
             </table>
@@ -96,13 +98,14 @@
 						<th class="px-4 py-3 text-center">Familia</th>
 						<th class="px-4 py-3 text-right">Venta</th>
 						<th class="px-4 py-3">vs Meta</th>
-						<th class="px-4 py-3 text-right">Proyección Venta</th>
-						<th class="px-4 py-3">Avance Proyección Venta</th>
+						<th class="px-4 py-3 text-right">Proy Venta</th>
+						<th class="px-4 py-3">Avance Proy Venta</th>
 						<th class="px-4 py-3 text-right">Compra</th>
                         <th class="px-4 py-3 dt-text-left">c/v</th>
-						<th class="px-4 py-3 text-right">Proyección Compra</th>
+						<th class="px-4 py-3 text-right">Proy Compra</th>
                         <th class="px-4 py-3 dt-text-left">c/v</th>
-						<th class="px-4 py-3">Avance Proyección Compra</th>
+						<th class="px-4 py-3">Avance Proy Compra</th>
+                        <th class="px-4 py-3">Por Comprar Dlls</th>
 					</tr>
 				</thead>
 				<tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -142,6 +145,7 @@
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$family['projection']['purchaseVsProjection']"/>
 						</td>
+                        <td class="px-4 py-3 text-right"> {{$family['toPurchaseDlls']}} </td>
 					</tr>
                     @endforeach
 				</tbody>
@@ -177,6 +181,7 @@
 						<td class="px-4 py-3">
 							<x-projectionProgress :value="$category['projection']['purchaseVsProjection']" size="lg"/>
 						</td>
+                        <td class="px-4 py-3 text-xl text-right font-bold"> {{ $category['toPurchaseDlls'] }} </td>
 					</tr>
 				</tfoot>
 			</table>
@@ -195,13 +200,14 @@
                         <th class="px-4 py-3 text-center">Sucursal</th>
                         <th class="px-4 py-3 text-right">Venta</th>
                         <th class="px-4 py-3">vs Meta</th>
-                        <th class="px-4 py-3 text-right">Proyección Venta</th>
-                        <th class="px-4 py-3">Avance Proyección Venta</th>
+                        <th class="px-4 py-3 text-right">Proy Venta</th>
+                        <th class="px-4 py-3">Avance Proy Venta</th>
                         <th class="px-4 py-3 text-right">Compra</th>
                         <th class="px-4 py-3 dt-text-left">c/v</th>
-                        <th class="px-4 py-3 text-right">Proyección Compra</th>
+                        <th class="px-4 py-3 text-right">Proy Compra</th>
                         <th class="px-4 py-3 dt-text-left">c/v</th>
-                        <th class="px-4 py-3">Avance Proyección Compra</th>
+                        <th class="px-4 py-3">Avance Proy Compra</th>
+                        <th class="px-4 py-3">Por Comprar Dlls</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -238,6 +244,7 @@
                             <td class="px-4 py-3 dt-text-left text-sm">{{ $branch['projection']['purchaseVsSale'] }}%</td>
                             <td class="px-4 py-3">
                                 <x-projectionProgress :value="$branch['projection']['purchaseVsProjection']"/>
+                            <td class="px-4 py-3 text-right"> {{ $branch['toPurchaseDlls'] }} </td>
                             </td>
                         </tr>
                     @endforeach
@@ -274,6 +281,7 @@
                         <td class="px-4 py-3">
                             <x-projectionProgress :value="$totals['projection']['purchaseVsProjection']" size="lg"/>
                         </td>
+                        <td class="px-4 py-3 text-xl font-bold text-right"> {{ $totals['toPurchaseDlls'] }} </td>
                     </tr>
                     </tfoot>
                 </table>

@@ -225,9 +225,10 @@ class BranchSalesTargetController extends Controller
         $firstDayOfMonthLastYear = Carbon::now()->subYear()->startOfMonth()->format('Y-m-d');
         $totalMonthSaleLastYear = $totalMonthSale->VentaMesAnoPasado * $goal;
         $firstDayOfMonthThisYear = Carbon::now()->startOfMonth()->format('Y-m-d');
-        $totalMonthSaleThisYear = $totalMonthSale->VentaMes;
+        $totalMonthSaleThisYear = $totalMonthSale->VentaMes ?? 0;
         // Se saca la relacion del mes
-        $saleMonthRelation = $totalMonthSaleThisYear > 0 ? $totalMonthSaleThisYear / $totalMonthSaleLastYear * 100 : 0;
+        $saleMonthRelation = $totalMonthSaleLastYear > 0 ? $totalMonthSaleThisYear / $totalMonthSaleLastYear * 100 : 0;
+//        dd([$totalMonthSaleThisYear, $totalMonthSaleLastYear]);
 
 
         // Se calculan los dias para sacar el total de venta del año en curso y el anterior al momento

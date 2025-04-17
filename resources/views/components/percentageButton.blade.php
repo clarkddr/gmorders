@@ -1,3 +1,4 @@
+
 @props(['value' => '0','above'=>'red','below'=>'green','min'=> 33, 'max'=> 39,'size'=>'sm'])
 
 @if ($value == 0)
