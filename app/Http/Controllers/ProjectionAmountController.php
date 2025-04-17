@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Family;
 use App\Models\Projection;
+use App\Models\ProjectionMonth;
 use App\Models\ProjectionAmount;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -100,6 +101,12 @@ class ProjectionAmountController extends Controller
                 $families = Family::all();
                 $categories = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
                 $branches = Branch::whereNotIn('BranchId', [4,5,10,14])->get();
+                $tc = 20;
+                // Recolectamos los porcentajes de cada familia
+                $familiesPercentage = ProjectionMonth::select('FamilyId')->selectRaw('SUM(percentage) as percentage')
+                    ->where('projection_id',2)->where('is_active',1)
+                    ->groupBy('FamilyId')->get()->keyBy('FamilyId');
+
 
                 // Se calculan las proyecciones totalizada por sucursal
                 $projectionResultBranches = $branches->map(function ($branch) use ($projectionamounts) {
@@ -120,7 +127,7 @@ class ProjectionAmountController extends Controller
                 // Se calculan las proyecciones tanto por categoria como por familia de una sola pasada
                 $projectionResults = $projectionamounts
                     ->groupBy('FamilyId')
-                    ->map(function ($familyGroup) use ($categories, $families) {
+                    ->map(function ($familyGroup) use ($categories, $families,$familiesPercentage) {
                         $family = $familyGroup->first();
                         // Encontramos la categoría asociada
                         $category = $categories->first(function ($category) use ($family) {
@@ -130,10 +137,14 @@ class ProjectionAmountController extends Controller
                         // Encontramos el modelo de la familia
                         $familyModel = $families->firstWhere('FamilyId', $family->FamilyId);
 
+                        // Encontramos el percentage de compra de la familia
+                        $percentage = $familiesPercentage->where('FamilyId', $family->FamilyId)->first()->percentage ?? 0;
+
                         // Sumamos los valores de la familia considerando todos los registros del grupo
                         $current = $familyGroup->sum('new_sale');
                         $old = $familyGroup->sum('old_sale');
                         $purchase = $familyGroup->sum('purchase');
+                        $toPurchaseWithPercentage = $purchase * ($percentage / 100);
                         $total = $current + $old;
 
                         // Retornamos los resultados formateados
@@ -145,7 +156,8 @@ class ProjectionAmountController extends Controller
                             'current' => $current,
                             'old' => $old,
                             'total' => $total,
-                            'purchase' => $purchase
+                            'purchase' => $purchase,
+                            'toPurchaseWithPercentage' => $toPurchaseWithPercentage,
                         ]);
                     });
 
@@ -228,7 +240,44 @@ class ProjectionAmountController extends Controller
                 $saleResultsBranches = collect($thisYearQueryResults[6]);
                 $purchaseResultsBranches = collect($thisYearQueryResults[7]);
 
-                $categoriesData = $categories->map(function ($category) use ($familiesGoalSale,$categoriesGoalSale,$saleResults, $purchaseResults, $projectionResults) {
+                // Para calcular el "por Comprar Dlls" se necesita:
+                // Todas las sucursales (branch::whereNotIn(4,5,10,14) [ok] $branches
+                // Proyeccion de compra anualizada por familia y sucursal (ProjectionAmount) [ok]$projectionamounts
+                // Obtener ProjectionMonth por mes activo (ProjectionMonth) [ok] $familiesPercentage
+                // Asignar el porcentaje de avance de cada familia por medio de projectionMonth
+                $projectionReducedByPercentage = collect($projectionamounts->map(function ($projectionAmount) use ($familiesPercentage) {
+                        $familyid = $projectionAmount->FamilyId;
+                        $branchid = $projectionAmount->BranchId;
+                        $purchase = $projectionAmount->purchase;
+                        $percentage = $familiesPercentage->where('FamilyId', $familyid)->first()->percentage ?? 0;
+                        $purchaseWithPercentage = $purchase * $percentage / 100;
+                        return collect([
+                            'familyid' => $familyid,
+                            'branchid' => $branchid,
+                            'purchase' => $purchaseWithPercentage,
+                        ]);
+                    })
+                );
+
+                // Agrupar por sucursal y sumar el total de compras con porcentaje
+                $projectionPurchaseReducedByPercentageByBranch = collect($projectionReducedByPercentage
+                    ->groupBy('branchid')
+                    ->map(function ($items) {
+                        return $items->sum('purchase');
+                }));
+                // Se reduce las compras proyectadas al porcentaje en cada sucursal y se reduce para que solo haya totales por sucursal
+                // Se integra las compras por sucursal de PurchaseResult (compras por sucursal) y se resta
+                // Al tener la diferencia de compra/comprado se reduce a DLLS [ok] $tc
+                // Se hace una combinacion de total de familias con
+                // projeccion de compras (ProjectionAmount)
+                // reducido a porcentaje por mes activo (ProjectionMonth) y comparandolo con la
+                // compra actual (PurchaseResult). Los resultados al final se necesitan totalizados por sucursal.
+
+
+                $toPurchaseDllsTotal = 0;
+                $categoriesData = $categories->map(function ($category)
+                use ($familiesGoalSale,$categoriesGoalSale,$saleResults, $purchaseResults, $projectionResults,$familiesPercentage,&$toPurchaseDllsTotal,$tc) {
+                    $toPurchaseDllsCategory = 0;
                     $current = $saleResults->where('CategoryId', $category->CategoryId)->sum('Current');
                     $old = $saleResults->where('CategoryId', $category->CategoryId)->sum('Old');
                     $total = $saleResults->where('CategoryId', $category->CategoryId)->sum('Amount');
@@ -244,6 +293,51 @@ class ProjectionAmountController extends Controller
 
                     $categoryGoalSale = $categoriesGoalSale->firstWhere('categoryId', $category->CategoryId)->get('categoryPartialGoal') ?? 9;
                     $saleVsGoal = $categoryGoalSale > 0 ? $total/$categoryGoalSale*100 : 0;
+
+                    $familiesData = $category->families->map(function ($family)
+                    use($familiesGoalSale,$saleResults,$purchaseResults,$projectionResults,$familiesPercentage,&$toPurchaseDllsCategory,$tc) {
+                        $current = $saleResults->where('FamilyId',$family->FamilyId)->sum('Current');
+                        $old = $saleResults->where('FamilyId',$family->FamilyId)->sum('Old');
+                        $total = $saleResults->where('FamilyId',$family->FamilyId)->sum('Amount');
+                        $purchase = $purchaseResults->where('FamilyId',$family->FamilyId)->sum('Costo');
+                        $purchaseVsSale = $total > 0 ? $purchase / $total * 100 : 0;
+                        $projectionCurrent = $projectionResults->where('familyid', $family->FamilyId)->sum('current');
+                        $projectionOld = $projectionResults->where('familyid', $family->FamilyId)->sum('old');
+                        $projectionTotal = $projectionResults->where('familyid', $family->FamilyId)->sum('total');
+                        $projectionPurchase = $projectionResults->where('familyid', $family->FamilyId)->sum('purchase');
+                        $projectionPurchaseVsSale = $projectionTotal > 0 ? $projectionPurchase / $projectionTotal * 100 : 0;
+                        $totalVsProjection = $projectionCurrent ? ($total/$projectionTotal*100) : 0;
+                        $purchaseVsProjection = $projectionPurchase ? ($purchase/$projectionPurchase*100) : 0;
+
+                        $familyGoalSale = $familiesGoalSale->firstWhere('familyId', $family->FamilyId)->get('partialGoalSaleFamily') ?? 9;
+                        $saleVsGoal = $familyGoalSale > 0 ? $total/$familyGoalSale*100 : 0;
+                        $percentage = $familiesPercentage->where('FamilyId',$family->FamilyId)->first()->percentage ?? 0;
+                        $toPurchaseDlls = (($projectionPurchase * ($percentage / 100)) - $purchase) / $tc;
+                        $toPurchaseDllsCategory += $toPurchaseDlls;
+
+                        return collect([
+                            'familyGoalSale' => $familyGoalSale, // 176,607
+                            'saleVsGoal' => number_format($saleVsGoal,0), // 1.4735
+                            'id' => $family->FamilyId,
+                            'name' => $family->Name,
+                            'current' => number_format($current,0),
+                            'old' => number_format($old,0),
+                            'total' => number_format($total,0),
+                            'purchase' => number_format($purchase),
+                            'purchaseVsSale' => number_format($purchaseVsSale,0),
+                            'totalVsProjection' => number_format($totalVsProjection,0),
+                            'projection' => [
+                                'current' => number_format($projectionCurrent,0),
+                                'old' => number_format($projectionOld,0),
+                                'total' => number_format($projectionTotal,0),
+                                'purchase' => number_format($projectionPurchase,0),
+                                'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
+                                'purchaseVsProjection' => number_format($purchaseVsProjection,0),
+                            ],
+                            'toPurchaseDlls' => number_format($toPurchaseDlls,0),
+                        ]);
+                    });
+                    $toPurchaseDllsTotal += $toPurchaseDllsCategory;
                     return collect([
                         'id' => $category->CategoryId,
                         'categoryPartialGoal' => $categoryGoalSale,
@@ -263,44 +357,10 @@ class ProjectionAmountController extends Controller
                             'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
                             'purchaseVsProjection' => number_format($purchaseVsProjection,0)
                         ],
-                        'families' => $category->families->map(function ($family) use($familiesGoalSale,$saleResults,$purchaseResults,$projectionResults) {
-                            $current = $saleResults->where('FamilyId',$family->FamilyId)->sum('Current');
-                            $old = $saleResults->where('FamilyId',$family->FamilyId)->sum('Old');
-                            $total = $saleResults->where('FamilyId',$family->FamilyId)->sum('Amount');
-                            $purchase = $purchaseResults->where('FamilyId',$family->FamilyId)->sum('Costo');
-                            $purchaseVsSale = $total > 0 ? $purchase / $total * 100 : 0;
-                            $projectionCurrent = $projectionResults->where('familyid', $family->FamilyId)->sum('current');
-                            $projectionOld = $projectionResults->where('familyid', $family->FamilyId)->sum('old');
-                            $projectionTotal = $projectionResults->where('familyid', $family->FamilyId)->sum('total');
-                            $projectionPurchase = $projectionResults->where('familyid', $family->FamilyId)->sum('purchase');
-                            $projectionPurchaseVsSale = $projectionTotal > 0 ? $projectionPurchase / $projectionTotal * 100 : 0;
-                            $totalVsProjection = $projectionCurrent ? ($total/$projectionTotal*100) : 0;
-                            $purchaseVsProjection = $projectionPurchase ? ($purchase/$projectionPurchase*100) : 0;
-
-                            $familyGoalSale = $familiesGoalSale->firstWhere('familyId', $family->FamilyId)->get('partialGoalSaleFamily') ?? 9;
-                            $saleVsGoal = $familyGoalSale > 0 ? $total/$familyGoalSale*100 : 0;
-                            return collect([
-                                'familyGoalSale' => $familyGoalSale, // 176,607
-                                'saleVsGoal' => number_format($saleVsGoal,0), // 1.4735
-                                'id' => $family->FamilyId,
-                                'name' => $family->Name,
-                                'current' => number_format($current,0),
-                                'old' => number_format($old,0),
-                                'total' => number_format($total,0),
-                                'purchase' => number_format($purchase),
-                                'purchaseVsSale' => number_format($purchaseVsSale,0),
-                                'totalVsProjection' => number_format($totalVsProjection,0),
-                                'projection' => [
-                                    'current' => number_format($projectionCurrent,0),
-                                    'old' => number_format($projectionOld,0),
-                                    'total' => number_format($projectionTotal,0),
-                                    'purchase' => number_format($projectionPurchase,0),
-                                    'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
-                                    'purchaseVsProjection' => number_format($purchaseVsProjection,0),
-                                ]
-                            ]);
-                        })
+                        'toPurchaseDlls' => number_format($toPurchaseDllsCategory,0),
+                        'families' => $familiesData,
                     ]);
+
                 });
 
                 $branchesGoalSale = $branches->map(function ($branch) use ($lastYearPartialSaleResultsBranches,$lastYearSaleResultsBranches,$projectionResultBranches) {
@@ -319,7 +379,9 @@ class ProjectionAmountController extends Controller
                     ]);
                 });
 
-                $branchesData = $branches->map(function ($branch) use ($projectionResultBranches,$saleResultsBranches,$purchaseResultsBranches,$branchesGoalSale){
+                $branchesData = $branches->map(function ($branch) use (
+                    $projectionResultBranches,$saleResultsBranches,$purchaseResultsBranches,$branchesGoalSale,$projectionPurchaseReducedByPercentageByBranch,$tc){
+
                     $current = $saleResultsBranches->where('branchid', $branch->BranchId)->sum('Current');
                     $old = $saleResultsBranches->where('branchid', $branch->BranchId)->sum('Old');
                     $total = $saleResultsBranches->where('branchid', $branch->BranchId)->sum('Amount');
@@ -334,6 +396,9 @@ class ProjectionAmountController extends Controller
                     $purchaseVsProjection = $projectionPurchase ? ($purchase/$projectionPurchase*100) : 0;
                     $branchGoalSale = $branchesGoalSale->firstWhere('branchid', $branch->BranchId)->get('partialGoalSale') ?? 0;
                     $saleVsGoal = $branchGoalSale > 0 ? $total/$branchGoalSale*100 : 0;
+                    $projectionPurchaseReducedByPercentage = $projectionPurchaseReducedByPercentageByBranch[$branch->BranchId] ?? 0;
+                    $toPurchase = $projectionPurchaseReducedByPercentage - $purchase;
+                    $toPurchaseDlls = $toPurchase / $tc;
                     return collect([
                         'id' => $branch->BranchId,
                         'categoryPartialGoal' => $branchGoalSale, //46,273,621
@@ -353,6 +418,7 @@ class ProjectionAmountController extends Controller
                             'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
                             'purchaseVsProjection' => number_format($purchaseVsProjection,0)
                         ],
+                        'toPurchaseDlls' => number_format($toPurchaseDlls,0),
                     ]);
                 });
 
@@ -377,6 +443,7 @@ class ProjectionAmountController extends Controller
                 $totalsProjectionPurchase = $projectionResults->sum('purchase');
                 $totalsProjectionPurchaseVsSale = $totalsProjectionTotal > 0 ? $totalsProjectionPurchase / $totalsProjectionTotal * 100 : 0;
                 $purchaseVsProjection = $totalsProjectionPurchase ? ($totalsPurchase/$totalsProjectionPurchase*100) : 0;
+
                 $totals = collect([
                     'saleVsGoal' => number_format($totalsSaleVsGoal,0),
                     'current' => number_format($totalsCurrent,0),
@@ -393,6 +460,7 @@ class ProjectionAmountController extends Controller
                         'purchaseVsSale' => number_format($totalsProjectionPurchaseVsSale,0),
                         'purchaseVsProjection' => number_format($purchaseVsProjection,0)
                     ],
+                    'toPurchaseDlls' => number_format($toPurchaseDllsTotal,0),
                 ]);
 
                 $data['categories'] = $categoriesData;
@@ -629,6 +697,8 @@ class ProjectionAmountController extends Controller
         $familyid = $request->family;
         $family = Family::find($request->family);
         $familyName = $family->Name;
+        $percentage = ProjectionMonth::where('FamilyId',$family->FamilyId)->where('projection_id',2)->where('is_active',1)->sum('percentage') / 100;
+        $tc = 20;
         $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
         $projectionAmounts = ProjectionAmount::with('families')->where('projection_id',$request->projection)->where('FamilyId',$familyid)->get();
         $projection = Projection::find($request->projection);
@@ -747,7 +817,7 @@ class ProjectionAmountController extends Controller
             $purchaseProjectionvsPurchaseTotal = number_format($purchaseTotal/$projectionSalesTotal['purchase']*100,1);
         }
 
-        $thisYearSales = $saleResults->map(function ($row) use ($branches, $filteredProjection, $purchaseResults, $goal){
+        $thisYearSales = $saleResults->map(function ($row) use ($branches, $filteredProjection, $purchaseResults, $goal,$percentage,$tc){
             $branch = $branches->firstWhere('BranchId',$row->branchid);
             $amount = $row->Amount;
             $purchase = $purchaseResults->firstWhere('branchid', $row->branchid)->Costo ?? 0;
@@ -755,7 +825,7 @@ class ProjectionAmountController extends Controller
             $projectionAmount = (float) ($projectionSale['amount'] ?? 0);
             $totalVsProjection = $projectionAmount != 0 ? (float) $row->Amount / (float)$projectionAmount * 100 : 0; // Aquí manejas la división
             $purchaseVsProjection = $projectionSale['purchase'] != 0 ? (float)$purchase/$projectionSale['purchase'] *100 : 0 ;
-            $toPurchaseDlls = ($projectionSale['purchase'] - $purchase) / 20;
+            $toPurchaseDlls = (($projectionSale['purchase'] * $percentage) - $purchase) / $tc;
             $goalSale = $goal->firstWhere('branchid', $row->branchid)->get('goalSale') ?? 0;
             $saleVsGoal = $goalSale != 0 ? (float) $row->Amount / (float) $goalSale * 100 : 0;
             $purchaseVsSale = $amount > 0 ? $purchase / $amount * 100 : 0;
@@ -810,7 +880,7 @@ class ProjectionAmountController extends Controller
             'purchase' => number_format($projectionSalesTotal['purchase'], 0, '.', ','),
             'totalVsProjection' => $totalVsProjection,
             'purchaseVsProjection' => $purchaseProjectionvsPurchaseTotal,
-            'toPurchaseDlls' => number_format(($projectionSalesTotal['purchase'] - $purchaseTotal ) / 19.5,0),
+            'toPurchaseDlls' => number_format((($projectionSalesTotal['purchase'] * $percentage) - $purchaseTotal)/$tc,0),
             'purchaseVsSale' => number_format($projectionPurchaseVsSale,0),
         ];
 

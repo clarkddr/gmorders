@@ -42,6 +42,7 @@ class ProjectionController extends Controller
         ];
         $initDate = $projection->start;
         $finalDate = $projection->end;
+
         // Se sacan las fechas para los dos ciclos
         $yearBeforeLastInitialDate = Carbon::createFromFormat('Y-m-d H:i:s', $initDate)->setTime(0,0,0)->subYear(2);
         $yearBeforeLastFinalDate = Carbon::createFromFormat('Y-m-d H:i:s', $finalDate)->setTime(0,0,0)->subYear(2);

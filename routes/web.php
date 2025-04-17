@@ -9,8 +9,8 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProjectionAmountController;
 use App\Http\Controllers\ProjectionController;
+use App\Http\Controllers\ProjectionMonthController;
 use App\Http\Controllers\SessionController;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchSalesTargetController;
@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function(){
     Route::get('purchaseoversale',[PurchaseOverSaleController::class,'index'])->name('purchaseoversale.index');
     Route::get('purchaseoversale/{id}',[PurchaseOverSaleController::class,'show'])->name('purchaseoversale.show');
     Route::get('branches',[BranchSalesTargetController::class,'index'])->name('branchTarget.index');
+    Route::get('projectionmonth/{id}',[ProjectionMonthController::class,'index'])->name('projectionmonth.index');
+    Route::post('projectionmonth',[ProjectionMonthController::class,'store'])->name('projectionmonth.store');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
