@@ -1,5 +1,12 @@
 <x-guestLayout>
-    <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg mt-16">
+    <div>
+    {{--    <p class="text-gray-700 dark:text-gray-200">Instrucciones de uso</p>--}}
+        <button @click="openModal" class="text-white bg-green-700  px-2 py-2 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+            👁️ Instrucciones para leer esta información
+        </button>
+
+    </div>
+    <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg mt-8">
         <div class="rounded-lg space-y-2 sm:space-y-6">
             <p class="text-gray-700 dark:text-gray-200">
                 <span id="todaySpan" class="font-semibold text-6xl">{{ucfirst($month)}}</span><br>
@@ -43,6 +50,84 @@
         </div>
     </div>
 </x-guestLayout>
+<x-modal title="">
+    <div class="text-gray-800 dark:text-gray-200 space-y-6 text-sm leading-relaxed">
+
+        <h2 class="text-lg font-semibold flex items-center gap-2">📘 INSTRUCCIONES PARA LEER ESTA INFORMACIÓN</h2>
+
+        <p>La información mostrada es <strong>SOLO de tu tienda</strong>.</p>
+
+        <h3 class="text-base font-semibold mt-4">🟩 PARTE I: Cuatro recuadros</h3>
+        <p>Cada cuadrito tiene un número con el símbolo %. Ese número dice cómo vamos con las ventas en tu tienda. Vamos uno por uno:</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
+                <div class="flex items-center text-lg font-semibold mb-2">
+                    <span class="mr-2">📅</span> % En el Año – Color verde o rojo
+                </div>
+                <p>
+                    Nos dice cómo vamos este año comparado con el año pasado.<br>
+                    Si es menos de 100%, significa que vamos vendiendo menos que la meta del año.<br>
+                    Está en rojo porque hay que mejorar, está en verde es porque vamos bien en el año.
+                </p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
+                <div class="flex items-center text-lg font-semibold mb-2">
+                    <span class="mr-2">📆</span> % En el Mes – Color verde o rojo
+                </div>
+                <p>
+                    Nos dice cómo vamos en el mes comparado con lo meta que tenemos en dicho mes.<br>
+                    Si es menos de 100% está en rojo, está en verde es porque vamos bien en el año.
+                </p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
+                <div class="flex items-center text-lg font-semibold mb-2">
+                    <span class="mr-2">📉</span> % Día Anterior – Color verde o rojo
+                </div>
+                <p>
+                    Nos dice cómo vendimos ayer comparado con la meta de ese día.<br>
+                    Más de 100% quiere decir que ayer fue un buen día.
+                </p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
+                <div class="flex items-center text-lg font-semibold mb-2">
+                    <span class="mr-2">📈</span> % Hoy – Color verde o rojo
+                </div>
+                <p>
+                    Nos dice cómo vamos hoy, hasta el momento, contra la meta del día actual.
+                </p>
+            </div>
+        </div>
+
+        <h3 class="text-base font-semibold mt-6">📊 PARTE II: Gráfica de barras</h3>
+
+        <div class="space-y-2">
+            <p><strong>📍 ¿Qué es una barra?</strong><br>
+                Cada barra es un día del mes en turno.</p>
+
+            <p><strong🔢> El número abajo</strong> (1, 2, 3, etc.) es el día del mes.</p>
+
+            <p><strong>🎨 El color de la barra</strong> te dice si lograste la meta o no:</p>
+            <ul class="list-disc list-inside ml-4">
+                <li>🟢 Verde: sí se logró o se pasó</li>
+                <li>🔴 Rojo: no se logró</li>
+            </ul>
+
+            <p><strong>🔝 ¿Qué significa el número arriba de cada barra?</strong><br>
+                Es el porcentaje comparado con la meta.<br>
+                Ejemplo: si por ejemplo, el día 1 tiene 200%, significa que ese día vendiste el doble de lo que tenías que vender.</p>
+
+            <p><strong>❓ ¿Y los días con 0%?</strong><br>
+                Son días donde no se ha vendido nada todavía o aún no llegan.</p>
+        </div>
+
+    </div>
+
+
+</x-modal>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
