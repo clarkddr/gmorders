@@ -14,6 +14,7 @@ use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchSalesTargetController;
+use App\Http\Controllers\YearSalesController;
 
 Route::middleware('guest')->group(function(){
     // Route::get('/register', [RegisteredUserController::class,'create']);
@@ -36,6 +37,7 @@ Route::middleware('auth')->group(function(){
     Route::get('branches',[BranchSalesTargetController::class,'index'])->name('branchTarget.index');
     Route::get('projectionmonth/{id}',[ProjectionMonthController::class,'index'])->name('projectionmonth.index');
     Route::post('projectionmonth',[ProjectionMonthController::class,'store'])->name('projectionmonth.store');
+    Route::get('yearsales',[YearSalesController::class,'index'])->name('yearsales.index');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
@@ -46,29 +48,15 @@ Route::resource('suppliers',SupplierController::class);
 Route::resource('galleries',GalleryController::class);
 Route::resource('images',ImageController::class);
 
-Route::get('test', function () {
-    return view();
-});
-
-
-
 Route::get('/upload', function () {
     return view('upload');
 });
 
 Route::post('/upload', [GalleryController::class, 'upload'])->name('upload');
-
 Route::delete('/logout', [SessionController::class,'destroy'])->middleware('auth');
-
-
 Route::get('/php', function () {
     $sql = DB::connection('mssql')->select('select * from branch');
     return phpinfo();
-});
-
-Route::get('/sql', function () {
-    $sql = DB::connection('mssql')->select('select * from branch');
-    dd($sql);
 });
 
 Route::get('/chart', function () {
