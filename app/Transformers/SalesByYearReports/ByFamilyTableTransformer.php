@@ -3,9 +3,36 @@ namespace App\Transformers\SalesByYearReports;
 use Illuminate\Support\Collection;
 
 class ByFamilyTableTransformer{
-    public function transform(Collection $rawData, Collection $families): array {
-        $grouped = $rawData->groupBy('FamilyId');
+    public function transform(Collection $rawData, Collection $families): array
+    {
+        // Se obtienen los anios para poder generar todas columnas
         $years = $this->getYears($rawData);
+
+
+        // Sacamos los GrandTotals para la fila de Footer
+        $grandSale = $rawData->sum('Sale');
+        $grandDiscount = $rawData->sum('Discount');
+        $byYear = $years->map(function($year) use ($rawData,$grandSale){
+            $sale = $rawData->where('Year', $year)->sum('Sale');
+            $discount = $rawData->where('Year', $year)->sum('Discount');
+            return collect([
+                'Year' => $year,
+                'Sale' => $sale,
+                'Discount' => $discount,
+                'discount_percentage' => ($sale + $discount) > 0 ? $discount / ($sale + $discount) * 100 : 0,
+                'sale_proportion' => $sale > 0 ? $sale / $grandSale * 100 : 0
+            ]);
+        });
+        $totalRow = collect([
+            'Years' => $byYear,
+            'Sale' => $grandSale,
+            'Discount' => $grandDiscount,
+            'discount_percentage' => ($grandSale + $grandDiscount) > 0 ? $grandDiscount / ($grandSale + $grandDiscount) * 100 : 0,
+        ]);
+
+
+        // Se sacan las filas por familia
+        $grouped = $rawData->groupBy('FamilyId');
 
         $byFamily = $grouped->map(function ($row,$key) use ($families, $years) {
             $familyId = $key;
@@ -17,25 +44,28 @@ class ByFamilyTableTransformer{
             $byYear = $years->map(function ($year) use ($row,$totalSale,$totalDiscount) {
                 $sale = $row->where('Year', $year)->sum('Sale');
                 $discount = $row->where('Year', $year)->sum('Discount');
-                return [
+                return collect([
                     'Year' => $year,
                     'Sale' => $sale,
                     'Discount' => $discount,
                     'discount_percentage' => ($sale + $discount) > 0 ? $discount / ($sale + $discount) * 100 : 0,
                     'sale_proportion' => $totalSale > 0 ? $sale / $totalSale * 100 : 0,
-                ];
+                ]);
             });
-            $base = [
+            $base = collect([
+                'Years' => $byYear,
                 'FamilyId' => $familyId,
                 'Name' => $familyName,
                 'Sale' => $totalSale,
-                'Total_discount_percentage' => $total_discount_percentage,
                 'Discount' => $totalDiscount,
-                'Years' => $byYear
-            ];
+                'Total_discount_percentage' => $total_discount_percentage,
+            ]);
             return $base;
         });
-        return $byFamily->values()->toArray();
+        return [
+            'byFamily' => $byFamily,
+            'totalRow' => $totalRow,
+        ];
     }
     public function getYears(Collection $rawData): Collection {
         return collect($rawData->groupBy('Year')->keys()->toArray());

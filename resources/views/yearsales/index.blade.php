@@ -146,14 +146,14 @@
                     <tfoot class="dark:divide-gray-700">
                     <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide uppercase border-t dark:border-gray-700 bg-gray-100 sm:grid-cols-9 dark:text-gray-300 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl border border-gray-200 dark:border-gray-700">Total</td>
-                        <td class="px-4 py-3 font-bold text-xl text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-100 dark:bg-gray-600 text-green-900 dark:text-green-100">{{ number_format(0,0) }}</td>
-                        <td class="px-4 py-3 font-bold text-xl text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format(0,0) }}</td>
-                        <td class="px-4 py-3 font-bold text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format(0,0) }}%</td>
-                        @foreach($years as $year)
-                            <td class="px-4 py-3 font-bold text-xl text-right bg-blue-100 dark:bg-gray-700 border-r-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format(0,0) }}</td>
-                            <td class="px-4 py-3 font-bold text-right bg-blue-100 dark:bg-gray-700 border-l-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format(0,0) }}</td>
-                            <td class="px-4 py-3 font-bold text-xl text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format(0,0) }}</td>
-                            <td class="px-4 py-3 font-bold text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format(0,0) }}%</td>
+                        <td class="px-4 py-3 font-bold text-xl text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-100 dark:bg-gray-600 text-green-900 dark:text-green-100">{{ number_format($familyGrandTotal['Sale'],0) }}</td>
+                        <td class="px-4 py-3 font-bold text-xl text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($familyGrandTotal['Discount'],0) }}</td>
+                        <td class="px-4 py-3 font-bold text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($familyGrandTotal['discount_percentage'],0) }}%</td>
+                        @foreach($familyGrandTotal['Years'] as $year)
+                            <td class="px-4 py-3 font-bold text-xl text-right bg-blue-100 dark:bg-gray-700 border-r-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format($year['Sale'],0) }}</td>
+                            <td class="px-4 py-3 font-bold text-right bg-blue-100 dark:bg-gray-700 border-l-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format($year['sale_proportion'],0) }}%</td>
+                            <td class="px-4 py-3 font-bold text-xl text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format($year['Discount'],0) }}</td>
+                            <td class="px-4 py-3 font-bold text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format($year['discount_percentage'],0) }}%</td>
                         @endforeach
                     </tr>
                     </tfoot>

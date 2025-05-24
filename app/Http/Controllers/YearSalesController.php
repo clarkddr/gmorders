@@ -14,10 +14,10 @@ use App\Transformers\SalesByYearReports\ByFamilyTableTransformer;
 class YearSalesController extends Controller
 {
     public function index(Request $request){
-        $from = '2025-01-01';
-        $to = '2025-05-20';
+        $from = '2025-05-01';
+        $to = '2025-05-23';
         $branchid = 0;
-        $familyid = 13;
+        $familyid = 0;
 
         $families = Family::all();
         $branches = Branch::whereNot('BranchId',[4,5,10,14])->get();
@@ -30,7 +30,8 @@ class YearSalesController extends Controller
         // Se obtienen las ventas por familia
         $familiesSales = $report['byFamily'];
         // Se transforman para poder usarlo como tabla en la vista
-        $familiesTableData = app(ByFamilyTableTransformer::class)->transform($familiesSales,$families);
+        $familiesTableData = app(ByFamilyTableTransformer::class)->transform($familiesSales,$families)['byFamily'];
+        $grandTotalRowFamilyTable = app(ByFamilyTableTransformer::class)->transform($familiesSales,$families)['totalRow'];
         $years = app(ByFamilyTableTransformer::class)->getYears($familiesSales);
 
         // Se obtienen las ventas por Sucursal
@@ -42,6 +43,7 @@ class YearSalesController extends Controller
             'chartData' => $chartData,
             'years' => $years,
             'familyRows' => $familiesTableData,
+            'familyGrandTotal' => $grandTotalRowFamilyTable,
             'branchRows' => $branchesTableData
         ];
 
