@@ -14,11 +14,11 @@
         </div>
     @endif
 
-    <x-titlePage title="Ventas">
+    <x-titlePage title="Ventas por año">
 {{--        <form action ="/saleandpurchase" method="GET" class="flex space-x-4 justify-end">--}}
 {{--            <select name="branch" id="branch" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
 {{--                <option value="0"  {{ $selectedBranch ? '' : 'selected' }}>Sucursal</option>--}}
-{{--                @foreach ($branchesList as $branch)--}}
+{{--                @foreach ($branches as $branch)--}}
 {{--                    <option value="{{ $branch->BranchId }}"--}}
 {{--                        {{ $selectedBranch == $branch->BranchId ? 'selected' : '' }}>--}}
 {{--                        {{ $branch->Name }}--}}
@@ -27,17 +27,15 @@
 {{--            </select>--}}
 {{--            <select name="family" id="family" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
 {{--                <option value="0"  {{ $selectedFamily ? '' : 'selected' }}>Familia</option>--}}
-{{--                @foreach ($familiesList as $category)--}}
+{{--                @foreach ($families as $category)--}}
 {{--                    <optgroup label="{{ $category->Name }}">--}}
 {{--                        @foreach ($category->families as $family)--}}
 {{--                            <option value="{{ $family->FamilyId }}"--}}
 {{--                                {{ $selectedFamily == $family->FamilyId ? 'selected' : '' }}>--}}
 {{--                                {{ $family->Name }}--}}
 {{--                            </option>--}}
+{{--                        @endforeach--}}
 {{--                @endforeach--}}
-{{--                @endforeach--}}
-
-
 {{--            </select>--}}
 {{--            <select name="category" id="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
 {{--                <option value="0"  {{ $selectedCategory ? '' : 'selected' }}>Depto</option>--}}
@@ -70,16 +68,20 @@
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
         <div class="rounded-lg">
             <!-- Gráfico de Ventas -->
+            @if($chartData != [])
             <div class="rounded-lg shadow-xs">
                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-{{--                    <h3 class="text-center text-lg sm:text-xl font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400 my-2">--}}
-{{--                        {{ 'Ventas' }}--}}
-{{--                    </h3>--}}
+                    <h3 class="text-center text-lg sm:text-xl font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400 my-2">
+                        {{ 'Ventas y Descuentos por Semana' }}
+                    </h3>
                     <canvas height="300" id="sales-chart" class="w-full max-w-full"></canvas>
                 </div>
             </div>
+            @endif
 
             <!-- Tabla de Familias -->
+
+            @if(isset($familyRows))
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mt-6 mb-6"> <!-- Ocupa 8/12 -->
                 <table id="familiesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-lg mb-6 border border-gray-200 dark:border-gray-700">
                     <thead>
@@ -146,10 +148,10 @@
                     <tfoot class="dark:divide-gray-700">
                     <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide uppercase border-t dark:border-gray-700 bg-gray-100 sm:grid-cols-9 dark:text-gray-300 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl border border-gray-200 dark:border-gray-700">Total</td>
-                        <td class="px-4 py-3 font-bold text-xl text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-100 dark:bg-gray-600 text-green-900 dark:text-green-100">{{ number_format($familyGrandTotal['Sale'],0) }}</td>
-                        <td class="px-4 py-3 font-bold text-xl text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($familyGrandTotal['Discount'],0) }}</td>
-                        <td class="px-4 py-3 font-bold text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($familyGrandTotal['discount_percentage'],0) }}%</td>
-                        @foreach($familyGrandTotal['Years'] as $year)
+                        <td class="px-4 py-3 font-bold text-xl text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-100 dark:bg-gray-600 text-green-900 dark:text-green-100">{{ number_format($grandTotal['Sale'],0) }}</td>
+                        <td class="px-4 py-3 font-bold text-xl text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($grandTotal['Discount'],0) }}</td>
+                        <td class="px-4 py-3 font-bold text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($grandTotal['discount_percentage'],0) }}%</td>
+                        @foreach($grandTotal['Years'] as $year)
                             <td class="px-4 py-3 font-bold text-xl text-right bg-blue-100 dark:bg-gray-700 border-r-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format($year['Sale'],0) }}</td>
                             <td class="px-4 py-3 font-bold text-right bg-blue-100 dark:bg-gray-700 border-l-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format($year['sale_proportion'],0) }}%</td>
                             <td class="px-4 py-3 font-bold text-xl text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format($year['Discount'],0) }}</td>
@@ -159,44 +161,94 @@
                     </tfoot>
                 </table>
             </div>
+            @endif
             <!-- termina Tabla de Familias -->
+            @if(isset($branchRows))
             <!-- Tabla de Sucursales -->
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mt-6 mb-6"> <!-- Ocupa 8/12 -->
+                <h3 class="text-xl sm:text-xl font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400 my-2">
+                    {{ 'Por Sucursal' }}
+                </h3>
                 <table id="branchesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
-                    <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                        <th class="px-4 py-3">Sucursal</th>
-                        <th class="px-4 py-3">Total</th>
+                    <!-- Fila de cabeceras de años agrupadas -->
+                    <tr class="text-xs font-semibold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-300 dark:bg-gray-800">
+                        <th class="px-4 py-2 border border-gray-300 dark:border-gray-600" rowspan="2">Familia</th>
+                        <th class="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-green-50 dark:bg-gray-600 text-green-800 dark:text-green-200" rowspan="2">Total Venta</th>
+                        <th class="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-amber-50 dark:bg-gray-600 text-amber-800 dark:text-amber-200" rowspan="2">Total Descuento</th>
+                        <th class="px-4 py-2 text-xs border border-gray-300 dark:border-gray-600 bg-amber-50 dark:bg-gray-600 text-amber-800 dark:text-amber-200" rowspan="2">%</th>
                         @foreach($years as $year)
-                            <th class="px-4 py-3">{{$year}}</th>
+                            <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600 border-b-0 th-center" colspan="4">
+                                {{ $year }}
+                            </th>
+                        @endforeach
+                    </tr>
+                    <!-- Subfila para Venta/Descuento -->
+                    <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                        @foreach($years as $year)
+                            <th class="px-4 py-2 bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 border-r-0 border-gray-300 dark:border-gray-600">
+                                Venta
+                            </th>
+                            <th class="px-4 py-2 bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 border-l-0 border-gray-300 dark:border-gray-600">
+                                %
+                            </th>
+                            <th class="px-4 py-2 bg-red-50 dark:bg-gray-900 text-red-700 dark:text-red-300 border border-gray-300 dark:border-gray-600">
+                                Descuento
+                            </th>
+                            <th class="px-4 py-2 text-xs bg-red-50 dark:bg-gray-900 text-red-700 dark:text-red-300 border border-gray-300 dark:border-gray-600">
+                                %
+                            </th>
                         @endforeach
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($branchRows as $branch)
-                        <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3">{{ $branch['Name'] }}</td>
-                            <td class="px-4 py-3">{{ number_format($branch['Sale'],0) }}</td>
+                        <tr class="text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-4 py-3 font-medium border border-gray-200 dark:border-gray-700">{{ $branch['Name'] }}</td>
+                            <td class="px-4 py-3 font-semibold text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-gray-600 text-green-800 dark:text-green-200">
+                                {{ number_format($branch['Sale'],0) }}
+                            </td>
+                            <td class="px-4 py-3 font-semibold text-right border border-gray-200 dark:border-gray-700 bg-amber-50 dark:bg-gray-600 text-amber-800 dark:text-amber-200">
+                                {{ number_format($branch['Discount'],0) }}
+                            </td>
+                            <td class="px-4 py-3 text-xs text-right border border-gray-200 dark:border-gray-700 bg-amber-50 dark:bg-gray-600 text-amber-800 dark:text-amber-200">
+                                {{ number_format($branch['Total_discount_percentage']) }}%
+                            </td>
                             @foreach($branch['Years'] as $year)
-                                <td class="px-4 py-3">{{ number_format($year['Sale'],0) }}</td>
+                                <td class="px-4 py-3 text-right bg-blue-50 dark:bg-gray-700 text-blue-800 dark:text-blue-200 border-l border-gray-200 dark:border-gray-700">
+                                    {{ number_format($year['Sale'],0) }}
+                                </td>
+                                <td class="px-4 py-3 text-xs text-right bg-blue-50 dark:bg-gray-700 text-blue-800 dark:text-blue-200 border-r border-gray-200 dark:border-gray-700">
+                                    {{ number_format($year['sale_proportion'],0) }}%
+                                </td>
+                                <td class="px-4 py-3 text-right bg-red-50 dark:bg-gray-900 text-red-800 dark:text-red-200 border border-gray-200 dark:border-gray-700">
+                                    {{ number_format($year['Discount'],0) }}</td>
+                                @php $inventorySale = $year['Sale'] + $year['Discount']; @endphp
+                                <td class="px-4 py-3 text-xs text-right bg-red-50 dark:bg-gray-900 text-red-800 dark:text-red-200 border border-gray-200 dark:border-gray-700">
+                                    {{ number_format($year['discount_percentage'],0) }}%
+                                </td>
                             @endforeach
                         </tr>
                     @endforeach
                     </tbody>
                     <tfoot class="dark:divide-gray-700">
-                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-                        <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ 0 }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ 0 }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ 0 }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ 0 }} </td>
+                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide uppercase border-t dark:border-gray-700 bg-gray-100 sm:grid-cols-9 dark:text-gray-300 dark:bg-gray-800">
+                        <td class="px-4 py-3 font-bold text-xl border border-gray-200 dark:border-gray-700">Total</td>
+                        <td class="px-4 py-3 font-bold text-xl text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-100 dark:bg-gray-600 text-green-900 dark:text-green-100">{{ number_format($grandTotal['Sale'],0) }}</td>
+                        <td class="px-4 py-3 font-bold text-xl text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($grandTotal['Discount'],0) }}</td>
+                        <td class="px-4 py-3 font-bold text-right border border-gray-200 dark:border-gray-700 bg-amber-100 dark:bg-gray-600 text-amber-900 dark:text-amber-100">{{ number_format($grandTotal['discount_percentage'],0) }}%</td>
+                        @foreach($grandTotal['Years'] as $year)
+                            <td class="px-4 py-3 font-bold text-xl text-right bg-blue-100 dark:bg-gray-700 border-r-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format($year['Sale'],0) }}</td>
+                            <td class="px-4 py-3 font-bold text-right bg-blue-100 dark:bg-gray-700 border-l-0 border-gray-200 dark:border-gray-700 text-blue-900 dark:text-blue-100">{{ number_format($year['sale_proportion'],0) }}%</td>
+                            <td class="px-4 py-3 font-bold text-xl text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format($year['Discount'],0) }}</td>
+                            <td class="px-4 py-3 font-bold text-right bg-red-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-red-900 dark:text-red-100">{{ number_format($year['discount_percentage'],0) }}%</td>
+                        @endforeach
                     </tr>
                     </tfoot>
                 </table>
             </div>
+            @endif
             <!-- termina Tabla de Sucursales -->
-
-
         </div>
     </div>
 
@@ -221,12 +273,12 @@
                 mode: 'index',
                 intersect: false,
             },
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Ventas y Descuentos por Semana'
-                }
-            },
+            // plugins: {
+            //     title: {
+            //         display: true,
+            //         text: 'Ventas y Descuentos por Semana'
+            //     }
+            // },
             scales: {
                 x: {
                     ticks: {

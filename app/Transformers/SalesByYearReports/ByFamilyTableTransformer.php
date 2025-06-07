@@ -34,9 +34,9 @@ class ByFamilyTableTransformer{
         // Se sacan las filas por familia
         $grouped = $rawData->groupBy('FamilyId');
 
+
         $byFamily = $grouped->map(function ($row,$key) use ($families, $years) {
             $familyId = $key;
-            // Usamos Optional para evitar errores si no se encuentra el nombre
             $familyName = $families->where('FamilyId', $key)->first()->Name ?? 'Sin Nombre';
             $totalSale = $row->sum('Sale');
             $totalDiscount = $row->sum('Discount');
@@ -68,6 +68,6 @@ class ByFamilyTableTransformer{
         ];
     }
     public function getYears(Collection $rawData): Collection {
-        return collect($rawData->groupBy('Year')->keys()->toArray());
+        return collect($rawData->groupBy('Year')->keys()->sortDesc()->toArray());
     }
 }

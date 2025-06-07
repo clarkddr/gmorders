@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\Category;
 use App\Models\Family;
 use App\Transformers\SalesByYearReports\ByBranchTableTransformer;
 use Illuminate\Http\Request;
@@ -10,17 +11,32 @@ use App\Services\SalesByYearReports\TotalizedSalesReportService;
 use App\Transformers\SalesByYearReports\WeeklyChartTransformer;
 use App\Transformers\SalesByYearReports\ByFamilyTableTransformer;
 
-
 class YearSalesController extends Controller
 {
     public function index(Request $request){
-        $from = '2025-05-01';
-        $to = '2025-05-23';
+        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
+        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+        $familiesWithCategories = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
+
+//        if ($request->all() == []){
+//            $data = [
+//                'categories' => $categories,
+//                'families' => $familiesWithCategories,
+//                'branches' => $branches,
+//                'chartData' => [],
+//                'selectedBranch' => 0,
+//                'selectedFamily' => 0
+//            ];
+//            return view('yearSales.index',$data);
+//        }
+
+
+        $from = '2024-6-7';
+        $to = '2024x-06-7';
         $branchid = 0;
-        $familyid = 0;
+        $familyid = 0;//Family::where('Name','Sandalia')->first()->FamilyId;
 
         $families = Family::all();
-        $branches = Branch::whereNot('BranchId',[4,5,10,14])->get();
         // Se obtienen las ventas que contiene los tres reportes, por semana, por familia y por sucursal
         $report = app(TotalizedSalesReportService::class)->getData($from,$to,$branchid,$familyid);
         // Se obtiene el reporte de ventas por semana
@@ -37,17 +53,15 @@ class YearSalesController extends Controller
         // Se obtienen las ventas por Sucursal
         $branchSales = $report['byBranch'];
         // Se transforman para poder usarlo como tabla en la vista
-        $branchesTableData = app(ByBranchTableTransformer::class)->transform($branchSales,$branches);
+        $branchesTableData = app(ByBranchTableTransformer::class)->transform($branchSales,$branches)['byBranch'];
 
         $data = [
             'chartData' => $chartData,
             'years' => $years,
             'familyRows' => $familiesTableData,
-            'familyGrandTotal' => $grandTotalRowFamilyTable,
-            'branchRows' => $branchesTableData
+            'grandTotal' => $grandTotalRowFamilyTable,
+            'branchRows' => $branchesTableData,
         ];
-
-//        dd($data);
 
         return view('yearSales.index',$data);
     }
