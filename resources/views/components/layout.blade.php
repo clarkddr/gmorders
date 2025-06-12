@@ -36,6 +36,7 @@
 		<!-- Flatpickr CSS -->
 		<link rel="stylesheet" type="text/css" src="{{asset('js/flatpickr/dist/themes/dark.css')}}">
 
+
 		<!-- Flatpickr JS -->
 		{{-- <script src="{{asset('js/flatpickr.js')}}"></script>
 		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/rangePlugin.js"></script>		 --}}
@@ -61,5 +62,6 @@
 			</main>
 		</div>
 	</div>
+    <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
 </body>
 </html>

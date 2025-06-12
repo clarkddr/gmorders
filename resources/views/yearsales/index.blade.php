@@ -15,54 +15,54 @@
     @endif
 
     <x-titlePage title="Ventas por año">
-{{--        <form action ="/saleandpurchase" method="GET" class="flex space-x-4 justify-end">--}}
-{{--            <select name="branch" id="branch" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option value="0"  {{ $selectedBranch ? '' : 'selected' }}>Sucursal</option>--}}
-{{--                @foreach ($branches as $branch)--}}
-{{--                    <option value="{{ $branch->BranchId }}"--}}
-{{--                        {{ $selectedBranch == $branch->BranchId ? 'selected' : '' }}>--}}
-{{--                        {{ $branch->Name }}--}}
-{{--                    </option>--}}
-{{--                @endforeach--}}
-{{--            </select>--}}
-{{--            <select name="family" id="family" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option value="0"  {{ $selectedFamily ? '' : 'selected' }}>Familia</option>--}}
-{{--                @foreach ($families as $category)--}}
-{{--                    <optgroup label="{{ $category->Name }}">--}}
-{{--                        @foreach ($category->families as $family)--}}
-{{--                            <option value="{{ $family->FamilyId }}"--}}
-{{--                                {{ $selectedFamily == $family->FamilyId ? 'selected' : '' }}>--}}
-{{--                                {{ $family->Name }}--}}
-{{--                            </option>--}}
-{{--                        @endforeach--}}
-{{--                @endforeach--}}
-{{--            </select>--}}
-{{--            <select name="category" id="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option value="0"  {{ $selectedCategory ? '' : 'selected' }}>Depto</option>--}}
-{{--                @foreach ($categoriesList as $category)--}}
-{{--                    <option value="{{ $category->CategoryId }}"--}}
-{{--                        {{ $selectedCategory == $category->CategoryId ? 'selected' : '' }}>--}}
-{{--                        {{ $category->Name }}--}}
-{{--                    </option>--}}
-{{--                @endforeach--}}
-{{--            </select>--}}
-{{--            <select id="presetSelect" onchange="applyDates2()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option disabled selected>Fechas</option>--}}
-{{--                <option value="year">Anual</option>--}}
-{{--                <option value="summer">Verano</option>--}}
-{{--                <option value="winter">Invierno</option>--}}
-{{--                <option value="lastMonth">Mes Anterior</option>--}}
-{{--                <option value="thisMonth">Este Mes</option>--}}
-{{--                <option value="week">Semana</option>--}}
-{{--                <option value="yesterday">Ayer</option>--}}
-{{--                <option value="today">Hoy</option>--}}
-{{--            </select>--}}
-{{--            <input id="dates2" name="dates2" value="{{old('dates2')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />--}}
-{{--            <input id="dates1" name="dates1" value="{{old('dates1')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />--}}
-{{--            <button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">--}}
-{{--                Buscar--}}
-{{--            </button>--}}
-{{--        </form>--}}
+        <form action ="/yearsales" method="GET" class="flex space-x-4 justify-end">
+            <select name="branch" id="branch" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option value="0"  {{ $selectedBranch ? '' : 'selected' }}>Sucursal</option>
+                @foreach ($branches as $branch)
+                    <option value="{{ $branch->BranchId }}"
+                        {{ $selectedBranch == $branch->BranchId ? 'selected' : '' }}>
+                        {{ $branch->Name }}
+                    </option>
+                @endforeach
+            </select>
+            <select name="family" id="family" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option value="0"  {{ $selectedFamily ? '' : 'selected' }}>Familia</option>
+                @foreach ($families as $category)
+                    <optgroup label="{{ $category->Name }}">
+                        @foreach ($category->families as $family)
+                            <option value="{{ $family->FamilyId }}"
+                                {{ $selectedFamily == $family->FamilyId ? 'selected' : '' }}>
+                                {{ $family->Name }}
+                            </option>
+                        @endforeach
+                @endforeach
+            </select>
+            <select name="category" id="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option value="0"  {{ $selectedCategory ? '' : 'selected' }}>Depto</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->CategoryId }}"
+                        {{ $selectedCategory == $category->CategoryId ? 'selected' : '' }}>
+                        {{ $category->Name }}
+                    </option>
+                @endforeach
+            </select>
+            <select id="presetSelect" onchange="applyDates()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                <option disabled selected>Fechas</option>
+                <option value="year">Anual</option>
+                <option value="summer">Verano</option>
+                <option value="winter">Invierno</option>
+                <option value="lastMonth">Mes Anterior</option>
+                <option value="thisMonth">Este Mes</option>
+                <option value="twoWeeks">Dos Semanas</option>
+                <option value="week">Semana</option>
+                <option value="yesterday">Ayer</option>
+                <option value="today">Hoy</option>
+            </select>
+            <input id="dates" name="dates" value="{{old('dates')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
+            <button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+                Buscar
+            </button>
+        </form>
     </x-titlePage>
 
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
@@ -80,8 +80,10 @@
             @endif
 
             <!-- Tabla de Familias -->
-
-            @if(isset($familyRows))
+        @php
+            $urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates' => $selectedDate];
+        @endphp
+        @if(isset($familyRows))
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mt-6 mb-6"> <!-- Ocupa 8/12 -->
                 <table id="familiesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-lg mb-6 border border-gray-200 dark:border-gray-700">
                     <thead>
@@ -118,7 +120,11 @@
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($familyRows as $family)
                         <tr class="text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <td class="px-4 py-3 font-medium border border-gray-200 dark:border-gray-700">{{ $family['Name'] }}</td>
+                            <td class="px-4 py-3 font-medium border border-gray-200 dark:border-gray-700">
+                                <a href="{{route('yearsales.index',$urlParameters + ['family' => $family['FamilyId']])}}" class="text-blue-600 hover:underline" target="_blank">
+                                    {{ $family['Name'] }}
+                                </a>
+                            </td>
                             <td class="px-4 py-3 font-semibold text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-gray-600 text-green-800 dark:text-green-200">
                                 {{ number_format($family['Sale'],0) }}
                             </td>
@@ -165,6 +171,9 @@
             <!-- termina Tabla de Familias -->
             @if(isset($branchRows))
             <!-- Tabla de Sucursales -->
+            @php
+                $urlParameters = ['category'=> $selectedCategory,'family' => $selectedFamily, 'dates' => $selectedDate];
+            @endphp
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mt-6 mb-6"> <!-- Ocupa 8/12 -->
                 <h3 class="text-xl sm:text-xl font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400 my-2">
                     {{ 'Por Sucursal' }}
@@ -204,7 +213,11 @@
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($branchRows as $branch)
                         <tr class="text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <td class="px-4 py-3 font-medium border border-gray-200 dark:border-gray-700">{{ $branch['Name'] }}</td>
+                            <td class="px-4 py-3 font-medium border border-gray-200 dark:border-gray-700">
+                                <a href="{{route('yearsales.index',$urlParameters + ['branch' => $branch['BranchId']])}}" class="text-blue-600 hover:underline" target="_blank">
+                                    {{ $branch['Name'] }}
+                                </a>
+                            </td>
                             <td class="px-4 py-3 font-semibold text-right border-r-0 border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-gray-600 text-green-800 dark:text-green-200">
                                 {{ number_format($branch['Sale'],0) }}
                             </td>
@@ -255,10 +268,54 @@
 
 
 </x-layout>
-
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
 <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
 
+        const datesInput = document.getElementById('dates');
+        const flatpickr1 = flatpickr(datesInput, {
+            // plugins: [new rangePlugin({ input: endInput })],
+            dateFormat: "Y-m-d",
+            mode: "range",
+            altInput: true,
+            altFormat: "d M y",
+            locale: {firstDayOfWeek: 1},
+            onReady: function(selectedDates, dateStr, instance) {
+                // Establecer el valor si ya existe uno seleccionado en la base de datos
+                const selectedDate = "{{ $selectedDate }}"; // Recoges esto desde el backend
+                if (selectedDate) {
+                    instance.setDate(selectedDate);
+                }
+            },
+        });
+        // Recoge todas las fechas desde Blade en una sola variable
+        const predefinedDates = @json($dates);
+
+        // Mapeo de cada opción del select a los pares de fecha a aplicar
+        const datePresets = {
+            today: [predefinedDates.today, predefinedDates.today],
+            yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],
+            thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],
+            lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],
+            week: [predefinedDates.initialWeekday, predefinedDates.yesterday],
+            twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],
+            year: [predefinedDates.initialYear, predefinedDates.yesterday],
+            winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],
+            summer: [predefinedDates.initialSummer, predefinedDates.finalSummer],
+        };
+
+        const applyDates = () => {
+            const selectedValue = document.getElementById("presetSelect").value;
+            const dates = datePresets[selectedValue];
+            if(dates){
+                flatpickr1.setDate(dates);
+            }
+        }
+        // Registrar la función en el ámbito global
+        window.applyDates = applyDates;
+    });
+</script>
 <script>
     const chartData = @json($chartData);
     //Chart.register(window['chartjs-plugin-colors']);
@@ -292,7 +349,10 @@
         }
     });
 </script>
+
+
 <script>
+
     $('#familiesTable').DataTable({
         paging:true,
         searching: true,

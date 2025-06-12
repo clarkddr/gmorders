@@ -12,12 +12,12 @@ class TotalizedSalesReportService {
         $this->repository = $repository;
     }
 
-    public function getData(string $from, string $to, int $branchid = 0, int $familyid = 0) {
+    public function getData(string $from, string $to, int $branchid = 0, int $familyid = 0, int $categoryid = 0) {
         // Llamamos al repositorio y pasamos los parámetros de fecha como String
         $rawReport = $this->repository->getYearSalesDiscounts(
             Carbon::parse($from),
             Carbon::parse($to),
-            $branchid, $familyid
+            $branchid, $familyid, $categoryid
         );
         // Se recolecta la informacion para complementarlo a los datos
         $branches = Branch::pluck('Name','BranchId');

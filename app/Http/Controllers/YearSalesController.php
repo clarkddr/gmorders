@@ -10,35 +10,54 @@ use Illuminate\Http\Request;
 use App\Services\SalesByYearReports\TotalizedSalesReportService;
 use App\Transformers\SalesByYearReports\WeeklyChartTransformer;
 use App\Transformers\SalesByYearReports\ByFamilyTableTransformer;
+use App\Helpers\DateHelper;
 
 class YearSalesController extends Controller
 {
     public function index(Request $request){
-        $categories = Category::whereIn('CategoryId',[1,4,12])->get();
+        $categories = Category::whereIn('CategoryId',[1,2,4,12])->get();
         $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
         $familiesWithCategories = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
+        // Obtener fechas para el dropdown de fechas
+        $dates = DateHelper::getDefaultDateRanges();
 
-//        if ($request->all() == []){
-//            $data = [
-//                'categories' => $categories,
-//                'families' => $familiesWithCategories,
-//                'branches' => $branches,
-//                'chartData' => [],
-//                'selectedBranch' => 0,
-//                'selectedFamily' => 0
-//            ];
-//            return view('yearSales.index',$data);
-//        }
+        if ($request->all() == []){
+            $data = [
+                'categories' => $categories,
+                'families' => $familiesWithCategories,
+                'branches' => $branches,
+                'chartData' => [],
+                'selectedBranch' => 0,
+                'selectedFamily' => 0,
+                'selectedCategory' => 0,
+                'selectedDate' => '',
+                'dates' => $dates,
+            ];
+            return view('yearSales.index',$data);
+        }
 
+        // Validar datos
+        $request->validate([
+            'dates' => ['required'],
+            'category' => ['required'],
+        ]);
 
-        $from = '2024-6-7';
-        $to = '2024x-06-7';
-        $branchid = 0;
-        $familyid = 0;//Family::where('Name','Sandalia')->first()->FamilyId;
+        $inputCategory = $request->input('category');
+        $inputBranch = $request->input('branch');
+        $inputFamily = $request->input('family');
+        $inputDates = $request->input('dates');
 
+        // Pasar fechas con el helper para descomponerlas en caso de que sean rango
+        [$fromDate, $toDate] = DateHelper::parseDateRange($inputDates);
+
+        $from = $fromDate->format('Y-m-d');
+        $to = $toDate->format('Y-m-d');
+        $branchid = Branch::where('BranchId',$inputBranch)->first()->BranchId ?? 0;
+        $familyid = Family::where('FamilyId',$inputFamily)->first()->FamilyId ?? 0;
+        $categoryid = Category::where('CategoryId',$inputCategory)->first()->CategoryId ?? 0;
         $families = Family::all();
         // Se obtienen las ventas que contiene los tres reportes, por semana, por familia y por sucursal
-        $report = app(TotalizedSalesReportService::class)->getData($from,$to,$branchid,$familyid);
+        $report = app(TotalizedSalesReportService::class)->getData($from,$to,$branchid,$familyid,$categoryid);
         // Se obtiene el reporte de ventas por semana
         $weeklySales = $report['weeks'];
         // Se transforma las ventas por semana para usarlo en la gráfica
@@ -55,12 +74,21 @@ class YearSalesController extends Controller
         // Se transforman para poder usarlo como tabla en la vista
         $branchesTableData = app(ByBranchTableTransformer::class)->transform($branchSales,$branches)['byBranch'];
 
+
         $data = [
             'chartData' => $chartData,
             'years' => $years,
             'familyRows' => $familiesTableData,
             'grandTotal' => $grandTotalRowFamilyTable,
             'branchRows' => $branchesTableData,
+            'categories' => $categories,
+            'families' => $familiesWithCategories,
+            'branches' => $branches,
+            'selectedBranch' => $branchid,
+            'selectedFamily' => $familyid,
+            'selectedCategory' => $inputCategory,
+            'selectedDate' => $inputDates,
+            'dates' => $dates,
         ];
 
         return view('yearSales.index',$data);
