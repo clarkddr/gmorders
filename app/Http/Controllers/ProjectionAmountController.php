@@ -108,6 +108,7 @@ class ProjectionAmountController extends Controller
                     ->groupBy('FamilyId')->get()->keyBy('FamilyId');
 
 
+
                 // Se calculan las proyecciones totalizada por sucursal
                 $projectionResultBranches = $branches->map(function ($branch) use ($projectionamounts) {
                     $branchid = $branch->BranchId;
@@ -190,6 +191,9 @@ class ProjectionAmountController extends Controller
                 $lastYearQueryResultsPartial = DB::connection('mssql')->selectResultSets($lastYearQueryPartialPeriod);
                 $lastYearPartialSaleResults = collect($lastYearQueryResultsPartial[2]);
                 // Recolectar las ventas parciales pero por sucursal
+                $current = $lastYearPartialSaleResults->sum('Current');
+                $old = $lastYearPartialSaleResults->sum('Old');
+                dd($lastYearPartialSaleResults->sum('Amount'));
                 $lastYearPartialSaleResultsBranches = collect($lastYearQueryResultsPartial[6]);
 
 
@@ -427,6 +431,7 @@ class ProjectionAmountController extends Controller
                 $totalsProjection = $projectionResults->sum('total'); // Total de Projeccion 49,565,713
                 $relationGoal = $totalsLastYearSale > 0 ? $totalsProjection / $totalsLastYearSale : 0; // Relacion Venta Anterior y Proyeccion 49,565,713/45,169,208 = 1.0973
                 $lastYearPartialSale = $lastYearPartialSaleResults->sum('Amount'); // Total de Venta Parcial Año Anterior 1,772,687.3
+
                 $partialGoalSale = $lastYearPartialSale * $relationGoal; // Meta de Venta Parcial 1,945,169.77
 
                  // Relacion entre Meta de Venta Parcial y Venta actual - 2,438,972 / 1,945,169 = 1.2538

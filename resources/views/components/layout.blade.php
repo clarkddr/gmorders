@@ -18,6 +18,7 @@
 		<script src="{{asset('/js/init-alpine.js')}}"></script>
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-8MntMizyPIYkcjoDkYqgrQOuWOZsp92zlZ9d7M2RCG0s1Zua8H215p2PdsxS7qg/4hLrHrdPsZgVZpXheHYT+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colors@0.5.0/dist/chartjs-plugin-colors.min.js"></script> -->
 		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 		{{-- <link
@@ -34,6 +35,7 @@
 		<script src="{{asset('js/focus-trap.js')}}" defer></script>
 		<!-- Flatpickr CSS -->
 		<link rel="stylesheet" type="text/css" src="{{asset('js/flatpickr/dist/themes/dark.css')}}">
+
 
 		<!-- Flatpickr JS -->
 		{{-- <script src="{{asset('js/flatpickr.js')}}"></script>
@@ -60,5 +62,6 @@
 			</main>
 		</div>
 	</div>
+    <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
 </body>
 </html>
