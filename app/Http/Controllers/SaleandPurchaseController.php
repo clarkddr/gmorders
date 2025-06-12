@@ -20,7 +20,7 @@ class SaleandPurchaseController extends Controller
         $familiesList = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
 
         // Obtener fechas para el dropdown de fechas
-
+        // 29May-11Jun 2025 vs 30May-12Jun 2024
         $dates = DateHelper::getDefaultDateRanges();
 
         $data = [
@@ -62,24 +62,9 @@ class SaleandPurchaseController extends Controller
                 $families = $category->families;
             }
 
+            [$fromDate1, $toDate1] = DateHelper::parseDateRange($inputDates1);
+            [$fromDate2, $toDate2] = DateHelper::parseDateRange($inputDates2);
 
-            if($inputDates1 != '' && $inputDates1 != 0 &&
-                $inputDates2 != '' && $inputDates2 != 0){
-                $dates1 = array_map('trim', explode('to', $inputDates1));
-                $dates2 = array_map('trim', explode('to', $inputDates2));
-                if(count($dates1) == 1){
-                    $dates1[] = $dates1[0];
-                }
-                if(count($dates2) == 1){
-                    $dates2[] = $dates2[0];
-                }
-            }
-
-            $fromDate1 = Carbon::createFromFormat('Y-m-d', $dates1[0])->setTime(0,0,0);
-            $toDate1 = Carbon::createFromFormat('Y-m-d', $dates1[1])->setTime(0,0,0);
-
-            $fromDate2 = Carbon::createFromFormat('Y-m-d', $dates2[0])->setTime(0,0,0);
-            $toDate2 = Carbon::createFromFormat('Y-m-d', $dates2[1])->setTime(0,0,0);
 
             // Validación adicional
             if ($fromDate1 >= $fromDate2) {

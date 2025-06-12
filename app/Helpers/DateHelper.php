@@ -36,8 +36,21 @@ class DateHelper
         $dates['initialWeekday'] = $day->copy()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
         $dates['initialWeekdayLastYear'] = $initialWeekdayLastYear->format('Y-m-d');
         $dates['finalWeekdayLastYear'] = $initialWeekdayLastYear->copy()->addDays($dayDifference)->format('Y-m-d');
+        //Ultmimos 7 dias
+        $dates['initialSevenDays'] = $day->copy()->subDays(6)->format('Y-m-d');
+        $dates['finalSevenDays'] = $day->format('Y-m-d');
+        $dates['initialSevenDaysLastYear'] = $day->copy()->subDays(5)->subYear()->format('Y-m-d');
+        $dates['finalSevenDaysLastYear'] = $day->copy()->addDays(1)->subYear()->format('Y-m-d');
         // Ultimas dos semanas
         $dates['initialTwoWeeks'] = $day->copy()->yesterday()->subDays(13)->format('Y-m-d');
+        $dates['initialTwoWeeksLastYear'] = $day->copy()->yesterday()->subYear()->subDays(12)->format('Y-m-d');
+        $dates['finalTwoWeeksLastYear'] = $day->copy()->yesterday()->subYear()->addDays(1)->format('Y-m-d');
+
+        // Mes Actual
+        $dates['initialMonth'] = $day->copy()->startOfMonth()->format('Y-m-d');
+        $dates['finalMonth'] = $day->copy()->endOfMonth()->format('Y-m-d');
+        $dates['initialMonthLastYear'] = $day->copy()->subYear()->startOfMonth()->format('Y-m-d');
+        $dates['finalMonthLastYear'] = $day->copy()->subYear()->endOfMonth()->format('Y-m-d');
 
         // Whole Year
         $yesterday = Carbon::yesterday();
@@ -47,10 +60,10 @@ class DateHelper
 
         // Invierno this year
 
-        $dates['initialWinter'] = Carbon::now()->startOfYear()->month(9)->day(1)->format('Y-m-d');
+        $dates['initialWinter'] = Carbon::now()->month(9)->day(1)->format('Y-m-d');
         $isWinter = Carbon::today()->isAfter($dates['initialWinter']);
         $dates['initialWinterLastYear'] = Carbon::now()->startOfYear()->subYear()->month(9)->day(1)->format('Y-m-d');
-        $dates['finalWinter'] = $isWinter ? $dates['yesterday'] : Carbon::now()->startOfYear()->subYear()->month(12)->day(31)->format('Y-m-d');
+        $dates['finalWinter'] = $isWinter ? $dates['yesterday'] : Carbon::now()->startOfYear()->month(12)->day(31)->format('Y-m-d');
         $dates['finalWinterLastYear'] = $isWinter ? $dates['yesterdayLastYear'] : Carbon::now()->startOfYear()->subYear()->month(12)->day(31)->format('Y-m-d');
 
         //Verano

@@ -51,14 +51,16 @@
                     </option>
                 @endforeach
             </select>
-            <select id="presetSelect" onchange="applyDates2()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+            <select id="presetSelect" onchange="applyDates()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                 <option disabled selected>Fechas</option>
                 <option value="year">Anual</option>
                 <option value="summer">Verano</option>
                 <option value="winter">Invierno</option>
                 <option value="lastMonth">Mes Anterior</option>
                 <option value="thisMonth">Este Mes</option>
+                <option value="twoWeeks">Dos Semanas</option>
                 <option value="week">Semana</option>
+                <option value="sevenDays">7 dias</option>
                 <option value="yesterday">Ayer</option>
                 <option value="today">Hoy</option>
             </select>
@@ -299,72 +301,49 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 	});
 
-    const applyDates2 = () => {
-        const select = document.getElementById("presetSelect");
-        const selectedValue = select.value;
-        if (selectedValue === "today") {
-            const today = "{{$dates['today']}}";
-            const todaySameWeekdayLastYear = "{{$dates['todaySameWeekdayLastYear']}}";
-            flatpickr1.setDate([todaySameWeekdayLastYear, todaySameWeekdayLastYear]);
-            flatpickr2.setDate([today, today]);
-        }
-        if (selectedValue === "yesterday") {
-            const yesterday = "{{$dates['yesterday']}}";
-            const sameWeekdayLastYear = "{{$dates['sameWeekdayLastYear']}}";
-            flatpickr1.setDate([sameWeekdayLastYear, sameWeekdayLastYear]);
-            flatpickr2.setDate([yesterday, yesterday]);
-        }
-        if (selectedValue === "thisMonth") {
-            const thisMonthInitial = "{{$dates['thisMonthInitial']}}";
-            const yesterday = "{{$dates['yesterday']}}";
-            const thisMonthInitialLastYear = "{{$dates['thisMonthInitialLastYear']}}";
-            const yesterdayLastYear = "{{$dates['yesterdayLastYear']}}";
-            flatpickr1.setDate([thisMonthInitialLastYear, yesterdayLastYear]);
-            flatpickr2.setDate([thisMonthInitial, yesterday]);
-        }
-        if (selectedValue === "lastMonth") {
-            const lastMonthInitial = "{{$dates['lastMonthInitial']}}";
-            const lastMonthEnd = "{{$dates['lastMonthEnd']}}";
-            const lastMonthInitialLastYear = "{{$dates['lastMonthInitialLastYear']}}";
-            const lastMonthEndLastYear = "{{$dates['lastMonthEndLastYear']}}";
-            flatpickr1.setDate([lastMonthInitialLastYear, lastMonthEndLastYear]);
-            flatpickr2.setDate([lastMonthInitial, lastMonthEnd]);
-        }
-        if (selectedValue === "week") {
-            const yesterday = "{{$dates['yesterday']}}";
-            const initialWeekday = "{{$dates['initialWeekday']}}";
-            const initialWeekdayLastYear = "{{$dates['initialWeekdayLastYear']}}";
-            const finalWeekdayLastYear = "{{$dates['finalWeekdayLastYear']}}";
-            flatpickr1.setDate([initialWeekdayLastYear, finalWeekdayLastYear]);
-            flatpickr2.setDate([initialWeekday,yesterday]);
-        }
-        if (selectedValue === "year") {
-            const yesterday = "{{$dates['yesterday']}}";
-            const initialYear = "{{$dates['initialYear']}}";
-            const initialLastYear = "{{$dates['initialLastYear']}}";
-            const finalLastYear = "{{$dates['finalLastYear']}}";
-            flatpickr1.setDate([initialLastYear, finalLastYear]);
-            flatpickr2.setDate([initialYear,yesterday]);
-        }
-        if (selectedValue === "winter") {
-            const initialWinter = "{{$dates['initialWinter']}}";
-            const initialWinterLastYear = "{{$dates['initialWinterLastYear']}}";
-            const finalWinter = "{{$dates['finalWinter']}}";
-            const finalWinterLastYear = "{{$dates['finalWinterLastYear']}}";
-            flatpickr1.setDate([initialWinterLastYear, finalWinterLastYear]);
-            flatpickr2.setDate([initialWinter,finalWinter]);
-        }
-        if (selectedValue === "summer") {
-            const initialSummer = "{{$dates['initialYear']}}";
-            const initialSummerLastYear = "{{$dates['initialLastYear']}}";
-            const finalSummer = "{{$dates['finalSummer']}}";
-            const finalSummerLastYear = "{{$dates['finalSummerLastYear']}}";
-            flatpickr1.setDate([initialSummerLastYear, finalSummerLastYear]);
-            flatpickr2.setDate([initialSummer,finalSummer]);
-        }
+
+
+    // Recoge todas las fechas desde Blade en una sola variable
+    const predefinedDates = @json($dates);
+
+    // Mapeo de cada opción del select a los pares de fecha a aplicar
+    const thisYeardatePresets = {
+        today: [predefinedDates.today, predefinedDates.today],
+        yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],
+        thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],
+        lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],
+        week: [predefinedDates.initialWeekday, predefinedDates.yesterday],
+        sevenDays: [predefinedDates.initialSevenDays, predefinedDates.finalSevenDays],
+        twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],
+        year: [predefinedDates.initialYear, predefinedDates.yesterday],
+        winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],
+        summer: [predefinedDates.initialYear, predefinedDates.finalSummer],
     };
+    const lastYeardatePresets = {
+        today: [predefinedDates.todaySameWeekdayLastYear, predefinedDates.todaySameWeekdayLastYear],
+        yesterday: [predefinedDates.sameWeekdayLastYear, predefinedDates.sameWeekdayLastYear],
+        thisMonth: [predefinedDates.thisMonthInitialLastYear, predefinedDates.yesterdayLastYear],
+        lastMonth: [predefinedDates.lastMonthInitialLastYear, predefinedDates.lastMonthEndLastYear],
+        week: [predefinedDates.initialWeekdayLastYear, predefinedDates.finalWeekdayLastYear],
+        sevenDays: [predefinedDates.initialSevenDaysLastYear, predefinedDates.finalSevenDaysLastYear],
+        twoWeeks: [predefinedDates.initialTwoWeeksLastYear, predefinedDates.finalTwoWeeksLastYear],
+        year: [predefinedDates.initialLastYear, predefinedDates.finalLastYear],
+        summer: [predefinedDates.initialLastYear, predefinedDates.finalSummerLastYear],
+        winter: [predefinedDates.initialWinterLastYear, predefinedDates.finalWinterLastYear],
+    };
+
+    const applyDates = () => {
+        const selectedValue = document.getElementById("presetSelect").value;
+        const firstDates = thisYeardatePresets[selectedValue];
+        const secondDates = lastYeardatePresets[selectedValue];
+
+        if(firstDates && secondDates){
+            flatpickr2.setDate(firstDates);
+            flatpickr1.setDate(secondDates);
+        }
+    }
     // Registrar la función en el ámbito global
-    window.applyDates2 = applyDates2;
+    window.applyDates = applyDates;
 
 	$('#familiesTable').DataTable({
         paging:true,
