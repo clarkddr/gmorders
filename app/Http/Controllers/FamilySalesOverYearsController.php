@@ -8,12 +8,15 @@ use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\DateHelper;
 
 class FamilySalesOverYearsController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::whereIn('CategoryId', [1, 4, 12])->get();
+        $categories = Category::whereIn('CategoryId', [1,2, 4, 12])->get();
+        // Fechas preestablecidas
+        $dates = DateHelper::getDefaultDateRanges();
         $data = [
             'selectedDate' => '',
             'selectedCategory' => 0,
@@ -23,7 +26,7 @@ class FamilySalesOverYearsController extends Controller
             'totalPurchase' => ['purchase2' => 0, 'purchase1' => 0, 'purchase0' => 0,
                 'purchaseRelation2' => 0, 'purchaseRelation1' => 0,],
             'year' => ['2' => '', '1' => '', '0' => ''],
-
+            'dates' => $dates,
         ];
 
         if ($request->all() != []) {
@@ -36,22 +39,17 @@ class FamilySalesOverYearsController extends Controller
             $inputDates = $request->input('dates');
 
             $category = Category::findOrFail($inputCategory);
-            if ($inputDates != '' && $inputDates != 0) {
-                $dates = array_map('trim', explode('to', $inputDates));
-                if (count($dates) == 1) {
-                    $dates[] = $dates[0];
-                }
-            }
 
-            $date1 = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->subYear(2);
-            $date2 = Carbon::createFromFormat('Y-m-d', $dates[1])->setTime(0, 0, 0);
+            [$date1, $date2] = DateHelper::parseDateRange($inputDates);
+            $titlesDate = $date1->copy()->firstOfYear();
+            $date1 = $date1->subYears(2);
 
-            $year['2'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->subYear(2)->year;
-            $year['1'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->subYear(1)->year;
-            $year['0'] = Carbon::createFromFormat('Y-m-d', $dates[0])->setTime(0, 0, 0)->year;
+            $year['2'] = $titlesDate->copy()->subYears(2)->year;
+            $year['1'] = $titlesDate->copy()->subYear()->year;
+            $year['0'] = $titlesDate->year;
 
             $query = "
-            EXEC dbo.DRGetFamilySalesOverYears @From = '{$date1}', @To = '{$date2}', @Category = {$category->CategoryId}
+            EXEC dbo.DRGetFamilySalesOverYears @From = '{$date1->format('Y-m-d')}', @To = '{$date2->format('Y-m-d')}', @Category = {$category->CategoryId}
             ";
             $queryResults = DB::connection('mssql')->selectResultSets($query);
 
@@ -122,13 +120,9 @@ class FamilySalesOverYearsController extends Controller
                     'purchase0' => number_format($purchase->purchase0, 0),
                 ]);
             });
-
-
-            // Resultados de Compras
-
-
             $data = [
                 'selectedDate' => $request->input('dates'),
+                'dates' => $dates,
                 'selectedCategory' => $category,
                 'categories' => $categories,
                 'amounts' => $amounts,
