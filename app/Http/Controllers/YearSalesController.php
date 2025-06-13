@@ -33,7 +33,7 @@ class YearSalesController extends Controller
                 'selectedDate' => '',
                 'dates' => $dates,
             ];
-            return view('yearSales.index',$data);
+            return view('yearsales.index',$data);
         }
 
         // Validar datos
@@ -91,6 +91,6 @@ class YearSalesController extends Controller
             'dates' => $dates,
         ];
 
-        return view('yearSales.index',$data);
+        return view('yearsales.index',$data);
     }
 }
