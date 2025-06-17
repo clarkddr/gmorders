@@ -193,7 +193,7 @@ class ProjectionAmountController extends Controller
                 // Recolectar las ventas parciales pero por sucursal
                 $current = $lastYearPartialSaleResults->sum('Current');
                 $old = $lastYearPartialSaleResults->sum('Old');
-                dd($lastYearPartialSaleResults->sum('Amount'));
+
                 $lastYearPartialSaleResultsBranches = collect($lastYearQueryResultsPartial[6]);
 
 
