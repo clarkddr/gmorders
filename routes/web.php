@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchSalesTargetController;
 use App\Http\Controllers\YearSalesController;
+use App\Http\Controllers\PerformanceController;
 
 Route::middleware('guest')->group(function(){
     // Route::get('/register', [RegisteredUserController::class,'create']);
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function(){
     Route::get('projectionmonth/{id}',[ProjectionMonthController::class,'index'])->name('projectionmonth.index');
     Route::post('projectionmonth',[ProjectionMonthController::class,'store'])->name('projectionmonth.store');
     Route::get('yearsales',[YearSalesController::class,'index'])->name('yearsales.index');
+    Route::get('performance',[PerformanceController::class,'index'])->name('performance.index');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');

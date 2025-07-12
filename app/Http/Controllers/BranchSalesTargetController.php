@@ -165,6 +165,7 @@ class BranchSalesTargetController extends Controller
         $branchid = $branch->branch_id ?? 0;
         $branchName = $branch->branch->Name ?? '';
 
+
         $date = Carbon::today();
         $now = Carbon::now();
         $month = $date->translatedFormat('F');
@@ -192,6 +193,7 @@ class BranchSalesTargetController extends Controller
         }
         // Se recolectan todos los dias del mes actual para iterar sobre ellos.
         $today = Carbon::today()->format('Y-m-d');
+
         $daysOfMonth = collect(getDaysOfMonth($today));
 
         // Function para obtener ventas por dia, parametos: desde, hasta, sucursal
