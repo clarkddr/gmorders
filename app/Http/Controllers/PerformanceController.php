@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\DateHelper;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Family;
+use App\Models\Supplier;
 use App\Transformers\Performance\ByCategoryTransformer;
 use App\Transformers\Performance\ByResultsTransformer;
 use App\Transformers\Performance\BySupplierTransformer;
@@ -16,17 +18,58 @@ use App\Transformers\Performance\ByBranchTransformer;
 
 class PerformanceController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
+        $categories = Category::whereIn('CategoryId', [1, 2, 4, 12])->get();
+        $branches = Branch::whereNotIn('BranchId', [4, 5, 10, 14])->get();
+        $familiesWithCategories = Category::with('families')->whereIn('CategoryId', [1, 2, 4, 12])->get();
+        $suppliers = Supplier::all()->sortBy('Name');
+        // Obtener fechas para el dropdown de fechas
+        $dates = DateHelper::getDefaultDateRanges();
 
+        $data = [
+            'families' => $familiesWithCategories,
+            'categories' => $categories,
+            'branches' => $branches,
+            'suppliers' => $suppliers,
+            'dates' => $dates,
+            'selectedSupplier' => 0,
+            'selectedBranch' => 0,
+            'selectedFamily' => 0,
+            'selectedCategory' => 0,
+            'selectedSaleDates' => '',
+            'selectedPurchaseDates' => '',
+        ];
 
-        $salesFrom = '2025-1-1';
-        $salesTo = '2025-7-31';
-        $purchaseFrom = $salesFrom;
-        $purchaseTo = $salesTo;
-        $categoryid = 0;
-        $familyid = 0;//Family::where('Name', 'Zapatilla')->first()->FamilyId;
-        $branchid = 0;
-        $supplierid = 0;
+        if ($request->all() == []) {
+            return view('performance.index', $data);
+        }
+
+        $categoryid = $request->input('category');
+        $branchid = $request->input('branch');
+        $familyid = $request->input('family');
+        $supplierid = $request->input('supplier');
+        $inputSaleDates = $request->input('sale_dates');
+        $inputPurchaseDates = $request->input('purchase_dates');
+
+        $request->validate([
+            'sale_dates' => 'required',
+            'purchase_dates' => 'required',
+        ]);
+
+        [$salesDatesFrom, $salesDatesTo] = DateHelper::parseDateRange($inputSaleDates);
+        [$purchaseDatesFrom, $purchaseDatesTo] = DateHelper::parseDateRange($inputPurchaseDates);
+
+        if ($salesDatesFrom >= $salesDatesTo || $purchaseDatesFrom >= $purchaseDatesTo) {
+            {
+                return redirect()->back()->withErrors(['sale_dates' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
+            }
+        }
+
+        $salesFrom = $salesDatesFrom;
+        $salesTo = $salesDatesTo;
+        $purchaseFrom = $purchaseDatesFrom;
+        $purchaseTo = $purchaseDatesTo;
 
         $dbData = app(PerformanceService::class)->getData(
             $salesFrom, $salesTo, $purchaseFrom, $purchaseTo, $branchid, $familyid, $categoryid, $supplierid);
@@ -37,16 +80,22 @@ class PerformanceController extends Controller
         $suppliersData = app(BySupplierTransformer::class)->transform($dbData['bySupplier']);
         $resultsData = app(ByResultsTransformer::class)->transform($dbData['results']);
 
-        $data = [
+        $dataExtra = [
             'categoriesData' => $categoriesData,
             'familiesData' => $familiesData,
             'branchesData' => $branchesData,
             'suppliersData' => $suppliersData,
-            'resultsData' => $resultsData
+            'resultsData' => $resultsData,
+            'selectedSupplier' => $supplierid,
+            'selectedBranch' => $branchid,
+            'selectedFamily' => $familyid,
+            'selectedCategory' => $categoryid,
+            'selectedSaleDates' => $inputSaleDates,
+            'selectedPurchaseDates' => $inputPurchaseDates,
         ];
 
+        $data = array_merge($data, $dataExtra);
+
         return view('performance.index', $data);
-
-
     }
 }

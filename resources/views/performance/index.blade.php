@@ -15,134 +15,226 @@
     @endif
 
     @php
-        //$selectedCategory = request('category', old('category'));
+        $defaultUrlParameters = ['category'=> $selectedCategory,'supplier'=> $selectedSupplier,'branch' => $selectedBranch,'family' => $selectedFamily,
+        'sale_dates' => $selectedSaleDates, 'purchase_dates' => $selectedPurchaseDates];
     @endphp
-    <x-titlePage title="Ventas/Compras {{$selectedCategory->name ?? ''}}">
-{{--        <form action ="/saleandpurchase" method="GET" class="flex space-x-4 justify-end">--}}
-{{--            <select name="branch" id="branch" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option value="0"  {{ $selectedBranch ? '' : 'selected' }}>Sucursal</option>--}}
-{{--                @foreach ($branchesList as $branch)--}}
-{{--                    <option value="{{ $branch->BranchId }}"--}}
-{{--                        {{ $selectedBranch == $branch->BranchId ? 'selected' : '' }}>--}}
-{{--                        {{ $branch->Name }}--}}
-{{--                    </option>--}}
-{{--                @endforeach--}}
-{{--            </select>--}}
-{{--            <select name="family" id="family" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option value="0"  {{ $selectedFamily ? '' : 'selected' }}>Familia</option>--}}
-{{--                @foreach ($familiesList as $category)--}}
-{{--                    <optgroup label="{{ $category->Name }}">--}}
-{{--                        @foreach ($category->families as $family)--}}
-{{--                            <option value="{{ $family->FamilyId }}"--}}
-{{--                                {{ $selectedFamily == $family->FamilyId ? 'selected' : '' }}>--}}
-{{--                                {{ $family->Name }}--}}
-{{--                            </option>--}}
-{{--                @endforeach--}}
-{{--                @endforeach--}}
+    <x-titlePage title="Rendimiento">
+        <div class="w-full">
+            <form action="/performance" method="GET" class="flex space-x-4 justify-end">
+            {{-- Proveedor --}}
+            <div class="flex flex-col w-full">
+                <label for="supplier" class="text-xs text-gray-400 mb-1">Proveedor</label>
+                <select name="supplier" id="supplier" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                    <option value="0" {{ $selectedSupplier ? '' : 'selected' }}>Proveedor</option>
+                    @foreach ($suppliers as $supplier)
+                        <option value="{{ $supplier->SupplierId }}" {{ $selectedSupplier == $supplier->SupplierId ? 'selected' : '' }}>
+                            {{ $supplier->Name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
+            {{-- Sucursal --}}
+            <div class="flex flex-col w-full">
+                <label for="branch" class="text-xs text-gray-400 mb-1">Sucursal</label>
+                <select name="branch" id="branch" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                    <option value="0" {{ $selectedBranch ? '' : 'selected' }}>Sucursal</option>
+                    @foreach ($branches as $branch)
+                        <option value="{{ $branch->BranchId }}" {{ $selectedBranch == $branch->BranchId ? 'selected' : '' }}>
+                            {{ $branch->Name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-{{--            </select>--}}
-{{--            <select name="category" id="category" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option value="0"  {{ $selectedCategory ? '' : 'selected' }}>Depto</option>--}}
-{{--                @foreach ($categoriesList as $category)--}}
-{{--                    <option value="{{ $category->CategoryId }}"--}}
-{{--                        {{ $selectedCategory == $category->CategoryId ? 'selected' : '' }}>--}}
-{{--                        {{ $category->Name }}--}}
-{{--                    </option>--}}
-{{--                @endforeach--}}
-{{--            </select>--}}
-{{--            <select id="presetSelect" onchange="applyDates()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">--}}
-{{--                <option disabled selected>Fechas</option>--}}
-{{--                <option value="year">Anual</option>--}}
-{{--                <option value="summer">Verano</option>--}}
-{{--                <option value="winter">Invierno</option>--}}
-{{--                <option value="lastMonth">Mes Anterior</option>--}}
-{{--                <option value="thisMonth">Este Mes</option>--}}
-{{--                <option value="twoWeeks">Dos Semanas</option>--}}
-{{--                <option value="week">Semana</option>--}}
-{{--                <option value="sevenDays">7 dias</option>--}}
-{{--                <option value="yesterday">Ayer</option>--}}
-{{--                <option value="today">Hoy</option>--}}
-{{--            </select>--}}
-{{--            <input id="dates2" name="dates2" value="{{old('dates2')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />--}}
-{{--            <input id="dates1" name="dates1" value="{{old('dates1')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />--}}
-{{--            <button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">--}}
-{{--                Buscar--}}
-{{--            </button>--}}
-{{--        </form>--}}
+            {{-- Familia --}}
+            <div class="flex flex-col w-full">
+                <label for="family" class="text-xs text-gray-400 mb-1">Familia</label>
+                <select name="family" id="family" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                    <option value="0" {{ $selectedFamily ? '' : 'selected' }}>Familia</option>
+                    @foreach ($families as $category)
+                        <optgroup label="{{ $category->Name }}">
+                            @foreach ($category->families as $family)
+                                <option value="{{ $family->FamilyId }}" {{ $selectedFamily == $family->FamilyId ? 'selected' : '' }}>
+                                    {{ $family->Name }}
+                                </option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Depto --}}
+            <div class="flex flex-col w-full">
+                <label for="category" class="text-xs text-gray-400 mb-1">Depto</label>
+                <select name="category" id="category" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                    <option value="0" {{ $selectedCategory ? '' : 'selected' }}>Depto</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->CategoryId }}" {{ $selectedCategory == $category->CategoryId ? 'selected' : '' }}>
+                            {{ $category->Name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Preset de Fechas --}}
+            <div class="flex flex-col w-full">
+                <label for="presetSelect" class="text-xs text-gray-400 mb-1">Fechas</label>
+                <select id="presetSelect" onchange="applyDates()" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                    <option disabled selected>Fechas</option>
+                    <option value="year">Anual</option>
+                    <option value="summer">Verano</option>
+                    <option value="winter">Invierno</option>
+                    <option value="lastMonth">Mes Anterior</option>
+                    <option value="thisMonth">Este Mes</option>
+                    <option value="twoWeeks">Dos Semanas</option>
+                    <option value="week">Semana</option>
+                    <option value="sevenDays">7 días</option>
+                    <option value="yesterday">Ayer</option>
+                    <option value="today">Hoy</option>
+                </select>
+            </div>
+
+            {{-- Fechas de venta --}}
+            <div class="flex flex-col w-full">
+                <label for="sale_dates" class="text-xs text-gray-400 mb-1">Fechas de venta</label>
+                <input
+                    id="sale_dates"
+                    name="sale_dates"
+                    value="{{ old('sale_dates') }}"
+                    placeholder="Selecciona fechas"
+                    class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400"
+                />
+            </div>
+
+            {{-- Fechas de compra --}}
+            <div class="flex flex-col w-full">
+                <label for="purchase_dates" class="text-xs text-gray-400 mb-1">Fechas de compra</label>
+                <input
+                    id="purchase_dates"
+                    name="purchase_dates"
+                    value="{{ old('purchase_dates') }}"
+                    placeholder="Selecciona fechas"
+                    class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400"
+                />
+            </div>
+
+            {{-- Botón --}}
+            <div class="flex flex-col justify-end">
+                <button type="submit" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Buscar
+                </button>
+            </div>
+    </form>
+        </div>
+
     </x-titlePage>
 
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
         <div class="rounded-lg">
-
             <!-- Categories Table -->
-            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
-                <table id="categoriesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
-                    <thead>
-                    <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                        <th class="px-4 py-3">Departamento</th>
-                        <th class="px-4 py-3">Venta Periodo</th>
-                        <th class="px-4 py-3">Otra Venta</th>
-                        <th class="px-4 py-3">Venta Total</th>
-                        <th class="px-4 py-3">Descuento Periodo</th>
-                        <th class="px-4 py-3">Otro Descuento</th>
-                        <th class="px-4 py-3">Descuento Total</th>
-                        <th class="px-4 py-3">Compra Costo</th>
-                        <th class="px-4 py-3">Compra Inventario</th>
-                        <th class="px-4 py-3">V/C</th>
-                        <th class="px-4 py-3">Rend</th>
-                    </tr>
-                    </thead>
-
-                    @php
-                        //$urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates1' => $selectedDate1, 'dates2' => $selectedDate2];
-                    @endphp
-                    <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                    @foreach($categoriesData['categories'] as $category)
-                        <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 font-bold text-xl"> {{ $category['categoryname'] }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['purchaseSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['otherSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['totalSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['purchaseDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['otherDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['totalDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['purchase'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['inventory'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['purchaseVsSale'],0) }}% </td>
-                            <td class="px-4 py-3 "> {{ number_format($category['performance'],0) }}% </td>
+            @if(isset($categoriesData))
+            <div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
+                <div class="w-full overflow-x-auto rounded-lg">
+                    <table id="categoriesTable" class="w-full whitespace-no-wrap rounded-lg shadow-xs">
+                        <thead>
+                        <tr	class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                            <th class="px-4 py-3 text-center">Departamento</th>
+                            <th class="px-4 py-3 text-right">Venta Periodo</th>
+                            <th class="px-4 py-3 text-right">%</th>
+                            <th class="px-4 py-3 text-right">Otra Venta</th>
+                            <th class="px-4 py-3 text-right">%</th>
+                            <th class="px-4 py-3 text-right">Total Venta</th>
+                            <th class="px-4 py-3 text-right">Compra</th>
+                            <th class="px-4 py-3 text-right">Compra PV</th>
+                            <th class="px-4 py-3 dt-text-right">c/v</th>
+                            <th class="px-4 py-3 dt-text-right">Rend</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                    <tfoot class="dark:divide-gray-700">
-                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-                        <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPurchaseSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalOtherSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalTotalSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPurchaseDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalOtherDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalTotalDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPurchase'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalInventory'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPurchaseVsSale'],0) }}% </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPerformance'],0) }}% </td>
-                    </tr>
-                    </tfoot>
-                </table>
+                        </thead>
+
+                        @php
+                            $urlParameters = $defaultUrlParameters;
+                        @endphp
+                        <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                        @foreach($categoriesData['categories'] as $category)
+                            <tr class="text-gray-700 dark:text-gray-400">
+                                <td class="px-4 py-3 text-xl">
+                                    <a href="{{route('performance.index',array_merge($urlParameters,['category' => $category['categoryid']]))}}" class="underline" target="_blank">
+                                        {{ $category['categoryname'] }}
+                                    </a>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-xl">{{number_format($category['purchaseSale'],0) }}</span>
+                                        <span class="text-xs text-red-400">{{number_format($category['purchaseDiscount'],0) .' - '. number_format($category['purchaseDiscountRelation'])}}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3"> {{ number_format($category['purchaseSaleRelation'],0) }}% </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-xl">{{number_format($category['otherSale'],0) }}</span>
+                                        <span class="text-xs text-red-400">{{number_format($category['otherDiscount'],0) .' - '. number_format($category['otherDiscountRelation'])}}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3"> {{ number_format($category['otherSaleRelation'],0) }}% </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-xl">{{number_format($category['totalSale'],0) }}</span>
+                                        <span class="text-xs text-red-400">{{number_format($category['totalDiscount'],0) .' - '. number_format($category['totalDiscountRelation'])}}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-xl"> {{ number_format($category['purchase'],0) }} </td>
+                                <td class="px-4 py-3 text-xl"> {{ number_format($category['inventory'],0) }} </td>
+                                <td class="px-4 py-3 text-xl"> {{ number_format($category['purchaseVsSale'],0) }}% </td>
+                                <td class="px-4 py-3 text-xl"> {{ number_format($category['performance'],0) }}% </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                        <tfoot class="dark:divide-gray-700">
+                        <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                            <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl font-bold">{{number_format($categoriesData['totalPurchaseSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($categoriesData['totalPurchaseDiscount'],0) .' - '. number_format($categoriesData['totalPurchaseDiscountRelation'])}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-xl font-bold"> {{ number_format($categoriesData['totalPurchaseSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl font-bold">{{number_format($categoriesData['totalOtherSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($categoriesData['totalOtherDiscount'],0) .' - '. number_format($categoriesData['totalOtherDiscountRelation'])}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-xl font-bold"> {{ number_format($categoriesData['totalOtherSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl font-bold">{{number_format($categoriesData['totalTotalSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($categoriesData['totalTotalDiscount'],0) .' - '. number_format($categoriesData['totalTotalDiscountRelation'])}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPurchase'],0) }} </td>
+                            <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalInventory'],0) }} </td>
+                            <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPurchaseVsSale'],0) }}% </td>
+                            <td class="px-4 py-3 font-bold text-xl"> {{ number_format($categoriesData['totalPerformance'],0) }}% </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
+            @endif
             <!-- Families Table -->
+            @if(isset($familiesData))
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
                 <table id="familiesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                         <th class="px-4 py-3">Familia</th>
                         <th class="px-4 py-3">Venta Periodo</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Otra Venta</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Venta Total</th>
-                        <th class="px-4 py-3">Descuento Periodo</th>
-                        <th class="px-4 py-3">Otro Descuento</th>
-                        <th class="px-4 py-3">Descuento Total</th>
                         <th class="px-4 py-3">Compra Costo</th>
                         <th class="px-4 py-3">Compra Inventario</th>
                         <th class="px-4 py-3">V/C</th>
@@ -151,34 +243,66 @@
                     </thead>
 
                     @php
-                        //$urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates1' => $selectedDate1, 'dates2' => $selectedDate2];
+                    $urlParameters = $defaultUrlParameters;
                     @endphp
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($familiesData['families'] as $family)
                         <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 font-bold text-xl whitespace-normal break-words"> {{ $family['familyname'] }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['purchaseSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['otherSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['totalSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['purchaseDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['otherDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['totalDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['purchase'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['inventory'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['purchaseVsSale'],0) }}% </td>
-                            <td class="px-4 py-3 "> {{ number_format($family['performance'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl">
+                                <a href="{{route('performance.index',array_merge($urlParameters,['family' => $family['familyid']]))}}" class="underline" target="_blank">
+                                    {{ $family['familyname'] }}
+                                </a>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($family['purchaseSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($family['purchaseDiscount'],0) .' - '. number_format($family['purchaseDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($family['purchaseSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($family['otherSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($family['otherDiscount'],0) .' - '. number_format($family['otherDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($family['otherSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($family['totalSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($family['totalDiscount'],0) .' - '. number_format($family['totalDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($family['purchase'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($family['inventory'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($family['purchaseVsSale'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($family['performance'],0) }}% </td>
                         </tr>
                     @endforeach
                     </tbody>
                     <tfoot class="dark:divide-gray-700">
-                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-400 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalPurchaseSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalOtherSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalTotalSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalPurchaseDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalOtherDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalTotalDiscount'],0) }} </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl">{{number_format($familiesData['totalPurchaseSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($familiesData['totalPurchaseDiscount'],0) .' - '. number_format($familiesData['totalPurchaseDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($familiesData['totalPurchaseSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl">{{number_format($familiesData['totalOtherSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($familiesData['totalOtherDiscount'],0) .' - '. number_format($familiesData['totalOtherDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($familiesData['totalOtherSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl">{{number_format($familiesData['totalTotalSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($familiesData['totalTotalDiscount'],0) .' - '. number_format($familiesData['totalTotalDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalPurchase'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalInventory'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($familiesData['totalPurchaseVsSale'],0) }}% </td>
@@ -187,6 +311,9 @@
                     </tfoot>
                 </table>
             </div>
+            @endif
+
+            @if(isset($branchesData))
             <!-- Branches Table -->
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
                 <table id="branchesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
@@ -194,11 +321,10 @@
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                         <th class="px-4 py-3">Sucursal</th>
                         <th class="px-4 py-3">Venta Periodo</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Otra Venta</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Venta Total</th>
-                        <th class="px-4 py-3">Descuento Periodo</th>
-                        <th class="px-4 py-3">Otro Descuento</th>
-                        <th class="px-4 py-3">Descuento Total</th>
                         <th class="px-4 py-3">Compra Costo</th>
                         <th class="px-4 py-3">Compra Inventario</th>
                         <th class="px-4 py-3">V/C</th>
@@ -207,34 +333,68 @@
                     </thead>
 
                     @php
-                        //$urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates1' => $selectedDate1, 'dates2' => $selectedDate2];
+                        $urlParameters = $defaultUrlParameters;
                     @endphp
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($branchesData['branches'] as $branch)
                         <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 font-bold text-xl"> {{ $branch['branchname'] }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['purchaseSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['otherSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['totalSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['purchaseDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['otherDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['totalDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['purchase'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['inventory'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['purchaseVsSale'],0) }}% </td>
-                            <td class="px-4 py-3 "> {{ number_format($branch['performance'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl">
+{{--                                <a href="{{route('performance.index',$urlParameters + ['branch' => $branch['branchid']])}}" class="underline" target="_blank">--}}
+                                <a href="{{route('performance.index',array_merge($urlParameters, ['branch' => $branch['branchid']]))}}" class="underline" target="_blank">
+                                    {{ $branch['branchname'] }}
+                                </a>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($branch['purchaseSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($branch['purchaseDiscount'],0) .' - '. number_format($branch['purchaseDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($branch['purchaseSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($branch['otherSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($branch['otherDiscount'],0) .' - '. number_format($branch['purchaseDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($branch['otherSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($branch['totalSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($branch['totalDiscount'],0) .' - '. number_format($branch['purchaseDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($branch['purchase'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($branch['inventory'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($branch['purchaseVsSale'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($branch['performance'],0) }}% </td>
                         </tr>
                     @endforeach
                     </tbody>
                     <tfoot class="dark:divide-gray-700">
-                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                    <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-400 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalPurchaseSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalOtherSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalTotalSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalPurchaseDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalOtherDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalTotalDiscount'],0) }} </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl font-bold">{{number_format($branchesData['totalPurchaseSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($branchesData['totalPurchaseDiscount'],0) .' - '. number_format($branchesData['totalPurchaseDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($branchesData['totalPurchaseSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl font-bold">{{number_format($branchesData['totalOtherSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($branchesData['totalOtherDiscount'],0) .' - '. number_format($branchesData['totalOtherDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($branchesData['totalOtherSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl font-bold">{{number_format($branchesData['totalTotalSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($branchesData['totalTotalDiscount'],0) .' - '. number_format($branchesData['totalTotalDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalPurchase'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalInventory'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($branchesData['totalPurchaseVsSale'],0) }}% </td>
@@ -243,7 +403,9 @@
                     </tfoot>
                 </table>
             </div>
+            @endif
             <!-- Results Table -->
+            @if(isset($resultsData))
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
                 <table id="resultsTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
@@ -251,11 +413,10 @@
                         <th class="px-4 py-3">Familia</th>
                         <th class="px-4 py-3">Sucursal</th>
                         <th class="px-4 py-3">Venta Periodo</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Otra Venta</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Venta Total</th>
-{{--                        <th class="px-4 py-3">Descuento Periodo</th>--}}
-{{--                        <th class="px-4 py-3">Otro Descuento</th>--}}
-{{--                        <th class="px-4 py-3">Descuento Total</th>--}}
                         <th class="px-4 py-3">Compra Costo</th>
                         <th class="px-4 py-3">Compra Inventario</th>
                         <th class="px-4 py-3">C/V</th>
@@ -269,18 +430,40 @@
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($resultsData['results'] as $row)
                         <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 font-bold text-xl whitespace-normal break-words"> {{ $row['familyname'] }} </td>
-                            <td class="px-4 py-3 font-bold text-xl whitespace-normal break-words"> {{ $row['branchname'] }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($row['purchaseSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($row['otherSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($row['totalSale'],0) }} </td>
-{{--                            <td class="px-4 py-3 "> {{ number_format($row['purchaseDiscount'],0) }} </td>--}}
-{{--                            <td class="px-4 py-3 "> {{ number_format($row['otherDiscount'],0) }} </td>--}}
-{{--                            <td class="px-4 py-3 "> {{ number_format($row['totalDiscount'],0) }} </td>--}}
-                            <td class="px-4 py-3 "> {{ number_format($row['purchase'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($row['inventory'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($row['purchaseVsSale'],0) }}% </td>
-                            <td class="px-4 py-3 "> {{ number_format($row['performance'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl">
+                                <a href="{{route('performance.index',array_merge($urlParameters,['family' => $row['familyid']]))}}" class="underline" target="_blank">
+                                    {{ $row['familyname'] }}
+                                </a>
+                            </td>
+                            <td class="px-4 py-3 text-xl">
+                                <a href="{{route('performance.index',array_merge($urlParameters,['branch' => $row['branchid']]))}}" class="underline" target="_blank">
+                                    {{ $row['branchname'] }}
+                                </a>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($row['purchaseSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($row['purchaseDiscount'],0) .' - '. number_format($row['purchaseDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($row['purchaseSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($row['otherSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($row['otherDiscount'],0) .' - '. number_format($row['otherDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($row['otherSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($row['totalSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($row['totalDiscount'],0) .' - '. number_format($row['totalDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($row['purchase'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($row['inventory'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($row['purchaseVsSale'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($row['performance'],0) }}% </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -288,12 +471,26 @@
                     <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ '' }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalPurchaseSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalOtherSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalTotalSale'],0) }} </td>
-{{--                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalPurchaseDiscount'],0) }} </td>--}}
-{{--                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalOtherDiscount'],0) }} </td>--}}
-{{--                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalTotalDiscount'],0) }} </td>--}}
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl font-bold">{{number_format($resultsData['totalPurchaseSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($resultsData['totalPurchaseDiscount'],0) .' - '. number_format($resultsData['totalPurchaseDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($resultsData['totalPurchaseSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl font-bold">{{number_format($resultsData['totalOtherSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($resultsData['totalOtherDiscount'],0) .' - '. number_format($resultsData['totalOtherDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($resultsData['totalOtherSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl font-bold">{{number_format($resultsData['totalTotalSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($resultsData['totalTotalDiscount'],0) .' - '. number_format($resultsData['totalTotalDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalPurchase'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalInventory'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($resultsData['totalPurchaseVsSale'],0) }}% </td>
@@ -302,19 +499,19 @@
                     </tfoot>
                 </table>
             </div>
-
+            @endif
             <!-- Suppliers Table -->
+            @if(isset($suppliersData))
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
                 <table id="suppliersTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                         <th class="px-4 py-3">Proveedor</th>
                         <th class="px-4 py-3">Venta Periodo</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Otra Venta</th>
+                        <th class="px-4 py-3">%</th>
                         <th class="px-4 py-3">Venta Total</th>
-                        <th class="px-4 py-3">Descuento Periodo</th>
-                        <th class="px-4 py-3">Otro Descuento</th>
-                        <th class="px-4 py-3">Descuento Total</th>
                         <th class="px-4 py-3">Compra Costo</th>
                         <th class="px-4 py-3">Compra Inventario</th>
                         <th class="px-4 py-3">C/V</th>
@@ -328,29 +525,61 @@
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                     @foreach($suppliersData['suppliers'] as $supplier)
                         <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 font-bold text-xl whitespace-normal break-words"> {{ $supplier['suppliername'] }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['purchaseSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['otherSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['totalSale'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['purchaseDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['otherDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['totalDiscount'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['purchase'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['inventory'],0) }} </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['purchaseVsSale'],0) }}% </td>
-                            <td class="px-4 py-3 "> {{ number_format($supplier['performance'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl">
+                                <a href="{{route('performance.index',array_merge($urlParameters,['supplier' => $supplier['suppliername']]))}}" class="underline" target="_blank">
+                                    {{ $supplier['suppliername'] }}
+                                </a>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($supplier['purchaseSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($supplier['purchaseDiscount'],0) .' - '. number_format($supplier['purchaseDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($supplier['purchaseSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($supplier['otherSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($supplier['otherDiscount'],0) .' - '. number_format($supplier['otherDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3"> {{ number_format($supplier['otherSaleRelation'],0) }}% </td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xl">{{number_format($supplier['totalSale'],0) }}</span>
+                                    <span class="text-xs text-red-400">{{number_format($supplier['totalDiscount'],0) .' - '. number_format($supplier['totalDiscountRelation'],0)}}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($supplier['purchase'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($supplier['inventory'],0) }} </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($supplier['purchaseVsSale'],0) }}% </td>
+                            <td class="px-4 py-3 text-xl"> {{ number_format($supplier['performance'],0) }}% </td>
                         </tr>
                     @endforeach
                     </tbody>
                     <tfoot class="dark:divide-gray-700">
                     <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalPurchaseSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalOtherSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalTotalSale'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalPurchaseDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalOtherDiscount'],0) }} </td>
-                        <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalTotalDiscount'],0) }} </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl">{{number_format($suppliersData['totalPurchaseSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($suppliersData['totalPurchaseDiscount'],0) .' - '. number_format($suppliersData['totalPurchaseDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($suppliersData['totalPurchaseSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl">{{number_format($suppliersData['totalOtherSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($suppliersData['totalOtherDiscount'],0) .' - '. number_format($suppliersData['totalOtherDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-xl"> {{ number_format($suppliersData['totalOtherSaleRelation'],0) }}% </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col items-end">
+                                <span class="text-xl">{{number_format($suppliersData['totalTotalSale'],0) }}</span>
+                                <span class="text-xs text-red-400">{{number_format($suppliersData['totalTotalDiscount'],0) .' - '. number_format($suppliersData['totalTotalDiscountRelation'],0)}}%</span>
+                            </div>
+                        </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalPurchase'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalInventory'],0) }} </td>
                         <td class="px-4 py-3 font-bold text-xl"> {{ number_format($suppliersData['totalPurchaseVsSale'],0) }}% </td>
@@ -359,12 +588,10 @@
                     </tfoot>
                 </table>
             </div>
-
+            @endif
 
         </div>
     </div>
-
-
 
 </x-layout>
 
@@ -374,96 +601,81 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-{{--        const datesInput1 = document.getElementById('dates1');--}}
-{{--        const flatpickr1 = flatpickr(datesInput1, {--}}
-{{--            // plugins: [new rangePlugin({ input: endInput })],--}}
-{{--            dateFormat: "Y-m-d",--}}
-{{--            mode: "range",--}}
-{{--            altInput: true,--}}
-{{--            altFormat: "d M y",--}}
-{{--            locale: {firstDayOfWeek: 1},--}}
-{{--            onReady: function(selectedDates1, dateStr, instance) {--}}
-{{--                // Establecer el valor si ya existe uno seleccionado en la base de datos--}}
-{{--                const selectedDate1 = "{{ $selectedDate1 }}"; // Recoges esto desde el backend--}}
-{{--                if (selectedDate1) {--}}
-{{--                    instance.setDate(selectedDate1);--}}
-{{--                }--}}
-{{--            },--}}
-{{--        });--}}
-{{--        const datesInput2 = document.getElementById('dates2');--}}
-{{--        const flatpickr2 = flatpickr(datesInput2, {--}}
-{{--            // plugins: [new rangePlugin({ input: endInput })],--}}
-{{--            dateFormat: "Y-m-d",--}}
-{{--            mode: "range",--}}
-{{--            altInput: true,--}}
-{{--            altFormat: "d M y",--}}
-{{--            locale: {firstDayOfWeek: 1},--}}
-{{--            onReady: function(selectedDates2, dateStr, instance) {--}}
-{{--                // Establecer el valor si ya existe uno seleccionado en la base de datos--}}
-{{--                const selectedDate2 = "{{ $selectedDate2 }}"; // Recoges esto desde el backend--}}
-{{--                if (selectedDate2) {--}}
-{{--                    instance.setDate(selectedDate2);--}}
-{{--                }--}}
-{{--            },--}}
-{{--        });--}}
+        const saleDatesInput = document.getElementById('sale_dates');
+        const flatpickr1 = flatpickr(saleDatesInput, {
+            // plugins: [new rangePlugin({ input: endInput })],
+            dateFormat: "Y-m-d",
+            mode: "range",
+            altInput: true,
+            altFormat: "d M y",
+            locale: {firstDayOfWeek: 1},
+            onReady: function(selectedDates1, dateStr, instance) {
+                // Establecer el valor si ya existe uno seleccionado en la base de datos
+                const selectedSaleDates = "{{ $selectedSaleDates }}"; // Recoges esto desde el backend
+                if (selectedSaleDates) {
+                    instance.setDate(selectedSaleDates);
+                }
+            },
+        });
+        const purchaseDatesInput = document.getElementById('purchase_dates');
+        const flatpickr2 = flatpickr(purchaseDatesInput, {
+            // plugins: [new rangePlugin({ input: endInput })],
+            dateFormat: "Y-m-d",
+            mode: "range",
+            altInput: true,
+            altFormat: "d M y",
+            locale: {firstDayOfWeek: 1},
+            onReady: function(selectedDates2, dateStr, instance) {
+                // Establecer el valor si ya existe uno seleccionado en la base de datos
+                const selectedPurchaseDates = "{{ $selectedPurchaseDates }}"; // Recoges esto desde el backend
+                if (selectedPurchaseDates) {
+                    instance.setDate(selectedPurchaseDates);
+                }
+            },
+        });
+        // Recoge todas las fechas desde Blade en una sola variable
+        const predefinedDates = @json($dates);
 
+        // Mapeo de cada opción del select a los pares de fecha a aplicar
+        const thisYeardatePresets = {
+            today: [predefinedDates.today, predefinedDates.today],
+            yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],
+            thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],
+            lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],
+            week: [predefinedDates.initialWeekday, predefinedDates.yesterday],
+            sevenDays: [predefinedDates.initialSevenDays, predefinedDates.finalSevenDays],
+            twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],
+            year: [predefinedDates.initialYear, predefinedDates.yesterday],
+            winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],
+            summer: [predefinedDates.initialYear, predefinedDates.finalSummer],
+        };
 
+        const applyDates = () => {
+            const selectedValue = document.getElementById("presetSelect").value;
+            const saleDates = thisYeardatePresets[selectedValue];
+            const purchaseDates = thisYeardatePresets[selectedValue];
 
-{{--        // Recoge todas las fechas desde Blade en una sola variable--}}
-{{--        const predefinedDates = @json($dates);--}}
-
-{{--        // Mapeo de cada opción del select a los pares de fecha a aplicar--}}
-{{--        const thisYeardatePresets = {--}}
-{{--            today: [predefinedDates.today, predefinedDates.today],--}}
-{{--            yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],--}}
-{{--            thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],--}}
-{{--            lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],--}}
-{{--            week: [predefinedDates.initialWeekday, predefinedDates.yesterday],--}}
-{{--            sevenDays: [predefinedDates.initialSevenDays, predefinedDates.finalSevenDays],--}}
-{{--            twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],--}}
-{{--            year: [predefinedDates.initialYear, predefinedDates.yesterday],--}}
-{{--            winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],--}}
-{{--            summer: [predefinedDates.initialYear, predefinedDates.finalSummer],--}}
-{{--        };--}}
-{{--        const lastYeardatePresets = {--}}
-{{--            today: [predefinedDates.todaySameWeekdayLastYear, predefinedDates.todaySameWeekdayLastYear],--}}
-{{--            yesterday: [predefinedDates.sameWeekdayLastYear, predefinedDates.sameWeekdayLastYear],--}}
-{{--            thisMonth: [predefinedDates.thisMonthInitialLastYear, predefinedDates.yesterdayLastYear],--}}
-{{--            lastMonth: [predefinedDates.lastMonthInitialLastYear, predefinedDates.lastMonthEndLastYear],--}}
-{{--            week: [predefinedDates.initialWeekdayLastYear, predefinedDates.finalWeekdayLastYear],--}}
-{{--            sevenDays: [predefinedDates.initialSevenDaysLastYear, predefinedDates.finalSevenDaysLastYear],--}}
-{{--            twoWeeks: [predefinedDates.initialTwoWeeksLastYear, predefinedDates.finalTwoWeeksLastYear],--}}
-{{--            year: [predefinedDates.initialLastYear, predefinedDates.finalLastYear],--}}
-{{--            summer: [predefinedDates.initialLastYear, predefinedDates.finalSummerLastYear],--}}
-{{--            winter: [predefinedDates.initialWinterLastYear, predefinedDates.finalWinterLastYear],--}}
-{{--        };--}}
-
-{{--        const applyDates = () => {--}}
-{{--            const selectedValue = document.getElementById("presetSelect").value;--}}
-{{--            const firstDates = thisYeardatePresets[selectedValue];--}}
-{{--            const secondDates = lastYeardatePresets[selectedValue];--}}
-
-{{--            if(firstDates && secondDates){--}}
-{{--                flatpickr2.setDate(firstDates);--}}
-{{--                flatpickr1.setDate(secondDates);--}}
-{{--            }--}}
-{{--        }--}}
-{{--        // Registrar la función en el ámbito global--}}
-{{--        window.applyDates = applyDates;--}}
+            if(saleDates && purchaseDates){
+                flatpickr2.setDate(saleDates);
+                flatpickr1.setDate(purchaseDates);
+            }
+        }
+        // Registrar la función en el ámbito global
+        window.applyDates = applyDates;
 
         $('#categoriesTable').DataTable({
             paging:false,
             searching: false,
             info: false,
             "lenghtChange": false,
-            "order": [[10, "desc"]],
+            "order": [[9, "desc"]],
         });
         $('#familiesTable').DataTable({
             paging:true,
             searching: false,
             info: false,
             "lenghtChange": false,
-            "order": [[10, "desc"]],
+            "order": [[9, "desc"]],
         });
         $('#resultsTable').DataTable({
             paging:true,
@@ -474,31 +686,19 @@
         });
         $('#branchesTable').DataTable({
             dom: 't',
-            paging:true,
+            paging:false,
             searching: false,
             info: false,
             "lenghtChange": false,
-            "order": [[10, "desc"]],
+            "order": [[9, "desc"]],
         });
         $('#suppliersTable').DataTable({
             paging:true,
             searching: false,
             info: false,
             "lenghtChange": false,
-            "order": [[10, "desc"]],
+            "order": [[9, "desc"]],
         });
-{{--        $('#suppliersTable').DataTable({--}}
-{{--            // dom: 't',--}}
-{{--            paging:true,--}}
-{{--            searching: false,--}}
-{{--            info: false,--}}
-{{--            // language: {--}}
-{{--            //     url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json"--}}
-{{--            // },--}}
-{{--            "lenghtChange": false,--}}
-{{--            "order": [[1, "desc"]],--}}
-{{--        });--}}
-
     });
 </script>
 
@@ -568,5 +768,8 @@
     }
     .dt-text-left {
         text-align: left !important;
+    }
+    th.text-right {
+        text-align: right !important;
     }
 </style>
