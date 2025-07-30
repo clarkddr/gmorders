@@ -150,7 +150,7 @@ class DateHelper
                     'final' => $dates['finalWeekdayLastYear']
                 ]
             ],
-/*            'twentyEightDays' => [
+            'twentyEightDays' => [
                 'title' => '28 dias',
                 'thisYear' => [
                     'initial' => $dates['initialFourWeeks'],
@@ -160,7 +160,7 @@ class DateHelper
                     'initial' => $dates['initialFourWeeksLastYear'],
                     'final' => $dates['finalFourWeeksLastYear']
                 ]
-            ],*/
+            ],
             'twentyOneDays' => [
                 'title' => '21 dias',
                 'thisYear' => [
