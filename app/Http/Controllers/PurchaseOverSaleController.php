@@ -8,13 +8,15 @@ use Carbon\Carbon;
 use App\Models\Category;
 use App\Models\Family;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\DateHelper;
 
 class PurchaseOverSaleController extends Controller
 {
     public function index(Request $request)
-    {        
+    {
+        $dates = DateHelper::getDefaultDateRanges();
         $data = [
-            'selectedDate' => '',
+            'selectedDate1' => '',
             'vars' => [
                 'min' => 30,
                 'max' => 50,
@@ -22,19 +24,19 @@ class PurchaseOverSaleController extends Controller
                 'goal' => 40
             ],
             'categories' => collect([]),
+            'dates' => $dates,
         ];
-        
+
         if($request->all() != []){
             $categoryList = collect(Category::with('families')->whereIn('CategoryId',[1,4,12])->get());
-
             $request->validate([
-            'dates' => ['required'],
+            'dates1' => ['required'],
             'min' => ['required'],
             'max' => ['required'],
             'tc' => ['required'],
             'goal' => ['required'],
-            ]);            
-            $inputDates = $request->input('dates');                  
+            ]);
+            $inputDates = $request->input('dates1');
             if($inputDates != '' && $inputDates != 0){
                 $dates = array_map('trim', explode('to', $inputDates));
                 if(count($dates) == 1){
@@ -51,7 +53,7 @@ class PurchaseOverSaleController extends Controller
 
             $query = "EXEC dbo.DRFamiliesPurchaseOverSale @From = '{$date1}', @To = '{$date2}'";
             $queryResults = DB::connection('mssql')->selectResultSets($query);
-            
+
             // Resultados de Ventas
             $saleResults = collect($queryResults[0]);
             // Totalizados de Ventas
@@ -59,8 +61,8 @@ class PurchaseOverSaleController extends Controller
             // Resultado de compras
             $purchaseResults = collect($queryResults[1]);
             //Totalizado de Compras
-            $purchaseTotalResults = collect($queryResults[3]); 
-            
+            $purchaseTotalResults = collect($queryResults[3]);
+
             // Sacamos el gran total
             $grandTotalSale = $saleTotalResults->sum('Sale') ?? 0;
             $grandTotalPurchaseCost = $purchaseTotalResults->sum('PurchaseCost') ?? 0;
@@ -74,12 +76,12 @@ class PurchaseOverSaleController extends Controller
                'relation' => number_format($grandTotalRelation,0),
                'toPurchaseDlls' => number_format($grandTotalToPurchaseDlls,0),
             ]);
-            
-            
 
-            
-            $familyListWithData = $categoryList->map(function ($category) use ($vars, $saleResults, $saleTotalResults, $purchaseResults, $purchaseTotalResults) {                
-                $categoryPurchaseCost = $purchaseTotalResults->where('CategoryId', $category->CategoryId)->first()->PurchaseCost ?? 0;                
+
+
+
+            $familyListWithData = $categoryList->map(function ($category) use ($vars, $saleResults, $saleTotalResults, $purchaseResults, $purchaseTotalResults) {
+                $categoryPurchaseCost = $purchaseTotalResults->where('CategoryId', $category->CategoryId)->first()->PurchaseCost ?? 0;
                 $categoryPurchaseSale = $purchaseTotalResults->where('CategoryId', $category->CategoryId)->first()->PurchaseSale ?? 0;
                 $categorySale = $saleTotalResults->where('CategoryId', $category->CategoryId)->first()->Sale ?? 0;
                 $categoryTC = $purchaseTotalResults->where('CategoryId', $category->CategoryId)->first()->TC ?? 0;
@@ -116,16 +118,17 @@ class PurchaseOverSaleController extends Controller
                             'toPurchaseDlls' => number_format($familyToPurchaseDlls,0),
                         ]);
                     })
-                    
-                ]);             
+
+                ]);
             });
             $data = [
-                'selectedDate' => $inputDates,
+                'selectedDate1' => $inputDates,
                 'categories' => $familyListWithData,
                 'vars' => $vars,
                 'grandTotal' => $grandTotal,
+                'dates' => $dates
             ];
-        
+
         }
         // dd($familyListWithData);
         return view('purchaseoversale.index',$data);
@@ -148,9 +151,9 @@ class PurchaseOverSaleController extends Controller
 
         if($request->all() != []){
             $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
-            
-            
-            $inputDates = $request->input('dates');                  
+
+
+            $inputDates = $request->input('dates');
             if($inputDates != '' && $inputDates != 0){
                 $dates = array_map('trim', explode('to', $inputDates));
                 if(count($dates) == 1){
@@ -170,7 +173,7 @@ class PurchaseOverSaleController extends Controller
 
             $saleResults = collect($queryResults[0]);
             $purchaseResults = collect($queryResults[1]);
-           
+
 
             // Se sacan los totales de cada tabla
             $totalSale = $saleResults->sum('Sale') ?? 0;
@@ -179,7 +182,7 @@ class PurchaseOverSaleController extends Controller
             $totalRelation = $totalSale != 0 ? ($totalPurchaseCost / $totalSale * 100) : 0;
             $totalTC = $purchaseResults->average('TC') ?? 18.00;
             $totalToPurchaseDlls = (($totalSale * $vars['goal'] / 100) - $totalPurchaseCost) / $vars['tc'];
-            $family =  collect([                
+            $family =  collect([
                 'familyId' => $family->FamilyId,
                 'name' => $family->Name,
                 'sale' => number_format($totalSale,0),
@@ -188,10 +191,10 @@ class PurchaseOverSaleController extends Controller
                 'relation' => number_format($totalRelation,0),
                 'tc' => number_format($totalTC,2),
                 'toPurchaseDlls' => number_format($totalToPurchaseDlls,0),
-            ]);  
+            ]);
 
             $branchListWithData = $branches->map(function ($branch) use ($vars, $saleResults, $purchaseResults) {
-                $branchSale = $saleResults->firstWhere('BranchId', $branch->BranchId)->Sale ?? 0;                
+                $branchSale = $saleResults->firstWhere('BranchId', $branch->BranchId)->Sale ?? 0;
                 $branchPurchaseCost = $purchaseResults->firstWhere('BranchId', $branch->BranchId)->PurchaseCost ?? 0;
                 $branchPurchaseSale = $purchaseResults->firstWhere('BranchId', $branch->BranchId)->PurchaseSale ?? 0;
                 $branchRelation = $branchSale != 0 ? ($branchPurchaseCost / $branchSale * 100) : 0;

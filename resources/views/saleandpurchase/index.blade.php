@@ -53,19 +53,9 @@
             </select>
             <select id="presetSelect" onchange="applyDates()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                 <option disabled selected>Fechas</option>
-                <option value="year">Anual</option>
-                <option value="summer">Verano</option>
-                <option value="winter">Invierno</option>
-                <option value="lastMonth">Mes Anterior</option>
-                <option value="thisMonth">Este Mes</option>
-                <option value="twoWeeks">Dos Semanas</option>
-                <option value="week">Semana</option>
-                <option value="sevenDays">7 dias</option>
-                <option value="yesterday">Ayer</option>
-                <option value="today">Hoy</option>
             </select>
-			<input id="dates2" name="dates2" value="{{old('dates2')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
 			<input id="dates1" name="dates1" value="{{old('dates1')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
+			<input id="dates2" name="dates2" value="{{old('dates2')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
 			<button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
 				Buscar
 			</button>
@@ -264,87 +254,15 @@
 
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
 <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
+<script src="{{ asset('js/dateRanges.js') }}"></script>
+<script> // Definimos las variables que pasaremos al script de DateRanges
+        window.selectedDate1 = @json($selectedDate1);
+        window.selectedDate2 = @json($selectedDate2);
+    window.dates = @json($dates)
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
-	const datesInput1 = document.getElementById('dates1');
-	const flatpickr1 = flatpickr(datesInput1, {
-		// plugins: [new rangePlugin({ input: endInput })],
-		dateFormat: "Y-m-d",
-		mode: "range",
-        altInput: true,
-        altFormat: "d M y",
-        locale: {firstDayOfWeek: 1},
-		onReady: function(selectedDates1, dateStr, instance) {
-			// Establecer el valor si ya existe uno seleccionado en la base de datos
-			const selectedDate1 = "{{ $selectedDate1 }}"; // Recoges esto desde el backend
-			if (selectedDate1) {
-				instance.setDate(selectedDate1);
-			}
-		},
-	});
-	const datesInput2 = document.getElementById('dates2');
-	const flatpickr2 = flatpickr(datesInput2, {
-		// plugins: [new rangePlugin({ input: endInput })],
-		dateFormat: "Y-m-d",
-		mode: "range",
-        altInput: true,
-        altFormat: "d M y",
-        locale: {firstDayOfWeek: 1},
-        onReady: function(selectedDates2, dateStr, instance) {
-            // Establecer el valor si ya existe uno seleccionado en la base de datos
-            const selectedDate2 = "{{ $selectedDate2 }}"; // Recoges esto desde el backend
-            if (selectedDate2) {
-                instance.setDate(selectedDate2);
-            }
-        },
-	});
-
-
-
-    // Recoge todas las fechas desde Blade en una sola variable
-    const predefinedDates = @json($dates);
-
-    // Mapeo de cada opción del select a los pares de fecha a aplicar
-    const thisYeardatePresets = {
-        today: [predefinedDates.today, predefinedDates.today],
-        yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],
-        thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],
-        lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],
-        week: [predefinedDates.initialWeekday, predefinedDates.yesterday],
-        sevenDays: [predefinedDates.initialSevenDays, predefinedDates.finalSevenDays],
-        twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],
-        year: [predefinedDates.initialYear, predefinedDates.yesterday],
-        winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],
-        summer: [predefinedDates.initialYear, predefinedDates.finalSummer],
-    };
-    const lastYeardatePresets = {
-        today: [predefinedDates.todaySameWeekdayLastYear, predefinedDates.todaySameWeekdayLastYear],
-        yesterday: [predefinedDates.sameWeekdayLastYear, predefinedDates.sameWeekdayLastYear],
-        thisMonth: [predefinedDates.thisMonthInitialLastYear, predefinedDates.yesterdayLastYear],
-        lastMonth: [predefinedDates.lastMonthInitialLastYear, predefinedDates.lastMonthEndLastYear],
-        week: [predefinedDates.initialWeekdayLastYear, predefinedDates.finalWeekdayLastYear],
-        sevenDays: [predefinedDates.initialSevenDaysLastYear, predefinedDates.finalSevenDaysLastYear],
-        twoWeeks: [predefinedDates.initialTwoWeeksLastYear, predefinedDates.finalTwoWeeksLastYear],
-        year: [predefinedDates.initialLastYear, predefinedDates.finalLastYear],
-        summer: [predefinedDates.initialLastYear, predefinedDates.finalSummerLastYear],
-        winter: [predefinedDates.initialWinterLastYear, predefinedDates.finalWinterLastYear],
-    };
-
-    const applyDates = () => {
-        const selectedValue = document.getElementById("presetSelect").value;
-        const firstDates = thisYeardatePresets[selectedValue];
-        const secondDates = lastYeardatePresets[selectedValue];
-
-        if(firstDates && secondDates){
-            flatpickr2.setDate(firstDates);
-            flatpickr1.setDate(secondDates);
-        }
-    }
-    // Registrar la función en el ámbito global
-    window.applyDates = applyDates;
-
 	$('#familiesTable').DataTable({
         paging:true,
         searching: false,
@@ -374,13 +292,8 @@ document.addEventListener('DOMContentLoaded', function () {
         "lenghtChange": false,
         "order": [[1, "desc"]],
 	});
-
 });
 </script>
-
-
-
-
 <style>
 
     form {

@@ -30,7 +30,10 @@
 					   bg-gray-100 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" />
 			</div>
 			<div class="flex items-center space-x-2">
-				<input id="dates" name="dates" value="{{old('dates')}}" class="bg-gray-100 block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
+                <select id="presetSelect" onchange="applyDates()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                    <option disabled selected>Fechas</option>
+                </select>
+				<input id="dates1" name="dates1" value="{{old('dates1')}}" class="bg-gray-100 block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
 			</div>
 			<button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-blue focus:shadow-outline-blue">
 				Buscar
@@ -141,7 +144,7 @@
 					@foreach ( $category['families'] as $family)
 					<tr class="text-gray-700 dark:text-gray-400">
 						<td class="px-4 py-3">
-							<a href="{{route('purchaseoversale.show',[$family['familyId'],'goal'=>$vars['goal'], 'tc'=>$vars['tc'], 'max'=>$vars['max'], 'min'=>$vars['min'], 'dates'=>$selectedDate])}}" class="text-blue-600 hover:underline">
+							<a href="{{route('purchaseoversale.show',[$family['familyId'],'goal'=>$vars['goal'], 'tc'=>$vars['tc'], 'max'=>$vars['max'], 'min'=>$vars['min'], 'dates'=>$selectedDate1])}}" class="text-blue-600 hover:underline">
 								{{$family['name']}}
 							</a>
 						</td>
@@ -185,42 +188,33 @@
 
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
 <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
-
-
-
-<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const datesInput = document.getElementById('dates');
-		flatpickr(datesInput, {
-			dateFormat: "Y-m-d",
-			mode: "range",
-			onReady: function(selectedDates, dateStr, instance) {
-				const selectedDate = "{{ $selectedDate }}"; // Recoges esto desde el backend
-				if (selectedDate) {
-					instance.setDate(selectedDate);
-				}
-			},
-		});
-		const tables = document.querySelectorAll('table');
-		tables.forEach(table => {
-			const tableId = table.id;
-			$(`#${tableId}`).DataTable({
-				dom: 't',
-				paging:false,
-				searching: false,
-				info: false,
-				lenghtChange: false,
-				"order": [[]],
-				"columnDefs": [{
-					//"targets": 3, "orderable": false,
-				}]
-			});
-		});
-	});
+<script src="{{ asset('js/dateRanges.js') }}"></script>
+<script> // Definimos las variables que pasaremos al script de DateRanges
+    window.selectedDate1 = @json($selectedDate1);
+    window.dates = @json($dates);
 </script>
+
+
+<script>
+    const tables = document.querySelectorAll('table');
+    tables.forEach(table => {
+        const tableId = table.id;
+        $(`#${tableId}`).DataTable({
+            dom: 't',
+            paging:false,
+            searching: false,
+            info: false,
+            lenghtChange: false,
+            "order": [[]],
+            "columnDefs": [{
+                //"targets": 3, "orderable": false,
+            }]
+        });
+    });
+</script>
+
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
-
 
 		chartData = @json($categories);
 		const annotationValue = @json($vars['goal']);

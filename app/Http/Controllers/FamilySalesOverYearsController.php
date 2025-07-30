@@ -18,7 +18,7 @@ class FamilySalesOverYearsController extends Controller
         // Fechas preestablecidas
         $dates = DateHelper::getDefaultDateRanges();
         $data = [
-            'selectedDate' => '',
+            'selectedDate1' => '',
             'selectedCategory' => 0,
             'categories' => $categories,
             'amounts' => [],
@@ -32,11 +32,11 @@ class FamilySalesOverYearsController extends Controller
         if ($request->all() != []) {
 
             $request->validate([
-                'dates' => ['required'],
+                'dates1' => ['required'],
                 'category' => ['required', 'not_in:Departamento'],
             ]);
             $inputCategory = $request->input('category');
-            $inputDates = $request->input('dates');
+            $inputDates = $request->input('dates1');
 
             $category = Category::findOrFail($inputCategory);
 
@@ -121,7 +121,7 @@ class FamilySalesOverYearsController extends Controller
                 ]);
             });
             $data = [
-                'selectedDate' => $request->input('dates'),
+                'selectedDate1' => $request->input('dates'),
                 'dates' => $dates,
                 'selectedCategory' => $category,
                 'categories' => $categories,

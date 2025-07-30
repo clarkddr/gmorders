@@ -37,8 +37,8 @@ class PerformanceController extends Controller
             'selectedBranch' => 0,
             'selectedFamily' => 0,
             'selectedCategory' => 0,
-            'selectedSaleDates' => '',
-            'selectedPurchaseDates' => '',
+            'selectedDate1' => '',
+            'selectedDate2' => '',
         ];
 
         if ($request->all() == []) {
@@ -49,12 +49,12 @@ class PerformanceController extends Controller
         $branchid = $request->input('branch');
         $familyid = $request->input('family');
         $supplierid = $request->input('supplier');
-        $inputSaleDates = $request->input('sale_dates');
-        $inputPurchaseDates = $request->input('purchase_dates');
+        $inputSaleDates = $request->input('dates1');
+        $inputPurchaseDates = $request->input('dates2');
 
         $request->validate([
-            'sale_dates' => 'required',
-            'purchase_dates' => 'required',
+            'dates1' => 'required',
+            'dates2' => 'required',
         ]);
 
         [$salesDatesFrom, $salesDatesTo] = DateHelper::parseDateRange($inputSaleDates);
@@ -90,8 +90,8 @@ class PerformanceController extends Controller
             'selectedBranch' => $branchid,
             'selectedFamily' => $familyid,
             'selectedCategory' => $categoryid,
-            'selectedSaleDates' => $inputSaleDates,
-            'selectedPurchaseDates' => $inputPurchaseDates,
+            'selectedDate1' => $inputSaleDates,
+            'selectedDate2' => $inputPurchaseDates,
         ];
 
         $data = array_merge($data, $dataExtra);

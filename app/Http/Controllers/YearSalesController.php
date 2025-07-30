@@ -30,7 +30,7 @@ class YearSalesController extends Controller
                 'selectedBranch' => 0,
                 'selectedFamily' => 0,
                 'selectedCategory' => 0,
-                'selectedDate' => '',
+                'selectedDate1' => '',
                 'dates' => $dates,
             ];
             return view('yearsales.index',$data);
@@ -38,14 +38,14 @@ class YearSalesController extends Controller
 
         // Validar datos
         $request->validate([
-            'dates' => ['required'],
+            'dates1' => ['required'],
             'category' => ['required'],
         ]);
 
         $inputCategory = $request->input('category');
         $inputBranch = $request->input('branch');
         $inputFamily = $request->input('family');
-        $inputDates = $request->input('dates');
+        $inputDates = $request->input('dates1');
 
         // Pasar fechas con el helper para descomponerlas en caso de que sean rango
         [$fromDate, $toDate] = DateHelper::parseDateRange($inputDates);
@@ -87,7 +87,7 @@ class YearSalesController extends Controller
             'selectedBranch' => $branchid,
             'selectedFamily' => $familyid,
             'selectedCategory' => $inputCategory,
-            'selectedDate' => $inputDates,
+            'selectedDate1' => $inputDates,
             'dates' => $dates,
         ];
 

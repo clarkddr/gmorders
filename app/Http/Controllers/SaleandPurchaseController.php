@@ -23,6 +23,7 @@ class SaleandPurchaseController extends Controller
         // 29May-11Jun 2025 vs 30May-12Jun 2024
         $dates = DateHelper::getDefaultDateRanges();
 
+
         $data = [
             'selectedDate1' => '',
             'selectedDate2' => '',
@@ -67,23 +68,18 @@ class SaleandPurchaseController extends Controller
 
 
             // Validación adicional
-            if ($fromDate1 >= $fromDate2) {
+            if ($fromDate2 >= $fromDate1) {
                 return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
             }
 
-            //    if ($toDate1 >= $toDate2) {
-            //        return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
-            //    }
-            if ($toDate1 >= $fromDate2) {
+            if ($toDate2 >= $fromDate1) {
                 return redirect()->back()->withErrors(['dates1' => 'La fecha del primer rango debe ser anterior a la fecha del segundo rango.'])->withInput();
             }
-
-//            dd([$fromDate1,$toDate2]);
 
 
             $query = "
-            EXEC dbo.DRGetFamilySalesPurchasesTwoDates2 @From = '{$fromDate1}', @to1 = '{$toDate1}',
-                @From2 = '{$fromDate2}', @To = '{$toDate2}',
+            EXEC dbo.DRGetFamilySalesPurchasesTwoDates2 @From = '{$fromDate2}', @to1 = '{$toDate2}',
+                @From2 = '{$fromDate1}', @To = '{$toDate1}',
                 @Category = {$inputCategory}, @branch = {$inputBranch}, @family = {$inputFamily}
             ";
             $queryResults = DB::connection('mssql')->selectResultSets($query);

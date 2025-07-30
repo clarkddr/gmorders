@@ -48,17 +48,8 @@
             </select>
             <select id="presetSelect" onchange="applyDates()" class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                 <option disabled selected>Fechas</option>
-                <option value="year">Anual</option>
-                <option value="summer">Verano</option>
-                <option value="winter">Invierno</option>
-                <option value="lastMonth">Mes Anterior</option>
-                <option value="thisMonth">Este Mes</option>
-                <option value="twoWeeks">Dos Semanas</option>
-                <option value="week">Semana</option>
-                <option value="yesterday">Ayer</option>
-                <option value="today">Hoy</option>
             </select>
-            <input id="dates" name="dates" value="{{old('dates')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
+            <input id="dates1" name="dates1" value="{{old('dates1')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
             <button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
                 Buscar
             </button>
@@ -81,7 +72,7 @@
 
             <!-- Tabla de Familias -->
         @php
-            $urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates' => $selectedDate];
+            $urlParameters = ['category'=> $selectedCategory,'branch' => $selectedBranch, 'dates' => $selectedDate1];
         @endphp
         @if(isset($familyRows))
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mt-6 mb-6"> <!-- Ocupa 8/12 -->
@@ -172,7 +163,7 @@
             @if(isset($branchRows))
             <!-- Tabla de Sucursales -->
             @php
-                $urlParameters = ['category'=> $selectedCategory,'family' => $selectedFamily, 'dates' => $selectedDate];
+                $urlParameters = ['category'=> $selectedCategory,'family' => $selectedFamily, 'dates' => $selectedDate1];
             @endphp
             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mt-6 mb-6"> <!-- Ocupa 8/12 -->
                 <h3 class="text-xl sm:text-xl font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400 my-2">
@@ -270,56 +261,14 @@
 </x-layout>
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
 <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const datesInput = document.getElementById('dates');
-        const flatpickr1 = flatpickr(datesInput, {
-            // plugins: [new rangePlugin({ input: endInput })],
-            dateFormat: "Y-m-d",
-            mode: "range",
-            altInput: true,
-            altFormat: "d M y",
-            locale: {firstDayOfWeek: 1},
-            onReady: function(selectedDates, dateStr, instance) {
-                // Establecer el valor si ya existe uno seleccionado en la base de datos
-                const selectedDate = "{{ $selectedDate }}"; // Recoges esto desde el backend
-                if (selectedDate) {
-                    instance.setDate(selectedDate);
-                }
-            },
-        });
-        // Recoge todas las fechas desde Blade en una sola variable
-        const predefinedDates = @json($dates);
-
-        // Mapeo de cada opción del select a los pares de fecha a aplicar
-        const datePresets = {
-            today: [predefinedDates.today, predefinedDates.today],
-            yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],
-            thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],
-            lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],
-            week: [predefinedDates.initialWeekday, predefinedDates.yesterday],
-            twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],
-            year: [predefinedDates.initialYear, predefinedDates.yesterday],
-            winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],
-            summer: [predefinedDates.initialSummer, predefinedDates.finalSummer],
-        };
-
-        const applyDates = () => {
-            const selectedValue = document.getElementById("presetSelect").value;
-            const dates = datePresets[selectedValue];
-            if(dates){
-                flatpickr1.setDate(dates);
-            }
-        }
-        // Registrar la función en el ámbito global
-        window.applyDates = applyDates;
-    });
+<script src="{{ asset('js/dateRanges.js') }}"></script>
+<script> // Definimos las variables que pasaremos al script de DateRanges
+    window.selectedDate1 = @json($selectedDate1);
+    window.dates = @json($dates);
 </script>
 <script>
     const chartData = @json($chartData);
     //Chart.register(window['chartjs-plugin-colors']);
-
     const ctx = document.getElementById('sales-chart').getContext('2d');
     new Chart(ctx, {
         type: 'line',

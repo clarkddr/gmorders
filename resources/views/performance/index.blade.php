@@ -16,7 +16,7 @@
 
     @php
         $defaultUrlParameters = ['category'=> $selectedCategory,'supplier'=> $selectedSupplier,'branch' => $selectedBranch,'family' => $selectedFamily,
-        'sale_dates' => $selectedSaleDates, 'purchase_dates' => $selectedPurchaseDates];
+        'dates1' => $selectedDate1, 'dates2' => $selectedDate2];
     @endphp
     <x-titlePage title="Rendimiento">
         <div class="w-full">
@@ -82,26 +82,16 @@
                 <label for="presetSelect" class="text-xs text-gray-400 mb-1">Fechas</label>
                 <select id="presetSelect" onchange="applyDates()" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
                     <option disabled selected>Fechas</option>
-                    <option value="year">Anual</option>
-                    <option value="summer">Verano</option>
-                    <option value="winter">Invierno</option>
-                    <option value="lastMonth">Mes Anterior</option>
-                    <option value="thisMonth">Este Mes</option>
-                    <option value="twoWeeks">Dos Semanas</option>
-                    <option value="week">Semana</option>
-                    <option value="sevenDays">7 días</option>
-                    <option value="yesterday">Ayer</option>
-                    <option value="today">Hoy</option>
                 </select>
             </div>
 
             {{-- Fechas de venta --}}
             <div class="flex flex-col w-full">
-                <label for="sale_dates" class="text-xs text-gray-400 mb-1">Fechas de venta</label>
+                <label for="dates1" class="text-xs text-gray-400 mb-1">Fechas de venta</label>
                 <input
-                    id="sale_dates"
-                    name="sale_dates"
-                    value="{{ old('sale_dates') }}"
+                    id="dates1"
+                    name="dates1"
+                    value="{{ old('dates1') }}"
                     placeholder="Selecciona fechas"
                     class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400"
                 />
@@ -109,11 +99,11 @@
 
             {{-- Fechas de compra --}}
             <div class="flex flex-col w-full">
-                <label for="purchase_dates" class="text-xs text-gray-400 mb-1">Fechas de compra</label>
+                <label for="dates2" class="text-xs text-gray-400 mb-1">Fechas de compra</label>
                 <input
-                    id="purchase_dates"
-                    name="purchase_dates"
-                    value="{{ old('purchase_dates') }}"
+                    id="dates2"
+                    name="dates2"
+                    value="{{ old('dates2') }}"
                     placeholder="Selecciona fechas"
                     class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400"
                 />
@@ -597,72 +587,15 @@
 
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
 <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
-
+<script src="{{ asset('js/dateRanges.js') }}"></script>
+<script> // Definimos las variables que pasaremos al script de DateRanges
+    window.selectedDate1 = @json($selectedDate1);
+    window.selectedDate2 = @json($selectedDate2);
+    window.dates = @json($dates);
+    window.useSameRangeForBoth = true;
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-
-        const saleDatesInput = document.getElementById('sale_dates');
-        const flatpickr1 = flatpickr(saleDatesInput, {
-            // plugins: [new rangePlugin({ input: endInput })],
-            dateFormat: "Y-m-d",
-            mode: "range",
-            altInput: true,
-            altFormat: "d M y",
-            locale: {firstDayOfWeek: 1},
-            onReady: function(selectedDates1, dateStr, instance) {
-                // Establecer el valor si ya existe uno seleccionado en la base de datos
-                const selectedSaleDates = "{{ $selectedSaleDates }}"; // Recoges esto desde el backend
-                if (selectedSaleDates) {
-                    instance.setDate(selectedSaleDates);
-                }
-            },
-        });
-        const purchaseDatesInput = document.getElementById('purchase_dates');
-        const flatpickr2 = flatpickr(purchaseDatesInput, {
-            // plugins: [new rangePlugin({ input: endInput })],
-            dateFormat: "Y-m-d",
-            mode: "range",
-            altInput: true,
-            altFormat: "d M y",
-            locale: {firstDayOfWeek: 1},
-            onReady: function(selectedDates2, dateStr, instance) {
-                // Establecer el valor si ya existe uno seleccionado en la base de datos
-                const selectedPurchaseDates = "{{ $selectedPurchaseDates }}"; // Recoges esto desde el backend
-                if (selectedPurchaseDates) {
-                    instance.setDate(selectedPurchaseDates);
-                }
-            },
-        });
-        // Recoge todas las fechas desde Blade en una sola variable
-        const predefinedDates = @json($dates);
-
-        // Mapeo de cada opción del select a los pares de fecha a aplicar
-        const thisYeardatePresets = {
-            today: [predefinedDates.today, predefinedDates.today],
-            yesterday: [predefinedDates.yesterday, predefinedDates.yesterday],
-            thisMonth: [predefinedDates.thisMonthInitial, predefinedDates.yesterday],
-            lastMonth: [predefinedDates.lastMonthInitial, predefinedDates.lastMonthEnd],
-            week: [predefinedDates.initialWeekday, predefinedDates.yesterday],
-            sevenDays: [predefinedDates.initialSevenDays, predefinedDates.finalSevenDays],
-            twoWeeks: [predefinedDates.initialTwoWeeks, predefinedDates.yesterday],
-            year: [predefinedDates.initialYear, predefinedDates.yesterday],
-            winter: [predefinedDates.initialWinter, predefinedDates.finalWinter],
-            summer: [predefinedDates.initialYear, predefinedDates.finalSummer],
-        };
-
-        const applyDates = () => {
-            const selectedValue = document.getElementById("presetSelect").value;
-            const saleDates = thisYeardatePresets[selectedValue];
-            const purchaseDates = thisYeardatePresets[selectedValue];
-
-            if(saleDates && purchaseDates){
-                flatpickr2.setDate(saleDates);
-                flatpickr1.setDate(purchaseDates);
-            }
-        }
-        // Registrar la función en el ámbito global
-        window.applyDates = applyDates;
-
         $('#categoriesTable').DataTable({
             paging:false,
             searching: false,
@@ -701,10 +634,6 @@
         });
     });
 </script>
-
-
-
-
 <style>
 
     form {
