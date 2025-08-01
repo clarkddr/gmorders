@@ -8,8 +8,19 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
+
+
         $day = Carbon::today();
+        $hourNow = (int) Carbon::now()->format('H');
+        $isLive = true;
+
+        if($request->all() != []){
+            $day = Carbon::create($request->all()['dates1']);
+            $hourNow = 23;
+            $isLive = false;
+        }
+
         $today = $day->copy()->format('Y-m-d'); // Fecha de hoy
 
         $lastYear = $day->copy()
@@ -18,8 +29,6 @@ class DashboardController extends Controller
             ->format('Y-m-d');
         $todayFormatted = Carbon::parse($today)->isoFormat('dddd D [de] MMMM YYYY');
         $lastYearFormatted = Carbon::parse($lastYear)->isoFormat('dddd D [de] MMMM YYYY');
-        $hourNow = (int) Carbon::now()->format('H');
-//        $hourNow = 23;
 
         $queryLastyear = "EXEC dbo.DRSalesByHour @From = '{$lastYear}', @To = '{$lastYear}'";
         $lastyearResults = DB::connection('mssql')->selectResultSets($queryLastyear);
@@ -78,7 +87,9 @@ class DashboardController extends Controller
             'amounts' => $amounts,
             'hourNow' => $hourNow,
             'todayFormatted' => $todayFormatted,
-            'lastYearFormatted' => $lastYearFormatted
+            'lastYearFormatted' => $lastYearFormatted,
+            'selectedDate1' => $today,
+            'isLive' => $isLive
         ];
 
         if (request()->header('X-Requested-With') === 'XMLHttpRequest'){

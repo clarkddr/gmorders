@@ -1,11 +1,20 @@
 <x-layout>
     <div class="overflow-hidden shadow-xs dark:bg-gray-900 rounded-lg">
         <div class="rounded-lg space-y-2 sm:space-y-6">
-            <p class="text-gray-700 dark:text-gray-200">
-                <span id="todaySpan" class="font-semibold">{{$todayFormatted}}</span>
-                <span class="font-semibold"> VS </span>
-                <span id="lastYearSpan" class="font-semibold">{{$lastYearFormatted}}</span>
-            </p>
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <p class="text-gray-700 dark:text-gray-200">
+                    <span id="todaySpan" class="font-semibold">{{$todayFormatted}}</span>
+                    <span class="font-semibold"> VS </span>
+                    <span id="lastYearSpan" class="font-semibold">{{$lastYearFormatted}}</span>
+                </p>
+                <form action ="/" method="GET" class="flex space-x-4 justify-end">
+                    <input id="dates1" name="dates1" value="{{old('dates1')}}" class="block mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 form-input focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray" placeholder="Fechas" />
+                    <button	type="submit" class="px-3 mt-1 py-1 text-sm text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-md active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+                        Buscar
+                    </button>
+                </form>
+
+            </div>
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
                     <span class="text-gray-500 dark:text-gray-400 text-left">Total Año Anterior</span>
@@ -53,11 +62,29 @@
         </div>
     </div>
 </x-layout>
-
+<link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
+<script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const datesInput1 = document.getElementById('dates1') || null;
+        const selectedDate1 = @json($selectedDate1);
+        const isLive = @json($isLive);
+        const flatpickr1 = flatpickr(datesInput1, {
+            dateFormat: "Y-m-d",
+            mode: "single",
+            altInput: true,
+            altFormat: "d M y",
+            locale: {firstDayOfWeek: 1},
+            onReady: function (selectedDates1, dateStr, instance) {
+                if (selectedDate1) {
+                    instance.setDate(selectedDate1);
+                }
+            },
+        });
+
+
+        // Trabajamos las graficas
         let amounts = @json($amounts->values()->toArray());
-        console.log(amounts);
         let hourNow = @json($hourNow);
 
         // Función para obtener el color dependiendo de la comparación con la línea de anotación
@@ -319,6 +346,6 @@
                 console.error('Error al traer los datos: ', error);
             }
         }
-        setInterval(fetchData, 60000);
+        if (isLive) setInterval(fetchData, 60000);
     });
 </script>
