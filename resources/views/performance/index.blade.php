@@ -91,7 +91,7 @@
                 <input
                     id="dates1"
                     name="dates1"
-                    value="{{ old('dates1') }}"
+{{--                    value="{{ old('dates1') }}"--}}
                     placeholder="Selecciona fechas"
                     class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400"
                 />
@@ -124,7 +124,7 @@
         <div class="rounded-lg">
             <!-- Categories Table -->
             @if(isset($categoriesData))
-            <div class="w-full overflow-hidden rounded-lg shadow-xs mb-6">
+            <div class="w-full overflow-hidden rounded-lg shadow-xs mb-2 mt-2">
                 <div class="w-full overflow-x-auto rounded-lg">
                     <table id="categoriesTable" class="w-full whitespace-no-wrap rounded-lg shadow-xs">
                         <thead>
@@ -153,21 +153,21 @@
                                         {{ $category['categoryname'] }}
                                     </a>
                                 </td>
-                                <td class="px-4 py-3">
+                                <td data-order="{{$category['purchaseSale']}}" class="px-4 py-3">
                                     <div class="flex flex-col items-end">
                                         <span class="text-xl">{{number_format($category['purchaseSale'],0) }}</span>
                                         <span class="text-xs text-red-400">{{number_format($category['purchaseDiscount'],0) .' - '. number_format($category['purchaseDiscountRelation'])}}%</span>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3"> {{ number_format($category['purchaseSaleRelation'],0) }}% </td>
-                                <td class="px-4 py-3">
+                                <td data-order="{{$category['otherSale']}}" class="px-4 py-3">
                                     <div class="flex flex-col items-end">
                                         <span class="text-xl">{{number_format($category['otherSale'],0) }}</span>
                                         <span class="text-xs text-red-400">{{number_format($category['otherDiscount'],0) .' - '. number_format($category['otherDiscountRelation'])}}%</span>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3"> {{ number_format($category['otherSaleRelation'],0) }}% </td>
-                                <td class="px-4 py-3">
+                                <td data-order="{{$category['totalSale']}}" class="px-4 py-3">
                                     <div class="flex flex-col items-end">
                                         <span class="text-xl">{{number_format($category['totalSale'],0) }}</span>
                                         <span class="text-xs text-red-400">{{number_format($category['totalDiscount'],0) .' - '. number_format($category['totalDiscountRelation'])}}%</span>
@@ -215,7 +215,7 @@
             @endif
             <!-- Families Table -->
             @if(isset($familiesData))
-            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
+            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-2"> <!-- Ocupa 8/12 -->
                 <table id="familiesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
@@ -243,21 +243,21 @@
                                     {{ $family['familyname'] }}
                                 </a>
                             </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$family['purchaseSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($family['purchaseSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($family['purchaseDiscount'],0) .' - '. number_format($family['purchaseDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($family['purchaseSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$family['otherSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($family['otherSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($family['otherDiscount'],0) .' - '. number_format($family['otherDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($family['otherSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$family['totalSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($family['totalSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($family['totalDiscount'],0) .' - '. number_format($family['totalDiscountRelation'],0)}}%</span>
@@ -305,7 +305,7 @@
 
             @if(isset($branchesData))
             <!-- Branches Table -->
-            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
+            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-2"> <!-- Ocupa 8/12 -->
                 <table id="branchesTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
@@ -335,21 +335,21 @@
                                 </a>
                             </td>
 
-                            <td class="px-4 py-3">
+                            <td data-order="{{$branch['purchaseSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($branch['purchaseSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($branch['purchaseDiscount'],0) .' - '. number_format($branch['purchaseDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($branch['purchaseSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$branch['otherSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($branch['otherSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($branch['otherDiscount'],0) .' - '. number_format($branch['purchaseDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($branch['otherSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$branch['totalSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($branch['totalSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($branch['totalDiscount'],0) .' - '. number_format($branch['purchaseDiscountRelation'],0)}}%</span>
@@ -396,7 +396,7 @@
             @endif
             <!-- Results Table -->
             @if(isset($resultsData))
-            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
+            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-2"> <!-- Ocupa 8/12 -->
                 <table id="resultsTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
@@ -430,21 +430,21 @@
                                     {{ $row['branchname'] }}
                                 </a>
                             </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$row['purchaseSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($row['purchaseSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($row['purchaseDiscount'],0) .' - '. number_format($row['purchaseDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($row['purchaseSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$row['otherSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($row['otherSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($row['otherDiscount'],0) .' - '. number_format($row['otherDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($row['otherSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{$row['totalSale']}}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($row['totalSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($row['totalDiscount'],0) .' - '. number_format($row['totalDiscountRelation'],0)}}%</span>
@@ -492,7 +492,7 @@
             @endif
             <!-- Suppliers Table -->
             @if(isset($suppliersData))
-            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-6"> <!-- Ocupa 8/12 -->
+            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-2"> <!-- Ocupa 8/12 -->
                 <table id="suppliersTable" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
@@ -516,25 +516,25 @@
                     @foreach($suppliersData['suppliers'] as $supplier)
                         <tr class="text-gray-700 dark:text-gray-400">
                             <td class="px-4 py-3 text-xl">
-                                <a href="{{route('performance.index',array_merge($urlParameters,['supplier' => $supplier['suppliername']]))}}" class="underline" target="_blank">
+                                <a href="{{route('performance.index',array_merge($urlParameters,['supplier' => $supplier['supplierid']]))}}" class="underline" target="_blank">
                                     {{ $supplier['suppliername'] }}
                                 </a>
                             </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{ $supplier['purchaseSale'] }}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($supplier['purchaseSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($supplier['purchaseDiscount'],0) .' - '. number_format($supplier['purchaseDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($supplier['purchaseSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{ $supplier['otherSale'] }}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($supplier['otherSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($supplier['otherDiscount'],0) .' - '. number_format($supplier['otherDiscountRelation'],0)}}%</span>
                                 </div>
                             </td>
                             <td class="px-4 py-3"> {{ number_format($supplier['otherSaleRelation'],0) }}% </td>
-                            <td class="px-4 py-3">
+                            <td data-order="{{ $supplier['totalSale'] }}" class="px-4 py-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-xl">{{number_format($supplier['totalSale'],0) }}</span>
                                     <span class="text-xs text-red-400">{{number_format($supplier['totalDiscount'],0) .' - '. number_format($supplier['totalDiscountRelation'],0)}}%</span>
@@ -551,7 +551,7 @@
                     <tr class="px-4 py-3 mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                         <td class="px-4 py-3 font-bold text-xl"> {{ 'Total' }} </td>
                         <td class="px-4 py-3">
-                            <div class="flex flex-col items-end">
+                            <div class="flex flex-col items-end ">
                                 <span class="text-xl">{{number_format($suppliersData['totalPurchaseSale'],0) }}</span>
                                 <span class="text-xs text-red-400">{{number_format($suppliersData['totalPurchaseDiscount'],0) .' - '. number_format($suppliersData['totalPurchaseDiscountRelation'],0)}}%</span>
                             </div>
@@ -692,7 +692,7 @@
     #suppliersTable_wrapper .dt-input {
         color: #c4c4c4; /* Color similar a gray-400 */
     }
-    #resultsTable_wrapper .dt-input {
+    #resultsTable_wrapper .dt-input, #resultsTable_wrapper .dt-search {
         color: #c4c4c4; /* Color similar a gray-400 */
     }
     .dt-text-left {

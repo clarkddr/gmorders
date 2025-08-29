@@ -5,6 +5,7 @@ use App\Http\Controllers\FamilySalesOverYearsController;
 use App\Http\Controllers\PurchaseOverSaleController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SaleandPurchaseController;
+use App\Http\Controllers\StylesResultsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProjectionAmountController;
@@ -40,6 +41,7 @@ Route::middleware('auth')->group(function(){
     Route::post('projectionmonth',[ProjectionMonthController::class,'store'])->name('projectionmonth.store');
     Route::get('yearsales',[YearSalesController::class,'index'])->name('yearsales.index');
     Route::get('performance',[PerformanceController::class,'index'])->name('performance.index');
+    Route::get('stylesresults',[StylesResultsController::class,'index'])->name('stylesresults.index');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');

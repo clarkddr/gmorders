@@ -121,7 +121,7 @@ class FamilySalesOverYearsController extends Controller
                 ]);
             });
             $data = [
-                'selectedDate1' => $request->input('dates'),
+                'selectedDate1' => $request->input('dates1'),
                 'dates' => $dates,
                 'selectedCategory' => $category,
                 'categories' => $categories,

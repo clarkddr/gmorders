@@ -6,7 +6,8 @@ use Carbon\Carbon;
 
 class TotalizedSalesReportRepository {
 
-    public function getYearSalesDiscounts(Carbon $from, Carbon $to, int $branchid = 0, int $familyid = 0, int $categoryid = 0) {
+    public function getYearSalesDiscounts(Carbon $from, Carbon $to,
+                    int $branchid = 0, int $familyid = 0, int $categoryid = 0) {
         $query = "EXEC dbo.DRSalesDiscountsByYearAndWeek2Years
         @FromLocal = :from,
         @ToLocal = :to,
