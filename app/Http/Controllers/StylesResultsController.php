@@ -35,7 +35,7 @@ class StylesResultsController extends Controller
         ];
 
         if ($request->all() == []) {
-            return view('stylesresults.index',$data);
+            return view('stylesResults.index',$data);
         }
 
 
