@@ -7,7 +7,6 @@ use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Supplier;
 use App\Repositories\StylesResults\StylesResultsRepository;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class StylesResultsController extends Controller
@@ -71,6 +70,6 @@ class StylesResultsController extends Controller
 
         $data = array_merge($data, $extraData);
 
-        return view('stylesresults.index',$data);
+        return view('stylesResults.index',$data);
     }
 }
