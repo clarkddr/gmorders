@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FamilySalesOverYearsController;
+use App\Http\Controllers\MaxminController;
 use App\Http\Controllers\PurchaseOverSaleController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SaleandPurchaseController;
@@ -42,6 +43,8 @@ Route::middleware('auth')->group(function(){
     Route::get('yearsales',[YearSalesController::class,'index'])->name('yearsales.index');
     Route::get('performance',[PerformanceController::class,'index'])->name('performance.index');
     Route::get('stylesresults',[StylesResultsController::class,'index'])->name('stylesresults.index');
+    Route::get('maxmin/search',[MaxminController::class,'search'])->name('maxmin.search');
+    Route::resource('maxmin',MaxminController::class);
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');

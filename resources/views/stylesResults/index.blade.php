@@ -234,8 +234,6 @@
 
     });
 </script>
-
-
 <script>
     $('#stylesTable').on('click', '.btn-detail', function () {
         const styleBranches = Object.values(JSON.parse(this.dataset.details)); // ✅ Es un array plano
@@ -262,7 +260,7 @@
             <tbody>
     `;
 
-        styleBranches.forEach(row => {
+        branches.forEach(row => {
             html += `
             <tr class="border-t border-gray-600">
                 <td class="px-3 py-2">${row.BranchName}</td>

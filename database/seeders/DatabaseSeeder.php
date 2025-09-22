@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Http\Controllers\BranchSalesTargetController;
+use App\Models\BranchMaxMin;
 use App\Models\Gallery;
 use App\Models\Image;
+use App\Models\Maxmin;
 use App\Models\Projection;
 use App\Models\ProjectionAmount;
 use App\Models\Supplier;
@@ -547,5 +549,67 @@ class DatabaseSeeder extends Seeder
             ['projection_id' => 2, 'branchid' =>  23,'familyid' => 27, 'new_sale' => 4000, 'old_sale' => 2000, 'purchase' => 2220, 'created_at' => now(), 'updated_at' => now() ],
             ['projection_id' => 2, 'branchid' =>  24,'familyid' => 27, 'new_sale' => 79000, 'old_sale' => 80000, 'purchase' => 58830, 'created_at' => now(), 'updated_at' => now() ],
         ]);
+
+        MaxMin::insert([
+            [
+                'code' => 'Iris-1S',
+                'SupplierId' => 106,
+                'SubcategoryId' => 693,
+                'ColorId' => 6,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'Iris-1S',
+                'SupplierId' => 106,
+                'SubcategoryId' => 693,
+                'ColorId' => 58,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'Cargo-S01',
+                'SupplierId' => 106,
+                'SubcategoryId' => 727,
+                'ColorId' => 58,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'MIA11',
+                'SupplierId' => 106,
+                'SubcategoryId' => 181,
+                'ColorId' => 6,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'MIA11',
+                'SupplierId' => 106,
+                'SubcategoryId' => 181,
+                'ColorId' => 37,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        BranchMaxMin::insert([
+            ['maxmin_id' => 1 , 'branch_id' => 1, 'max' => 6, 'min' => 3, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 2, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 3, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 6, 'max' => 24, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 7, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 8, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 9, 'max' => 24, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 11, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 12, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 13, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 15, 'max' => 6, 'min' => 3, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 22, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 23, 'max' => 12, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+            ['maxmin_id' => 1 , 'branch_id' => 24, 'max' => 24, 'min' => 6, 'created_at' => now(), 'updated_at' => now() ],
+        ]);
+
+
     }
 }
