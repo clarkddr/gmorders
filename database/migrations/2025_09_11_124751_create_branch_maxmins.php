@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void {
         Schema::create('branch_maxmins', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Maxmin::class,'maxmin_id');
+            $table->foreignIdFor(Maxmin::class,'maxmin_id')->constrained('maxmins')->cascadeOnDelete();
             $table->foreignIdFor(Branch::class,'branch_id');
             $table->integer('max')->default(0);
             $table->integer('min')->default(0);

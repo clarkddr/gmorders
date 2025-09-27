@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Maxmin extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['code'];
+    protected $fillable = ['code','SupplierId','Subcategoryid','Colorid','pack_quantity'];
 
     public function supplier(){
         return $this->belongsTo(Supplier::class,'SupplierId');

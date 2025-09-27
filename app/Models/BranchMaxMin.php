@@ -14,4 +14,8 @@ class BranchMaxMin extends Model
     {
         return $this->belongsTo(Maxmin::class);
     }
+
+    public function branch(){
+        return $this->belongsTo(Branch::class, 'branch_id', 'BranchId');
+    }
 }

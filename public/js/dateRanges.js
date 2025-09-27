@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
     // Recogemos las variables del Backend
     const useSame = window.useSameRangeForBoth || false;

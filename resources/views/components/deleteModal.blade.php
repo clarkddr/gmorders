@@ -1,4 +1,4 @@
-@props(['data' => 'data'])
+@props(['action'])
 <!-- Modal backdrop. This what you want to place close to the closing body tag -->
 <div
 x-show="isModalOpen"
@@ -11,7 +11,7 @@ x-transition:leave-end="opacity-0"
 class="fixed inset-0 z-30 flex items-end bg-black bg-opacity-50 sm:items-center sm:justify-center"
 >
 <!-- Modal -->
-<div  
+<div
   x-show="isModalOpen"
   x-transition:enter="transition ease-out duration-150"
   x-transition:enter-start="opacity-0 transform translate-y-1/2"
@@ -50,13 +50,13 @@ class="fixed inset-0 z-30 flex items-end bg-black bg-opacity-50 sm:items-center 
   <!-- Modal body -->
   <div class="mt-4 mb-6">
     <!-- Modal title -->
-    <p 
+    <p
       class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300"
     >
-      ¿Esta seguro de eliminar?
+      {{ $action }}
     </p>
     <!-- Modal description -->
-    <p class="text-sm text-gray-700 dark:text-gray-400">      
+    <p class="text-sm text-gray-700 dark:text-gray-400">
     </p>
   </div>
   <footer
@@ -68,9 +68,9 @@ class="fixed inset-0 z-30 flex items-end bg-black bg-opacity-50 sm:items-center 
     >
       Cancel
     </button>
-    <form method="POST" :action="'/images/' + imageData.id">
+      <form method="POST">
       @csrf
-      @method('delete')
+      @method('DELETE')
     <button
       class="w-full px-5 py-3 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-red-600 border border-transparent rounded-lg sm:w-auto sm:px-4 sm:py-2 active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-red"
     >

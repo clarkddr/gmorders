@@ -191,7 +191,10 @@
     </div>
 </x-layout>
 <x-modal title="">
-    <div id="modalBody" class="text-gray-800 dark:text-gray-200 space-y-6 text-sm leading-relaxed"></div>
+    <div id="modalBody" class="text-gray-800 dark:text-gray-200 space-y-6 text-sm leading-relaxed">
+
+    </div>
+
 </x-modal>
 
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
@@ -237,13 +240,10 @@
 <script>
     $('#stylesTable').on('click', '.btn-detail', function () {
         const styleBranches = Object.values(JSON.parse(this.dataset.details)); // ✅ Es un array plano
-
-
         if (!styleBranches || styleBranches.length === 0) {
             document.getElementById('modalBody').innerHTML = '<p class="text-center text-gray-400">No hay detalles por sucursal.</p>';
             return;
         }
-
         let html = `
         <p class="text-2xl font-semibold">Detalles por Sucursal</p>
         <p class="text-xl">${styleBranches[0].Code} - ${styleBranches[0].ColorName} - ${styleBranches[0].Price}.00</p>
@@ -260,7 +260,7 @@
             <tbody>
     `;
 
-        branches.forEach(row => {
+        styleBranches.forEach(row => {
             html += `
             <tr class="border-t border-gray-600">
                 <td class="px-3 py-2">${row.BranchName}</td>

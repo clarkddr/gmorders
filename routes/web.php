@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function(){
     Route::get('stylesresults',[StylesResultsController::class,'index'])->name('stylesresults.index');
     Route::get('maxmin/search',[MaxminController::class,'search'])->name('maxmin.search');
     Route::resource('maxmin',MaxminController::class);
+    Route::get('maxmin/{maxmin}/archive',[MaxminController::class,'archive'])->name('maxmin.archive');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');

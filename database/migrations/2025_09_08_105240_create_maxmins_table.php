@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignIdFor(Supplier::class,'SupplierId');
             $table->foreignIdFor(Subcategory::class,'SubcategoryId');
             $table->foreignIdFor(Color::class,'ColorId');
+            $table->integer('pack_quantity')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

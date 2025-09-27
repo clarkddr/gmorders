@@ -553,44 +553,13 @@ class DatabaseSeeder extends Seeder
         MaxMin::insert([
             [
                 'code' => 'Iris-1S',
+                'pack_quantity' => 6,
                 'SupplierId' => 106,
                 'SubcategoryId' => 693,
                 'ColorId' => 6,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
-            [
-                'code' => 'Iris-1S',
-                'SupplierId' => 106,
-                'SubcategoryId' => 693,
-                'ColorId' => 58,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'Cargo-S01',
-                'SupplierId' => 106,
-                'SubcategoryId' => 727,
-                'ColorId' => 58,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'MIA11',
-                'SupplierId' => 106,
-                'SubcategoryId' => 181,
-                'ColorId' => 6,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'MIA11',
-                'SupplierId' => 106,
-                'SubcategoryId' => 181,
-                'ColorId' => 37,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ]
         ]);
 
         BranchMaxMin::insert([

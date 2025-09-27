@@ -1,6 +1,6 @@
 <x-layout>
     @if(session('banner'))
-        <x-banner message="{{session('banner.message')}}" type="success" class=""/>
+        <x-banner message="{{session('banner.message')}}" type="{{session('banner.type')}}" class=""/>
     @endif
     {{-- Encabezado con título y espacio para dropdowns --}}
     @if ($errors->any())
