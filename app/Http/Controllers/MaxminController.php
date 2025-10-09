@@ -15,32 +15,47 @@ use App\Http\Requests\StoreMaxminRequest;
 class MaxminController extends Controller
 {
     public function index(Request $request){
-        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
-        $selectedDate = Carbon::now()->startOfYear();
-        $maxmins = app(MaxMinService::class)->getMaxminPzByBranch($selectedDate);
-        $data = [
-            'branches' => $branches,
-            'selectedDate1' => $selectedDate,
-            'maxmins' => $maxmins
-        ];
-        if($request->all() == []){
-            return view('maxmin.index',$data);
-        }
-
-
-        $request->validate([
-            'date' => 'date',
-            'branch' => 'required|numeric',
+        $validated = $request->validate([
+            'dates1'   => 'nullable|date',
+            'branch' => 'nullable|integer',
+            'visibility' => 'nullable|string',
         ]);
 
+        // Sucursales que NO se muestran
+        $excluded = [4, 5, 10,14]; // ajusta la lista según necesites
 
+        // Para el selector (todas menos excluidas)
+        $branches = Branch::whereNotIn('BranchId', $excluded)->get();
 
+        // Id seleccionado (0 = todas)
+        $branchId = isset($validated['branch']) ? (int) $validated['branch'] : 0;
+        $visibility = $validated['visibility'] ?? 'active';
 
-        return view('maxmin.index',$data);
+        // Colección a usar en el servicio (siempre colección)
+        $branchesQuery = Branch::query()
+            ->when($branchId === 0, function ($q) use ($excluded) {
+                $q->whereNotIn('BranchId', $excluded);
+            }, function ($q) use ($branchId) {
+                $q->where('BranchId', $branchId);
+            })
+            ->get();
+
+        // Fecha seleccionada (por defecto: inicio de año actual)
+        $selectedDate = !empty($validated['dates1'])
+            ? Carbon::parse($validated['dates1'])
+            : Carbon::now()->subYear()->startOfYear();
+
+        $maxmins = app(MaxMinService::class)->getMaxminPzByBranch($selectedDate, $branchesQuery, $visibility);
+
+        return view('maxmin.index', [
+            'branches'      => $branches,      // para dropdown
+            'selectedDate1' => $selectedDate,
+            'maxmins'       => $maxmins,
+            'selectedBranch'=> $branchId,
+        ]);
     }
 
     public function search(Request $request){
-
         if ($request->all() == []) {
             return view('maxmin.search',['branches' => []]);
         }
@@ -66,7 +81,7 @@ class MaxminController extends Controller
             'max' => 'numeric',
         ]);
 
-        $maxmin = MaxMin::where([
+        $maxmin = MaxMin::withTrashed()->where([
             'code' => $request['code'],
             'SupplierId' => $request['supplierid'],
             'Subcategoryid' => $request['subcategoryid'],
@@ -100,12 +115,13 @@ class MaxminController extends Controller
             'pack_quantity' => $validated['pack_quantity']
         ];
 
-        $maxminExists = MaxMin::where([
+        $maxminExists = MaxMin::withTrashed()->where([
             'code' => $validated['code'],
             'SupplierId' => $validated['supplierid'],
             'Subcategoryid' => $validated['subcategoryid'],
             'Colorid' => $validated['colorid'],
         ])->first();
+
 
         if($maxminExists) return redirect()->route('maxmin.index')->with('banner',['type' => 'warning','message' => 'Ocurrió un error, el Máximo/Mínimo ya existe.']);
 
@@ -144,7 +160,7 @@ class MaxminController extends Controller
         return view('maxmin.edit',$data);
     }
 
-    public function update(StoreMaxminRequest $request,     Maxmin $maxmin){
+    public function update(StoreMaxminRequest $request, Maxmin $maxmin){
         $data = $request->validated();
 
         $toIntOrNull = fn($v) => ($v === '' || $v === null) ? null : (int) $v;
@@ -201,12 +217,20 @@ class MaxminController extends Controller
     }
 
     public function destroy(Maxmin $maxmin){
-        $maxmin->forceDelete();
+        return 'Borrar';
+        //$maxmin->forceDelete();
         return redirect()->route('maxmin.index')->with('banner',['type' => 'success','message' => 'El Máximo/Mínimo se ha eliminado correctamente.']);
     }
 
-    public function archive(Maxmin $maxmin){
-        $maxmin->delete();
-        return redirect()->route('maxmin.index')->with('banner',['type' => 'success','message' => 'El Máximo/Mínimo se ha archivado correctamente.']);
+    public function toggle($id){
+        $maxmin = Maxmin::withTrashed()->findOrFail($id);
+        if($maxmin->trashed()){
+            $maxmin->restore();
+            $message = 'El Máximo/Mínimo se ha activado correctamente.';
+        } else {
+            $maxmin->delete();
+            $message = 'El Máximo/Mínimo se ha archivado correctamente.';
+        }
+        return redirect()->back()->with('banner',['type' => 'success','message' => $message]);
     }
 }

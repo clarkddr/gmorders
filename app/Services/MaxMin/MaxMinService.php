@@ -26,11 +26,25 @@ class MaxMinService {
         return collect($rawReport);
     }
 
-    public function getMaxminPzByBranch(Carbon $fromDate) {
-        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
-        $maxmins = MaxMin::with(['supplier','family','color','subcategory','branches'])
-            ->withSum('branches as total_max', 'max')
-            ->withSum('branches as total_min', 'min')
+    public function getMaxminPzByBranch(Carbon $fromDate,$branches, String $visibility = 'active') {
+        $branchIds = [];
+        foreach($branches as $branch) {
+            $branchIds[] = $branch->BranchId;
+        }
+
+        $maxminBase = MaxMin::query()
+            ->when($visibility === 'all', fn($q) => $q->withTrashed())
+            ->when($visibility === 'archived', fn($q) => $q->onlyTrashed());
+
+
+        $maxmins = $maxminBase
+            ->with([
+                'supplier','family','color','subcategory',
+                'branches' => fn($q) => $q->whereIn('branch_id', $branchIds),
+            ])
+            ->withSum(['branches as total_max' => fn($q) => $q->whereIn('branch_id', $branchIds)], 'max')
+            ->withSum(['branches as total_min' => fn($q) => $q->whereIn('branch_id', $branchIds)], 'min')
+            ->whereHas('branches', fn($q) => $q->whereIn('branch_id', $branchIds))
             ->get();
 
         $pairs = $maxmins->map(function ($maxmin) {
@@ -44,7 +58,8 @@ class MaxMinService {
 
         $pairsJson = json_encode($pairs, JSON_UNESCAPED_UNICODE);
 
-        $rawReports = $this->repository->MaxminPzByBranch($pairsJson, $fromDate);
+        $branchesIdsSQl = count($branchIds) > 1 ? 0 : $branchIds[0];
+        $rawReports = $this->repository->MaxminPzByBranch($pairsJson, $fromDate,$branchesIdsSQl);
 
         $results = $maxmins->map(function($maxmin) use ($rawReports,$branches) {
             $totalMax = $maxmin->total_max;
@@ -80,7 +95,11 @@ class MaxMinService {
                 'total_min' => $totalMin,
                 'total_inventory' => $totalInventory,
                 'branches' => $branchDetails,
-                'stock_out_count' => $stockOutCount
+                'stock_out_count' => $stockOutCount,
+                'created_at' => $maxmin->created_at,
+                'updated_at' => $maxmin->updated_at,
+                'deleted_at' => $maxmin->deleted_at,
+                'trashed' => $maxmin->trashed(),
             ]);
 
         });

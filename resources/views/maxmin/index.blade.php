@@ -45,17 +45,15 @@
 {{--                </select>--}}
 {{--            </div>--}}
             {{-- Proveedor --}}
-{{--            <div class="flex flex-col w-full">--}}
-{{--                <label for="supplier" class="text-xs text-gray-400 mb-1">Proveedor</label>--}}
-{{--                <select name="supplier" id="supplier" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">--}}
-{{--                    <option value="0" {{ $selectedSupplier ? '' : 'selected' }}>Proveedor</option>--}}
-{{--                    @foreach ($suppliers as $supplier)--}}
-{{--                        <option value="{{ $supplier->SupplierId }}" {{ $selectedSupplier == $supplier->SupplierId ? 'selected' : '' }}>--}}
-{{--                            {{ $supplier->Name }}--}}
-{{--                        </option>--}}
-{{--                    @endforeach--}}
-{{--                </select>--}}
-{{--            </div>--}}
+            <div class="flex flex-col w-full">
+                <label for="visibility" class="text-xs text-gray-400 mb-1">Mostrar</label>
+                <select name="visibility" id="visibility"
+                        class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                    <option value="active"   @selected(request('visibility','active') === 'active')>Activos</option>
+                    <option value="archived" @selected(request('visibility') === 'archived')>Archivados</option>
+                    <option value="all"      @selected(request('visibility') === 'all')>Todos</option>
+                </select>
+            </div>
 
 
             <div class="flex flex-col w-full">
@@ -69,18 +67,9 @@
                     @endforeach
                 </select>
             </div>
-
-            {{-- Preset de Fechas --}}
-{{--            <div class="flex flex-col w-full">--}}
-{{--                <label for="presetSelect" class="text-xs text-gray-400 mb-1">Fechas</label>--}}
-{{--                <select id="presetSelect" onchange="applyDates()" class="w-full rounded-md border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400">--}}
-{{--                    <option disabled selected>Fechas</option>--}}
-{{--                </select>--}}
-{{--            </div>--}}
-
 {{--            --}}{{-- Fechas de venta --}}
             <div class="flex flex-col w-full">
-                <label for="dates1" class="text-xs text-gray-400 mb-1">Fechas de venta</label>
+                <label for="dates1" class="text-xs text-gray-400 mb-1">Desde</label>
                 <input
                     id="dates1"
                     name="dates1"
@@ -119,8 +108,8 @@
                 <table id="table" class="py-0 w-full whitespace-no-wrap mx-0 rounded-lg shadow-xs mb-6">
                     <thead>
                     <tr class="text-xs font-semibold tracking-wide text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                        <th class="px-4 py-3">Subcategoria</th>
                         <th class="px-4 py-3">Proveedor</th>
+                        <th class="px-4 py-3">Subcategoría</th>
                         <th class="px-4 py-3">Estilo</th>
                         <th class="px-4 py-3">Color</th>
                         <th class="px-4 py-3">Pz/Pack</th>
@@ -167,12 +156,20 @@
                             <td class="px-4 py-3 ">
                                 <div class="flex justify-center space-x-2 text-sm">
                                     <x-editButton href="/maxmin/{{$row['id']}}/edit" />
-                                    <button @click="openModal" data-details='@json([$row, "archive"])'
-                                            class="btn-delete bg-gray-100 hover:bg-gray-200 text-gray-600 items-center justify-between px-2 py-2 text-sm font-medium leading-5 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                                            aria-label="Archive">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                                        </svg>
+                                    <button
+                                        @click="openModal"
+                                        data-details='@json([$row, $row['trashed'] ? 'unarchive' : 'archive'])'
+                                        class="btn-delete items-center justify-between px-2 py-2 text-sm font-medium leading-5 rounded-lg focus:outline-none focus:shadow-outline-gray bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                        aria-label="Archive">
+                                        @if($row['trashed'])
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001m0 0V4.355m0 4.992L17.34 6.67a8.25 8.25 0 1 0 1.635 8.86" />
+                                            </svg>
+                                        @else
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                            </svg>
+                                        @endif
                                     </button>
                                     <button @click="openModal" data-details='@json([$row,'delete'])'
                                         class="btn-delete bg-red-600 dark:text-white items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-white rounded-lg focus:outline-none focus:shadow-outline-gray"
@@ -212,12 +209,9 @@
 
 <link rel="stylesheet" href="{{ asset('flatpickr/dark.css') }}">
 <script src="{{ asset('flatpickr/flatpickr.js') }}"></script>
-
-<script> // Definimos las variables que pasaremos al script de DateRanges
-    window.selectedDate1 = @json($selectedDate1);
-    {{--window.dates = @json($dates);--}}
-</script>
 <script>
+    const selectedDate1 = @json($selectedDate1);
+    console.log(selectedDate1);
     const datesInput1 = document.getElementById('dates1') || null;
     flatpickr1 = flatpickr(datesInput1, {
         dateFormat: "Y-m-d",
@@ -238,6 +232,35 @@
         const type = details[1];
 
         const modalBody = document.getElementById('modalBody');
+        let description = '';
+        let action = '';
+        let method = '';
+        let buttonClass = '';
+        let buttonText = '';
+
+        switch(type){
+            case 'delete':
+                description = 'Estas seguro de eliminar el estilo?';
+                action = '/maxmin/'+id+'/delete';
+                method = 'DELETE';
+                buttonClass = 'bg-red-600 hover:bg-red-700 focus:shadow-outline-red';
+                buttonText = 'Eliminar';
+                break;
+            case 'archive':
+                description = 'Estas seguro de archivar el estilo?';
+                action = '/maxmin/'+id+'/toggle';
+                method = 'PATCH';
+                buttonClass = 'bg-yellow-600 hover:bg-yellow-700 focus:shadow-outline-yellow';
+                buttonText = 'Archivar';
+                break;
+            case 'unarchive':
+                description = 'Estas seguro de desarchivar el estilo?';
+                action = '/maxmin/'+id+'/toggle';
+                method = 'PATCH';
+                buttonClass = 'bg-green-600 hover:bg-green-700 focus:shadow-outline-green';
+                buttonText = 'Desarchivar';
+                break;
+        }
 
         // Construir el HTML dinámico del modal
         let modalContent = `
@@ -246,9 +269,7 @@
         </h2>
         <div class="text-gray-800 dark:text-gray-200 space-y-6 text-sm leading-relaxed">
             <p class="text-red-600 dark:text-red-300">
-                ${type === 'delete'
-            ? 'Estas seguro de eliminar el estilo?'
-            : 'Estas seguro de archivar el estilo?'}
+                ${description}
             </p>
         </div>
         <div class="flex justify-end mt-4">
@@ -257,13 +278,13 @@
                 @click="closeModal">
                 Cancelar
             </button>
-            <form method="POST" action="/maxmin/${id}">
+            <form method="POST" action="${action}">
                 @csrf
-        <input type="hidden" name="_method" value="${type === 'delete' ? 'DELETE' : 'GET'}">
+        <input type="hidden" name="_method" value="${method}">
                 <button class="w-full px-5 py-3 text-sm font-medium leading-5 text-white transition-colors duration-150
-                    ${type === 'delete' ? 'bg-red-600 hover:bg-red-700 focus:shadow-outline-red' : 'bg-yellow-600 hover:bg-yellow-700 focus:shadow-outline-yellow'}
-                    border border-transparent rounded-lg sm:w-auto sm:px-4 sm:py-2">
-                    ${type === 'delete' ? 'Eliminar' : 'Archivar'}
+                    border border-transparent rounded-lg sm:w-auto sm:px-4 sm:py-2
+                    ${buttonClass} ">
+                    ${buttonText}
                 </button>
             </form>
         </div>
@@ -281,14 +302,14 @@
         searching: true,
         info: false,
         "lenghtChange": false,
-        "order": [[10, "desc"]],
+        "order": [[2, "asc"],[3, "asc"]],
     });
 
     table.columns().every(function() {
         var column = this;
         var colIdx = column.index();
         // ❌ No poner filtro en la columna 1 (branches)
-        if (colIdx >4) {
+        if (colIdx > 3) {
             return; // saltamos esta columna
         }
         // Crea select en el segundo thead (fila .filters)
@@ -306,37 +327,8 @@
     });
 </script>
 <script>
-    function rowHtml(b) {
-        const shortage = (b.max ?? 0) > b.inventory ? (b.max - b.inventory) : 0;
-        const ok = !b.stock_out;
-
-        const statusIcon = ok
-            ? `
-        <svg class="w-5 h-5 inline-block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16Zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.172 7.707 8.879a1 1 0 10-1.414 1.414L9 13l4.707-4.707Z" clip-rule="evenodd"/>
-        </svg>`
-            : `
-        <svg class="w-5 h-5 inline-block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M9.401 1.592a1.25 1.25 0 012.198 0l7.125 13.75A1.25 1.25 0 0117.625 17H2.375a1.25 1.25 0 01-1.099-1.658l7.125-13.75zM10 7.5a.75.75 0 00-.75.75v3.5a.75.75 0 001.5 0V8.25A.75.75 0 0010 7.5zm0 7a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-        </svg>`;
-
-        const statusBadge = ok
-            ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-semibold">OK ${statusIcon}</span>`
-            : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-semibold">Below min ${statusIcon}</span>`;
-
-        return `
-      <tr class="border-b border-gray-200 dark:border-gray-700">
-        <td class="px-3 py-2 font-medium">${b.name}</td>
-        <td class="px-3 py-2 text-right">${b.min ?? ''}</td>
-        <td class="px-3 py-2 text-right">${b.max ?? ''}</td>
-        <td class="px-3 py-2 text-right font-semibold">${b.inventory}</td>
-        <td class="px-3 py-2 text-right">${shortage > 0 ? shortage : ''}</td>
-        <td class="px-3 py-2 text-right">${statusBadge}</td>
-      </tr>
-    `;
-    }
     function branchesTableHtml(details) {
-        const { id, code, color, supplier, subcategory, branches } = details;
+        const { id, code, color, supplier, subcategory, pack_quantity, branches } = details;
         const totalMin = branches.reduce((sum, b) => sum + (b.min ?? 0), 0);
         const totalMax = branches.reduce((sum, b) => sum + (b.max ?? 0), 0);
         const totalInventory = branches.reduce((sum, b) => sum + Number(b.inventory ?? 0), 0);
@@ -345,30 +337,48 @@
             const inv = b.inventory ?? 0;
             return sum + (max > inv ? max - inv : 0);
         }, 0);
+        const totalShortagePacks = branches.reduce((sum, b) => {
+            const max = b.max ?? null;
+            const inv = Number(b.inventory ?? 0);
+            const shortage = max != null && inv < max ? (max - inv) : 0;
+            return sum + (shortage > 0 ? Math.round(shortage / pack_quantity) : 0);
+        }, 0);
 
         const rows = branches.map(b => {
-            const shortage = b.max != null && b.inventory < b.max ? b.max - b.inventory : 0;
-            const statusIcon = b.stock_out
-                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-semibold">Bajo mínimo</span>`
-                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-semibold">OK</span>`;
+            const inv = Number(b.inventory ?? 0);
+            const min = b.min ?? null;
+            const max = b.max ?? null;
+            const shortage = max != null && inv < max ? (max - inv) : 0;
+            const shortagePacks = shortage > 0 ? Math.round(shortage / pack_quantity) : 0;
+            const isOverMax = max != null && inv > max;
+            const isBelowMin = !!b.stock_out || (min != null && inv < min);
 
+            let statusIcon;
+            if (isOverMax) {
+                statusIcon = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Sobre máximo</span>`;
+            } else if (isBelowMin) {
+                statusIcon = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-semibold">Bajo mínimo</span>`;
+            } else {
+                statusIcon = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-semibold">OK</span>`;
+            }
             return `
-      <tr class="border-b border-gray-200 dark:border-gray-700">
-        <td class="px-3 py-2 font-medium">${b.name}</td>
-        <td class="px-3 py-2 text-right">${b.min ?? ''}</td>
-        <td class="px-3 py-2 text-right">${b.max ?? ''}</td>
-        <td class="px-3 py-2 text-right font-semibold">${b.inventory ?? 0}</td>
-        <td class="px-3 py-2 text-right">${shortage > 0 ? shortage : ''}</td>
-        <td class="px-3 py-2 text-right">${statusIcon}</td>
-      </tr>
-    `;
+              <tr class="border-b border-gray-200 dark:border-gray-700">
+                <td class="px-3 py-2 font-medium">${b.name}</td>
+                <td class="px-3 py-2 text-right">${b.min ?? ''}</td>
+                <td class="px-3 py-2 text-right">${b.max ?? ''}</td>
+                <td class="px-3 py-2 text-right font-semibold">${b.inventory ?? 0}</td>
+                <td class="px-3 py-2 text-right">${shortage > 0 ? shortage : ''}</td>
+                <td class="px-3 py-2 text-right">${shortagePacks > 0 ? shortagePacks : ''}</td>
+                <td class="px-3 py-2 text-right">${statusIcon}</td>
+              </tr>
+            `;
         }).join('');
 
         return `
     <div class="space-y-4">
       <div>
         <h2 class="text-base font-semibold text-gray-800 dark:text-gray-100">Máximo y mínimo</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400">${code} • ${color} • ${supplier}  • ${subcategory}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">${code} • ${color} • ${supplier}  • ${subcategory} • Paquete de ${pack_quantity}</p>
       </div>
 
       <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
@@ -380,6 +390,7 @@
               <th class="px-3 py-2 text-right font-medium">Max</th>
               <th class="px-3 py-2 text-right font-medium">Existencia</th>
               <th class="px-3 py-2 text-right font-medium">Faltante</th>
+              <th class="px-3 py-2 text-right font-medium">F. Packs</th>
               <th class="px-3 py-2 text-right font-medium">Estatus</th>
             </tr>
           </thead>
@@ -393,6 +404,7 @@
                 <td class="px-3 py-2 text-right">${totalMax}</td>
                 <td class="px-3 py-2 text-right">${totalInventory}</td>
                 <td class="px-3 py-2 text-right">${totalShortage}</td>
+                <td class="px-3 py-2 text-right">${totalShortagePacks}</td>
                 <td class="px-3 py-2"></td>
               </tr>
             </tfoot>
@@ -412,8 +424,6 @@
         // Aquí asumo que dataset.details trae algo estilo:
         // { id, code, color, supplier, stockout_count, branches:[{name,min,max,inventory,stock_out}, ...] }
         const details = JSON.parse(this.dataset.details);
-        console.log(details);
-
         // Construye el HTML de la tabla
         const html = branchesTableHtml(details);
 

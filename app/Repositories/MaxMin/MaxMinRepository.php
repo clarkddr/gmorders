@@ -22,14 +22,16 @@ class MaxMinRepository {
         return collect($queryResults[0] ?? []);
     }
 
-    public function MaxminPzByBranch(String $maxmins, Carbon $fromDate){
+    public function MaxminPzByBranch(String $maxmins, Carbon $fromDate, int $branchid = 0){
         try {
             $sql = "EXEC dbo.DRCountPzByBranchMaxMin
             @PairsJson = :maxmins,
-            @FromDate = :fromDate";
+            @FromDate = :fromDate,
+            @branch = :branchid";
             $queryResults = DB::connection('mssql')->selectResultSets($sql,[
                 'maxmins' => $maxmins,
-                'fromDate' => $fromDate->format('Y-m-d')
+                'fromDate' => $fromDate->format('Y-m-d'),
+                'branchid' => $branchid
             ]);
         } catch (Throwable $e){
             report($e);
