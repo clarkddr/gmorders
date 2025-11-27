@@ -1,4 +1,5 @@
 <template>
+    <Head title="Buscador de Estilos" />
     <StyleLayout title="Buscador de Estilos">
 
         <!-- Buscador -->
@@ -20,7 +21,7 @@
 
 <script setup>
 import { ref, nextTick } from 'vue';
-import {router, usePage} from '@inertiajs/vue3';
+import { Head, router, usePage} from '@inertiajs/vue3';
 
 import StyleLayout from '@/Layouts/StyleLayout.vue';
 import SearchForm from '@/Pages/StyleSearch/Partials/SearchForm.vue';
