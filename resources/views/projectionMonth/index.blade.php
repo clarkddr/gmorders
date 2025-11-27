@@ -15,7 +15,6 @@
             Guardar
         </button>
     </x-titlePage>
-        {{$percentages->where('projection_id',2)->where('FamilyId',2)->where('month',1)->first()->percentage ?? 0}}
     <form name="amounts" id="amounts" action="/projectionmonth" method="POST"> @csrf
         <input type="hidden" name="projectionid" value="{{1}}">
         @foreach ($categories as $category)
@@ -49,8 +48,8 @@
                             <td class="py-2 text-center border-r border-gray-700">
                                 <input type="hidden" name="data[{{$family->FamilyId}}][{{$month}}][month]" value="{{$month}}">
                                 <input type="hidden" name="data[{{$family->FamilyId}}][{{$month}}][id]" value="{{$family->FamilyId}}">
-                                @php $value = $percentages->where('projection_id',2)->where('FamilyId',$family->FamilyId)->where('month',$month)->first()->percentage ?? '' @endphp
-                                @php $active = $percentages->where('projection_id',2)->where('FamilyId',$family->FamilyId)->where('month',$month)->first()->is_active ?? false @endphp
+                                @php $value = $percentages->where('projection_id',1)->where('FamilyId',$family->FamilyId)->where('month',$month)->first()->percentage ?? '' @endphp
+                                @php $active = $percentages->where('projection_id',1)->where('FamilyId',$family->FamilyId)->where('month',$month)->first()->is_active ?? false @endphp
                                 <x-input_percentage_color active="{{$active}}" value="{{$value}}" name="data[{{$family->FamilyId}}][{{$month}}][percentage]"/>
                                 <span class="text-xs">%</span>
 

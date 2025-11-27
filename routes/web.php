@@ -6,6 +6,7 @@ use App\Http\Controllers\MaxminController;
 use App\Http\Controllers\PurchaseOverSaleController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SaleandPurchaseController;
+use App\Http\Controllers\StyleSearchController;
 use App\Http\Controllers\StylesResultsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchSalesTargetController;
 use App\Http\Controllers\YearSalesController;
 use App\Http\Controllers\PerformanceController;
+use Inertia\Inertia;
 
 Route::middleware('guest')->group(function(){
     // Route::get('/register', [RegisteredUserController::class,'create']);
@@ -49,6 +51,9 @@ Route::middleware('auth')->group(function(){
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
+Route::get('styles/search',[StyleSearchController::class,'index'])->name('styleSearch.search');
+
+
 
 Route::get('/plan', [ImageController::class,'plan'])->name('plan');
 
