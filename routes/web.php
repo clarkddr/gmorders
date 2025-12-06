@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpensesResultsController;
 use App\Http\Controllers\FamilySalesOverYearsController;
 use App\Http\Controllers\MaxminController;
 use App\Http\Controllers\PurchaseOverSaleController;
@@ -48,6 +49,7 @@ Route::middleware('auth')->group(function(){
     Route::get('maxmin/search',[MaxminController::class,'search'])->name('maxmin.search');
     Route::resource('maxmin',MaxminController::class);
     Route::patch('maxmin/{id}/toggle',[MaxminController::class,'toggle'])->name('maxmin.toggle');
+    Route::get('expensesresults',[ExpensesResultsController::class,'index'])->name('expensesresults.index');
 });
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
