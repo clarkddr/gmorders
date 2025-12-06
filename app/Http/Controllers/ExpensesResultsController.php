@@ -26,7 +26,7 @@ class ExpensesResultsController extends Controller
 
 
         if ($request->all() == []) {
-            return view('expensesresults.index', $data);
+            return view('expensesResults.index', $data);
         }
 
         $request->validate([
@@ -42,6 +42,6 @@ class ExpensesResultsController extends Controller
         $data['year'] = $year;
 
 
-        return view('expensesresults.index',$data);
+        return view('expensesResults.index',$data);
     }
 }
