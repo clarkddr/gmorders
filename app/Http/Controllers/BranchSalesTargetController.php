@@ -207,6 +207,8 @@ class BranchSalesTargetController extends Controller
          * 3: Total de venta mensual parcial
          * 4: Total de venta de un dia antes
          * 5: Parciales de venta del dia actual
+         * 6: Venta de la semana pasada vs semana pasada del año anterior
+         * 7: Venta de la semana actual vs semana parcial año anterior
          * */
 
         // Obtenemos el total proyectado
@@ -220,7 +222,9 @@ class BranchSalesTargetController extends Controller
 
         // Obtenemos la venta total del año anterior para compararla con la proyeccion y obtener la meta
         $totalSaleWholeLastYear = $queryResults[1][0]->VentaAnoAnteriorCompleto;
-        $goal = $totalSaleWholeLastYear > 0 ? $projectionAmount / $totalSaleWholeLastYear : 1;
+        //$goal = $totalSaleWholeLastYear > 0 ? $projectionAmount / $totalSaleWholeLastYear : 1;
+        // Se puso en uno porque no se están utilizando las proyecciones en el 2026
+        $goal = 1;
 
         // Se calcula la venta parcial del mes actual y del año anterior
         $totalMonthSale = $queryResults[3][0];
@@ -250,6 +254,20 @@ class BranchSalesTargetController extends Controller
         // Se obtienen las ventas por dia del año en curso y del anterior hasta el momento. OJO El año anterior se le agrega un dia para poder comparar lunes-lunes
         $currentSaleResults = collect($queryResults[0]);
 
+
+        // Se obtiene la venta de la semana actual y la semana parcial del año pasado
+        $totalLastWeekSale = $queryResults[6][0];
+        $lastWeekSaleThisYear = $totalLastWeekSale->VentaLastSemanaActual * $goal;
+        $lastWeekSaleLastYear = $totalLastWeekSale->VentaLastSemanaAnoPasado;
+        $saleLastWeekRelation = $lastWeekSaleLastYear > 0 ? $lastWeekSaleThisYear / $lastWeekSaleLastYear * 100 : 0;
+
+        // Se obtiene la venta de la semana actual y la semana parcial del año pasado
+        $totalThisWeekSale = $queryResults[7][0];
+        $thisWeekSaleThisYear = $totalThisWeekSale->VentaSemanaActual * $goal;
+        $thisWeekSaleLastYear = $totalThisWeekSale->VentaSemanaAnoPasado;
+        $saleThisWeekRelation = $thisWeekSaleLastYear > 0 ? $thisWeekSaleThisYear / $thisWeekSaleLastYear * 100 : 0;
+
+
         $results = $daysOfMonth->map(function ($date) use ($currentSaleResults, $goal) {
             $dayLastYear = Carbon::parse($date)->subYear()->addDay();
             $day = Carbon::parse($date)->day;
@@ -275,6 +293,8 @@ class BranchSalesTargetController extends Controller
             'monthRelation' => $saleMonthRelation,
             'yesterdayRelation' => $saleYesterdayRelation,
             'todayRelation' => $todayRelation,
+            'lastWeekRelation' => $saleLastWeekRelation,
+            'thisWeekRelation' => $saleThisWeekRelation,
             'branchid' => $branchid,
             'name' => $branchName,
             'today' => $todayFormatted,

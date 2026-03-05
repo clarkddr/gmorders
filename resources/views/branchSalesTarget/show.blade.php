@@ -45,6 +45,20 @@
                     </span>
                 </div>
             </div>
+            <div class="flex flex-wrap items-start gap-4">
+                <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
+                    <span class="text-gray-500 dark:text-gray-400 text-left">% Semana Anterior </span>
+                    <span id="todayAccumulated" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
+                        <x-percentageButton below="red" above="green" :min="99" :max="100" :value="number_format($lastWeekRelation,0,'.','')" size="xl"/>
+                    </span>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg dark:bg-gray-800 w-full md:w-[calc(25%-1rem)]">
+                    <span class="text-gray-500 dark:text-gray-400 text-left">% Esta Semana</span>
+                    <span id="relationSpanContainer" class="text-lg font-semibold text-gray-900 dark:text-white text-right">
+                        <x-percentageButton below="red" above="green" :min="99" :max="100" :value="number_format($thisWeekRelation,0,',','')" size="xl"/>
+                    </span>
+                </div>
+            </div>
             <!-- Gráfico de Barras -->
             <div class="rounded-lg shadow-xs mt-8">
                 <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs dark:bg-gray-800">
