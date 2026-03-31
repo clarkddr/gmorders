@@ -15,4 +15,8 @@ class BranchSalesTarget extends Model
     public function branch(): BelongsTo{
         return $this->belongsTo(Branch::class,'branch_id','BranchId');
     }
+
+    public function activeBranch(): BelongsTo {
+        return $this->branch()->where('IsActive',1);
+    }
 }

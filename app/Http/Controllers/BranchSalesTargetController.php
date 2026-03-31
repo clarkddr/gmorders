@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class BranchSalesTargetController extends Controller
 {
     public function index(Request $request){
-        $branchTargets = BranchSalesTarget::with('branch')->get();
+        $branchTargets = BranchSalesTarget::with('activeBranch')->get();
         $data = [
             'branchTargets' => $branchTargets
         ];

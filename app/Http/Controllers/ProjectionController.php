@@ -33,7 +33,7 @@ class ProjectionController extends Controller
     {
         $projection = Projection::find($request->projectionid);
         $family = Family::find($request->familyid);
-        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+        $branches = Branch::where('IsActive',1)->get();
         $data = [
             'projection' => $projection,
             'family' => $family,

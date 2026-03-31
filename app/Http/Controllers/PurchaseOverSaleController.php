@@ -150,7 +150,7 @@ class PurchaseOverSaleController extends Controller
         ];
 
         if($request->all() != []){
-            $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+            $branches = Branch::where('IsActive',1)->get();
 
 
             $inputDates = $request->input('dates');
