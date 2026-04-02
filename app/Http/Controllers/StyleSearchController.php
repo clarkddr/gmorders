@@ -14,7 +14,8 @@ class StyleSearchController extends Controller
 
         return Inertia::render('StyleSearch/Search',[
             'styles' => $styles,
-            'filters' => ['query' => $query]
+            'filters' => ['query' => $query],
+            'slug' => $request->query('slug')
         ]);
 
     }

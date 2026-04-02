@@ -22,6 +22,7 @@
                             <th class="px-4 py-3">Sucursal</th>
                             <th class="px-4 py-3">Abrir</th>
                             <th class="px-4 py-3">Copiar</th>
+                            <th class="px-4 py-3">Link Inventario</th>
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -42,6 +43,14 @@
                                             data-link="{{ route('branchTarget.show', $branchTarget->slug) }}"
                                             onclick="copyLink(this)">
                                         Copiar link
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+                                            id="copyButton-{{ $branchTarget->id }}"
+                                            data-link="{{ route('styleSearchInventory.search', $branchTarget->slug) }}"
+                                            onclick="copyLink(this)">
+                                        Copiar Link
                                     </button>
                                 </td>
                             </tr>

@@ -8,6 +8,7 @@ use App\Http\Controllers\PurchaseOverSaleController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SaleandPurchaseController;
 use App\Http\Controllers\StyleSearchController;
+use App\Http\Controllers\StyleSearchInventoryController;
 use App\Http\Controllers\StylesResultsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ImageController;
@@ -54,6 +55,7 @@ Route::middleware('auth')->group(function(){
 
 Route::get('branch/{uid}',[BranchSalesTargetController::class,'show'])->name('branchTarget.show');
 Route::get('styles/search',[StyleSearchController::class,'index'])->name('styleSearch.search');
+Route::get('styles/search/{uid}',[StyleSearchInventoryController::class,'index'])->name('styleSearchInventory.search');
 
 
 

@@ -14,7 +14,7 @@ class BranchSalesTargetSeeder extends Seeder
      */
     public function run(): void
     {
-        $branches = [1, 2, 3, 6, 7, 8, 9, 11, 12, 13, 15, 22, 23, 24];
+        $branches = [2, 3, 6, 8, 9, 11, 13, 15, 22, 24];
 
         foreach ($branches as $branch) {
             DB::table('branch_sales_targets')->insert([
