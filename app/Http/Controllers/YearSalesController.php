@@ -16,7 +16,7 @@ class YearSalesController extends Controller
 {
     public function index(Request $request){
         $categories = Category::whereIn('CategoryId',[1,2,4,12])->get();
-        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
+        $branches = Branch::isActive()->get();
         $familiesWithCategories = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
         // Obtener fechas para el dropdown de fechas
         $dates = DateHelper::getDefaultDateRanges();

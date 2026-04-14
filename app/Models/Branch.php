@@ -22,4 +22,9 @@ class Branch extends Model
     {
         return $this->hasMany(Projection::class,'BranchId');
     }
+
+    public function scopeIsActive($query)
+    {
+        return $query->where('isActive', 1);
+    }
 }

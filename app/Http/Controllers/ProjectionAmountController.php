@@ -100,7 +100,7 @@ class ProjectionAmountController extends Controller
                 $projectionamounts = $selectedProjection->projectionamounts()->get();
                 $families = Family::all();
                 $categories = Category::with('families')->whereIn('CategoryId',[1,2,4,12])->get();
-                $branches = Branch::whereNotIn('BranchId', [4,5,10,14])->get();
+                $branches = Branch::isActive()->get();
                 $tc = 20;
                 // Recolectamos los porcentajes de cada familia
                 $familiesPercentage = ProjectionMonth::select('FamilyId')->selectRaw('SUM(percentage) as percentage')
@@ -704,8 +704,15 @@ class ProjectionAmountController extends Controller
         $familyName = $family->Name;
         $percentage = ProjectionMonth::where('FamilyId',$family->FamilyId)->where('projection_id',2)->where('is_active',1)->sum('percentage') / 100;
         $tc = 20;
-        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
-        $projectionAmounts = ProjectionAmount::with('families')->where('projection_id',$request->projection)->where('FamilyId',$familyid)->get();
+        $branches = Branch::isActive()->get();
+        $activeBranchIds = $branches->pluck('BranchId')->toArray();
+
+
+        $projectionAmounts = ProjectionAmount::with('families')
+            ->where('projection_id',$request->projection)
+            ->where('FamilyId',$familyid)
+            ->whereIn('BranchId',$activeBranchIds)->get();
+
         $projection = Projection::find($request->projection);
         $lastYearStart = Carbon::parse($projection->start)->subYear();
         $lastYearEnd = Carbon::parse($projection->end)->subYear();
@@ -758,6 +765,8 @@ class ProjectionAmountController extends Controller
         $queryResults = DB::connection('mssql')->selectResultSets($query);
         $saleResults = collect($queryResults[0]);
         $purchaseResults = collect($queryResults[1]);
+
+
 
 
 
