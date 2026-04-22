@@ -22,7 +22,7 @@ class MaxminController extends Controller
         ]);
 
         // Sucursales que NO se muestran
-        $excluded = [4, 5, 10,14]; // ajusta la lista según necesites
+        $excluded = [1,4, 5,7, 10,12,14,23]; // ajusta la lista según necesites
 
         // Para el selector (todas menos excluidas)
         $branches = Branch::whereNotIn('BranchId', $excluded)->get();
