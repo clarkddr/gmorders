@@ -94,8 +94,8 @@ class MaxminController extends Controller
 
         $color = Color::find($request->colorid) ?? 'Sin Color';
 
-        $branches = Branch::whereNotIn('BranchId',[4,5,10,14])->get();
-
+//        $branches = Branch::whereNotIn('BranchId',[1,4,5,10,14])->get();
+          $branches = Branch::isActive()->get();
         $data = [
             'branches' => $branches,
             'colorName' => $color->ColorName
@@ -217,8 +217,8 @@ class MaxminController extends Controller
     }
 
     public function destroy(Maxmin $maxmin){
-        return 'Borrar';
-        //$maxmin->forceDelete();
+//        return 'Borrar';
+        $maxmin->forceDelete();
         return redirect()->route('maxmin.index')->with('banner',['type' => 'success','message' => 'El Máximo/Mínimo se ha eliminado correctamente.']);
     }
 

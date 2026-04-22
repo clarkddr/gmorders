@@ -241,7 +241,7 @@
         switch(type){
             case 'delete':
                 description = 'Estas seguro de eliminar el estilo?';
-                action = '/maxmin/'+id+'/delete';
+                action = '/maxmin/'+ id;
                 method = 'DELETE';
                 buttonClass = 'bg-red-600 hover:bg-red-700 focus:shadow-outline-red';
                 buttonText = 'Eliminar';
